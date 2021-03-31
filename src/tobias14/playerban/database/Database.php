@@ -15,15 +15,16 @@ use tobias14\playerban\PlayerBan;
 class Database {
 
     /**
-     * TODO: Specify tables creation correctly
+     * TODO: Create log functionality
      *
      * @return void
      */
     public static function init() {
         $database = self::connect();
-        $database->query("CREATE TABLE IF NOT EXISTS users()");
-        $database->query("CREATE TABLE IF NOT EXISTS pending()");
-        $database->query("CREATE TABLE IF NOT EXISTS logs()");
+        $database->query("CREATE TABLE IF NOT EXISTS bans(id INT AUTO_INCREMENT, target VARCHAR(255) NOT NULL, duration INT NOT NULL, timestamp INT NOT NULL, PRIMARY KEY(id));");
+        $database->query("CREATE TABLE IF NOT EXISTS pending(id INT AUTO_INCREMENT, target VARCHAR(255) NOT NULL, duration INT NOT NULL, timestamp INT NOT NULL, moderator VARCHAR(255) NOT NULL, reason TEXT NOT NULL, PRIMARY KEY(id));");
+        //$database->query("CREATE TABLE IF NOT EXISTS logs();");
+        $database->close();
     }
 
     /**
@@ -54,8 +55,9 @@ class Database {
         $state = true;
         if(is_null($connection)) {
             $state = false;
+        } else {
+            $connection->close();
         }
-        $connection->close();
         return $state;
     }
 
