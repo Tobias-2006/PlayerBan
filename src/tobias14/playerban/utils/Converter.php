@@ -41,7 +41,8 @@ class Converter {
         $minutes = $minutes > 0 ? $minutes . "m" : "";
 
         $data = [$days, $hours, $minutes];
-        for ($i = 0; $i <= count($data); $i++) {
+        $count = count($data);
+        for ($i = 0; $i < $count; $i++) {
             if($data[$i] === "") {
                 unset($data[$i]);
             }
