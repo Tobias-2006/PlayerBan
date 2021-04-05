@@ -67,7 +67,7 @@ class PunishmentForm {
                 $player->sendMessage(C::RED . PlayerBan::getInstance()->getLang()->translateString("command.param.tooLong", ["id", "3"]));
                 return;
             }
-            if(!preg_match("/(^[1-9][0-9]{0,2}(m|h|d))(,[1-9][0-9]{0,2}(m|h|d)){0,2}$/", $duration)) {
+            if(!preg_match("/(^[1-9][0-9]{0,2}[mhd])(,[1-9][0-9]{0,2}[mhd]){0,2}$/", $duration)) {
                 $player->sendMessage(C::RED . PlayerBan::getInstance()->getLang()->translateString("command.param.incorrectFormat", ["duration", "1d,12h Example2: 2d,5h,30m Example3: 30m"]));
                 return;
             }
@@ -109,7 +109,7 @@ class PunishmentForm {
                 $player->sendMessage(PlayerBan::getInstance()->getLang()->translateString("command.punishments.delete.success", [$pun->id]));
                 return;
             }
-            if(!preg_match("/(^[1-9][0-9]{0,2}(m|h|d))(,[1-9][0-9]{0,2}(m|h|d)){0,2}$/", $duration)) {
+            if(!preg_match("/(^[1-9][0-9]{0,2}[mhd])(,[1-9][0-9]{0,2}[mhd]){0,2}$/", $duration)) {
                 $player->sendMessage(C::RED . PlayerBan::getInstance()->getLang()->translateString("command.param.incorrectFormat", ["duration", "1d,12h Example2: 2d,5h,30m Example3: 30m"]));
                 return;
             }

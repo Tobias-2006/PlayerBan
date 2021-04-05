@@ -9,7 +9,7 @@ class Converter {
 
     public static function str_to_seconds(string $string) : ?int {
         // FORMAT: 12d,3h,20m
-        if(!preg_match("/(^[1-9][0-9]{0,2}(m|h|d))(,[1-9][0-9]{0,2}(m|h|d)){0,2}$/", $string)) {
+        if(!preg_match("/(^[1-9][0-9]{0,2}[mhd])(,[1-9][0-9]{0,2}[mhd]){0,2}$/", $string)) {
             return null;
         }
         $time = 0;
