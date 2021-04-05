@@ -23,6 +23,7 @@ class Database {
         $database = self::connect();
         $database->query("CREATE TABLE IF NOT EXISTS bans(id INT AUTO_INCREMENT, target VARCHAR(255) NOT NULL, duration INT NOT NULL, timestamp INT NOT NULL, PRIMARY KEY(id));");
         $database->query("CREATE TABLE IF NOT EXISTS pending(id INT AUTO_INCREMENT, target VARCHAR(255) NOT NULL, duration INT NOT NULL, timestamp INT NOT NULL, moderator VARCHAR(255) NOT NULL, reason TEXT NOT NULL, PRIMARY KEY(id));");
+        $database->query("CREATE TABLE IF NOT EXISTS punishments(id INT NOT NULL, duration INT NOT NULL, description VARCHAR(255) NOT NULL, PRIMARY KEY(id));");
         //$database->query("CREATE TABLE IF NOT EXISTS logs();");
         $database->close();
     }
@@ -37,7 +38,7 @@ class Database {
                     $config->get("host", "127.0.0.1"),
                     $config->get("username", "root"),
                     $config->get("passwd", "password"),
-                    $config->get("dbname", "PlayerBan"),
+                    $config->get("dbname", "playerban"),
                     $config->get("port", 3306));
         } catch (Exception $e) {
             $connection = null;
