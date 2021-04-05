@@ -11,12 +11,30 @@ class PlayerBan extends PluginBase {
     private static $instance;
     private $baseLang;
 
-    public static function getInstance() : self {
-        return self::$instance;
-    }
-
     public function getLang() : BaseLang {
         return $this->baseLang;
+    }
+
+    public function punishmentExists(int $id) : bool {
+        $database = Database::connect();
+        $res = $database->query("SELECT * FROM punishments WHERE id='{$id}'")->num_rows === 1;
+        $database->close();
+        return $res;
+    }
+
+    public function getAllPunishments() : array {
+        $database = Database::connect();
+        $result = $database->query("SELECT * FROM punishments LIMIT 25");
+        $data = [];
+        while ($row = $result->fetch_assoc()) {
+            $data[] = $row;
+        }
+        $database->close();
+        return $data;
+    }
+
+    public static function getInstance() : self {
+        return self::$instance;
     }
 
     public function onLoad() {
