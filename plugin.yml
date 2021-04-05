@@ -3,3 +3,6 @@ api: 3.0.0
 version: 1.0.0
 main: tobias14\playerban\PlayerBan
 author: tobias14
+
+depend:
+  - FormAPI
