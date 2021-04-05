@@ -7,15 +7,34 @@ use pocketmine\plugin\PluginBase;
 use tobias14\playerban\commands\PunishmentsCommand;
 use tobias14\playerban\database\Database;
 
+/**
+ * This class represents the PlayerBan plugin
+ *
+ * Class PlayerBan
+ * @package tobias14\playerban
+ */
 class PlayerBan extends PluginBase {
 
+    /** @var self $instance */
     private static $instance;
+    /** @var BaseLang $baseLang */
     private $baseLang;
 
+    /**
+     * Message management
+     *
+     * @return BaseLang
+     */
     public function getLang() : BaseLang {
         return $this->baseLang;
     }
 
+    /**
+     * Checks if a punishment with id xy exists
+     *
+     * @param int $id
+     * @return bool
+     */
     public function punishmentExists(int $id) : bool {
         $database = Database::connect();
         $res = $database->query("SELECT * FROM punishments WHERE id='{$id}'")->num_rows === 1;
@@ -23,6 +42,11 @@ class PlayerBan extends PluginBase {
         return $res;
     }
 
+    /**
+     * Returns a list of all punishments (max. 25)
+     *
+     * @return array
+     */
     public function getAllPunishments() : array {
         $database = Database::connect();
         $result = $database->query("SELECT * FROM punishments LIMIT 25");
@@ -34,6 +58,11 @@ class PlayerBan extends PluginBase {
         return $data;
     }
 
+    /**
+     * Class instance
+     *
+     * @return self
+     */
     public static function getInstance() : self {
         return self::$instance;
     }
