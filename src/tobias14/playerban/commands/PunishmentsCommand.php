@@ -19,6 +19,10 @@ class PunishmentsCommand extends PluginCommand {
     }
 
     public function execute(CommandSender $sender, string $commandLabel, array $args) : bool{
+        if($this->getPlugin()->isDisabled()) {
+            $sender->sendMessage(C::RED . PlayerBan::getInstance()->getLang()->translateString("command.plugin.disabled"));
+            return true;
+        }
         if(!$sender->hasPermission($this->getPermission()) or !$sender instanceof Player) {
             $sender->sendMessage(C::RED . PlayerBan::getInstance()->getLang()->translateString("command.permission.denied"));
             return true;
