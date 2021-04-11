@@ -19,6 +19,8 @@ class PlayerBan extends PluginBase {
     private static $instance;
     /** @var BaseLang $baseLang */
     private $baseLang;
+    /** @var Database $database */
+    private $database;
 
     /**
      * Message management
@@ -30,32 +32,42 @@ class PlayerBan extends PluginBase {
     }
 
     /**
+     * @return Database
+     */
+    public function getDatabase() : Database {
+        return $this->database;
+    }
+
+    /**
+     * @return array
+     */
+    public function getDatabaseSettings() : array {
+        return [
+            'Host' => $this->getConfig()->get("host", "127.0.0.1"),
+            'Username' => $this->getConfig()->get("username", "root"),
+            'Password' => $this->getConfig()->get("passwd", "password"),
+            'Database' => $this->getConfig()->get("dbname", "playerban"),
+            'Port' => $this->getConfig()->get("port", 3306)
+        ];
+    }
+
+    /**
      * Checks if a punishment with id xy exists
      *
      * @param int $id
-     * @return bool
+     * @return null|bool
      */
-    public function punishmentExists(int $id) : bool {
-        $database = Database::connect();
-        $res = $database->query("SELECT * FROM punishments WHERE id='{$id}'")->num_rows === 1;
-        $database->close();
-        return $res;
+    public function punishmentExists(int $id) : ?bool {
+        return $this->getDatabase()->punishmentExists($id);
     }
 
     /**
      * Returns a list of all punishments (max. 25)
      *
-     * @return array
+     * @return null|array
      */
-    public function getAllPunishments() : array {
-        $database = Database::connect();
-        $result = $database->query("SELECT * FROM punishments LIMIT 25");
-        $data = [];
-        while ($row = $result->fetch_assoc()) {
-            $data[] = $row;
-        }
-        $database->close();
-        return $data;
+    public function getAllPunishments() : ?array {
+        return $this->getDatabase()->getAllPunishments();
     }
 
     /**
@@ -69,22 +81,13 @@ class PlayerBan extends PluginBase {
 
     public function onLoad() {
         self::$instance = $this;
-
         $this->saveDefaultConfig();
-
         $this->saveResource("eng.ini");
         $this->baseLang = new BaseLang("eng", $this->getDataFolder());
-
-        if(false === Database::checkConnection()) {
-            $this->getLogger()->error($this->getLang()->translateString("db.connection.failed"));
-            $this->getServer()->getPluginManager()->disablePlugin($this);
-            return;
-        }
-
-        Database::init();
     }
 
     public function onEnable() {
+        $this->database = new Database($this, $this->getDatabaseSettings());
         $command_map = $this->getServer()->getCommandMap();
         $commands = ["ban", "unban", "pardon", "ban-ip", "unban-ip"];
         foreach ($commands as $cmd) {

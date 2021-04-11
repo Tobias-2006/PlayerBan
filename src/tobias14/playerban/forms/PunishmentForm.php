@@ -26,6 +26,10 @@ class PunishmentForm {
      */
     public static function openMainForm(Player $player) {
         $punishments = PlayerBan::getInstance()->getAllPunishments();
+        if(is_null($punishments)) {
+            $player->sendMessage(C::RED . PlayerBan::getInstance()->getLang()->translateString("db.connection.failed"));
+            return;
+        }
         $form = new SimpleForm(function (Player $player, $data) use($punishments) {
             if(is_null($data)) return;
             if($data === count($punishments)) {
