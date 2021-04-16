@@ -10,10 +10,10 @@ use tobias14\playerban\tasks\ConnectionTerminationTask as CT;
 /**
  * This class controls the database connection
  *
- * Class Database
+ * Class DataManager
  * @package tobias14\playerban\database
  */
-class Database {
+class DataManager {
 
     /** @var mysqli $connection */
     private $connection;
@@ -23,7 +23,7 @@ class Database {
     private $settings;
 
     /**
-     * Database constructor.
+     * DataManager constructor.
      *
      * @param PlayerBan $plugin
      * @param array $settings
@@ -32,7 +32,7 @@ class Database {
         $this->plugin = $plugin;
         $this->settings = $settings;
         try {
-            $this->connection = new mysqli($settings['Host'], $settings['Username'], $settings['Password'], $settings['Database'], $settings['Port']);
+            $this->connection = new mysqli($settings['Host'], $settings['Username'], $settings['Password'], $settings['DataManager'], $settings['Port']);
         } catch (Exception $e) {
             $this->plugin->getLogger()->critical($this->plugin->getLang()->translateString("db.connection.failed"));
             $this->plugin->getServer()->getPluginManager()->disablePlugin($this->plugin);
@@ -81,7 +81,7 @@ class Database {
         $this->close();
         try {
             $settings = $this->settings;
-            $this->connection = new mysqli($settings['Host'], $settings['Username'], $settings['Password'], $settings['Database'], $settings['Port']);
+            $this->connection = new mysqli($settings['Host'], $settings['Username'], $settings['Password'], $settings['DataManager'], $settings['Port']);
             return true;
         } catch (Exception $e) {
             $this->plugin->getLogger()->critical($this->plugin->getLang()->translateString("db.connection.failed"));

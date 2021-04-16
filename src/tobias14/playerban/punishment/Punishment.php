@@ -2,7 +2,7 @@
 
 namespace tobias14\playerban\punishment;
 
-use tobias14\playerban\database\Database;
+use tobias14\playerban\database\DataManager;
 use tobias14\playerban\PlayerBan;
 
 /**
@@ -40,7 +40,7 @@ class Punishment {
      */
     public function save() : bool {
         if($this->id === -1 or $this->duration === -1 or $this->description === "") return false;
-        return $this->getDB()->savePunishment($this->id, $this->duration, $this->description);
+        return $this->getDataMgr()->savePunishment($this->id, $this->duration, $this->description);
     }
 
     /**
@@ -50,7 +50,7 @@ class Punishment {
      */
     public function delete() : bool {
         if(!PlayerBan::getInstance()->punishmentExists($this->id)) return false;
-        return $this->getDB()->deletePunishment($this->id);
+        return $this->getDataMgr()->deletePunishment($this->id);
     }
 
     /**
@@ -60,14 +60,14 @@ class Punishment {
      */
     public function update() : bool {
         if(!PlayerBan::getInstance()->punishmentExists($this->id)) return false;
-        return $this->getDB()->updatePunishment($this->id, $this->duration, $this->description);
+        return $this->getDataMgr()->updatePunishment($this->id, $this->duration, $this->description);
     }
 
     /**
-     * @return Database
+     * @return DataManager
      */
-    private function getDB() : Database {
-        return PlayerBan::getInstance()->getDatabase();
+    private function getDataMgr() : DataManager {
+        return PlayerBan::getInstance()->getDataManager();
     }
 
 }

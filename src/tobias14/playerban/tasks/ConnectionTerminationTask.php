@@ -42,7 +42,7 @@ class ConnectionTerminationTask extends Task {
     public function onRun(int $currentTick) {
         $this->timer--;
         if($this->timer === 0) {
-            $this->plugin->getDatabase()->close();
+            $this->plugin->getDataManager()->close();
             $this->plugin->getScheduler()->cancelTask($this->getTaskId());
             self::$instance = null;
         }

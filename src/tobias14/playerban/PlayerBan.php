@@ -5,7 +5,7 @@ namespace tobias14\playerban;
 use pocketmine\lang\BaseLang;
 use pocketmine\plugin\PluginBase;
 use tobias14\playerban\commands\PunishmentsCommand;
-use tobias14\playerban\database\Database;
+use tobias14\playerban\database\DataManager;
 
 /**
  * This class represents the PlayerBan plugin
@@ -19,8 +19,8 @@ class PlayerBan extends PluginBase {
     private static $instance;
     /** @var BaseLang $baseLang */
     private $baseLang;
-    /** @var Database $database */
-    private $database;
+    /** @var DataManager $dataMgr */
+    private $dataMgr;
 
     /**
      * Message management
@@ -32,10 +32,10 @@ class PlayerBan extends PluginBase {
     }
 
     /**
-     * @return Database
+     * @return DataManager
      */
-    public function getDatabase() : Database {
-        return $this->database;
+    public function getDataManager() : DataManager {
+        return $this->dataMgr;
     }
 
     /**
@@ -46,7 +46,7 @@ class PlayerBan extends PluginBase {
             'Host' => $this->getConfig()->get("host", "127.0.0.1"),
             'Username' => $this->getConfig()->get("username", "root"),
             'Password' => $this->getConfig()->get("passwd", "password"),
-            'Database' => $this->getConfig()->get("dbname", "playerban"),
+            'DataManager' => $this->getConfig()->get("dbname", "playerban"),
             'Port' => $this->getConfig()->get("port", 3306)
         ];
     }
@@ -58,7 +58,7 @@ class PlayerBan extends PluginBase {
      * @return null|bool
      */
     public function punishmentExists(int $id) : ?bool {
-        return $this->getDatabase()->punishmentExists($id);
+        return $this->getDataManager()->punishmentExists($id);
     }
 
     /**
@@ -67,7 +67,7 @@ class PlayerBan extends PluginBase {
      * @return null|array
      */
     public function getAllPunishments() : ?array {
-        return $this->getDatabase()->getAllPunishments();
+        return $this->getDataManager()->getAllPunishments();
     }
 
     /**
@@ -87,7 +87,7 @@ class PlayerBan extends PluginBase {
     }
 
     public function onEnable() {
-        $this->database = new Database($this, $this->getDatabaseSettings());
+        $this->dataMgr = new DataManager($this, $this->getDatabaseSettings());
         $command_map = $this->getServer()->getCommandMap();
         $commands = ["ban", "unban", "pardon", "ban-ip", "unban-ip"];
         foreach ($commands as $cmd) {
