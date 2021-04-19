@@ -6,13 +6,13 @@ use jojoe77777\FormAPI\CustomForm;
 use jojoe77777\FormAPI\SimpleForm;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat as C;
+use tobias14\playerban\log\Log;
 use tobias14\playerban\PlayerBan;
 use tobias14\playerban\punishment\Punishment;
 use tobias14\playerban\utils\Converter;
 
 /**
  * This class regulates the forms for the management of punishments
- * TODO: Add the creation of log entries in case of changes
  *
  * Class PunishmentForm
  * @package tobias14\playerban\forms
@@ -27,7 +27,7 @@ class PunishmentForm {
     public static function openMainForm(Player $player) {
         $punishments = PlayerBan::getInstance()->getAllPunishments();
         if(is_null($punishments)) {
-            $player->sendMessage(C::RED . PlayerBan::getInstance()->getLang()->translateString("db.connection.failed"));
+            $player->sendMessage(C::RED . PlayerBan::getInstance()->getLang()->translateString("command.error"));
             return;
         }
         $form = new SimpleForm(function (Player $player, $data) use($punishments) {
@@ -84,7 +84,20 @@ class PunishmentForm {
             $pun->id = $id;
             $pun->description = $description;
             $pun->duration = Converter::str_to_seconds($duration);
-            $pun->save();
+            if(is_null($pun->save())) {
+                $player->sendMessage(C::RED . PlayerBan::getInstance()->getLang()->translateString("command.error"));
+                return;
+            }
+
+            $log = new Log();
+            $log->type = Log::TYPE_CREATION;
+            $log->message = PlayerBan::getInstance()->getLang()->translateString("logger.punishment.creation", [$id, $player->getName()]);
+            $log->moderator = $player->getName();
+            $log->timestamp = time();
+            if(is_null($log->save())) {
+                $player->sendMessage(C::RED . PlayerBan::getInstance()->getLang()->translateString("command.error"));
+                return;
+            }
 
             $player->sendMessage(PlayerBan::getInstance()->getLang()->translateString("command.punishments.new.success", [$id]));
         });
@@ -109,7 +122,19 @@ class PunishmentForm {
             $duration = &$data[2];
 
             if($data[3]) {
-                $pun->delete();
+                if(is_null($pun->delete())) {
+                    $player->sendMessage(C::RED . PlayerBan::getInstance()->getLang()->translateString("command.error"));
+                    return;
+                }
+                $log = new Log();
+                $log->type = Log::TYPE_DELETION;
+                $log->message = PlayerBan::getInstance()->getLang()->translateString("logger.punishment.deletion", [$pun->id, $player->getName()]);
+                $log->moderator = $player->getName();
+                $log->timestamp = time();
+                if(is_null($log->save())) {
+                    $player->sendMessage(C::RED . PlayerBan::getInstance()->getLang()->translateString("command.error"));
+                    return;
+                }
                 $player->sendMessage(PlayerBan::getInstance()->getLang()->translateString("command.punishments.delete.success", [$pun->id]));
                 return;
             }
@@ -124,7 +149,20 @@ class PunishmentForm {
 
             $pun->description = $description;
             $pun->duration = Converter::str_to_seconds($duration);
-            $pun->update();
+            if(is_null($pun->update())) {
+                $player->sendMessage(C::RED . PlayerBan::getInstance()->getLang()->translateString("command.error"));
+                return;
+            }
+
+            $log = new Log();
+            $log->type = Log::TYPE_ADAPTATION;
+            $log->message = PlayerBan::getInstance()->getLang()->translateString("logger.punishment.adaptation", [$pun->id, $player->getName()]);
+            $log->moderator = $player->getName();
+            $log->timestamp = time();
+            if(is_null($log->save())) {
+                $player->sendMessage(C::RED . PlayerBan::getInstance()->getLang()->translateString("command.error"));
+                return;
+            }
 
             $player->sendMessage(PlayerBan::getInstance()->getLang()->translateString("command.punishments.edit.success", [$pun->id]));
         });

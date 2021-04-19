@@ -36,9 +36,9 @@ class Punishment {
     /**
      * Saves a new punishment to the database
      *
-     * @return bool
+     * @return null|bool
      */
-    public function save() : bool {
+    public function save() : ?bool {
         if($this->id === -1 or $this->duration === -1 or $this->description === "") return false;
         return $this->getDataMgr()->savePunishment($this->id, $this->duration, $this->description);
     }
@@ -46,9 +46,9 @@ class Punishment {
     /**
      * Deletes the punishment from the database if it exists
      *
-     * @return bool
+     * @return null|bool
      */
-    public function delete() : bool {
+    public function delete() : ?bool {
         if(!PlayerBan::getInstance()->punishmentExists($this->id)) return false;
         return $this->getDataMgr()->deletePunishment($this->id);
     }
@@ -56,9 +56,9 @@ class Punishment {
     /**
      * Saves changes to the database
      *
-     * @return bool
+     * @return null|bool
      */
-    public function update() : bool {
+    public function update() : ?bool {
         if(!PlayerBan::getInstance()->punishmentExists($this->id)) return false;
         return $this->getDataMgr()->updatePunishment($this->id, $this->duration, $this->description);
     }
