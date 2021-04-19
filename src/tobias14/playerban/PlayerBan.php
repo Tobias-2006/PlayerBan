@@ -4,6 +4,7 @@ namespace tobias14\playerban;
 
 use pocketmine\lang\BaseLang;
 use pocketmine\plugin\PluginBase;
+use tobias14\playerban\commands\PunishmentListCommand;
 use tobias14\playerban\commands\PunishmentsCommand;
 use tobias14\playerban\database\DataManager;
 
@@ -96,7 +97,8 @@ class PlayerBan extends PluginBase {
             }
         }
         $command_map->registerAll("PlayerBan", [
-           new PunishmentsCommand($this)
+            new PunishmentsCommand($this),
+            new PunishmentListCommand($this)
         ]);
     }
 
