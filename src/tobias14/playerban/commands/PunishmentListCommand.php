@@ -36,8 +36,10 @@ class PunishmentListCommand extends PluginCommand {
             $sender->sendMessage(C::RED . $this->getPlugin()->getLang()->translateString("command.error"));
             return true;
         }
+        $sender->sendMessage($this->getPlugin()->getLang()->translateString("command.punlist.title"));
         foreach ($data as $row) {
-            $sender->sendMessage($row['id'] . " » " . $row['description'] . " (" . Converter::seconds_to_str($row['duration']) . ")");
+            $msg = $this->getPlugin()->getLang()->translateString("command.punlist.output", [$row['id'], $row['description'], Converter::seconds_to_str($row['duration'])]);
+            $sender->sendMessage($msg);
         }
         return true;
     }
