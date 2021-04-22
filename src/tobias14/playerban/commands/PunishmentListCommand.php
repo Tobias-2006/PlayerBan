@@ -19,7 +19,7 @@ class PunishmentListCommand extends PluginCommand {
         parent::__construct("punishmentlist", $owner);
         $this->setAliases(["punlist"]);
         $this->setPermission("playerban.command.punishmentlist");
-        $this->setDescription("Create or edit punishments");
+        $this->setDescription("Outputs a list of all punishments");
     }
 
     public function execute(CommandSender $sender, string $commandLabel, array $args) :bool{
