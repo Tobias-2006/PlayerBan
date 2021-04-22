@@ -49,7 +49,7 @@ class DataManager {
         $this->db->query("CREATE TABLE IF NOT EXISTS bans(id INT AUTO_INCREMENT, target VARCHAR(255) NOT NULL, duration INT NOT NULL, timestamp INT NOT NULL, PRIMARY KEY(id));");
         $this->db->query("CREATE TABLE IF NOT EXISTS pending(id INT AUTO_INCREMENT, target VARCHAR(255) NOT NULL, duration INT NOT NULL, timestamp INT NOT NULL, moderator VARCHAR(255) NOT NULL, reason TEXT NOT NULL, PRIMARY KEY(id));");
         $this->db->query("CREATE TABLE IF NOT EXISTS punishments(id INT NOT NULL, duration INT NOT NULL, description VARCHAR(255) NOT NULL, PRIMARY KEY(id));");
-        $this->db->query("CREATE TABLE IF NOT EXISTS logs(type INT NOT NULL, message TEXT NOT NULL, moderator VARCHAR(255) NOT NULL, timestamp INT NOT NULL);");
+        $this->db->query("CREATE TABLE IF NOT EXISTS logs(type INT NOT NULL, description TEXT NOT NULL, moderator VARCHAR(255) NOT NULL, target VARCHAR(255), creation_time INT NOT NULL);");
     }
 
     /**
@@ -87,15 +87,16 @@ class DataManager {
 
     /**
      * @param int $type
-     * @param string $message
+     * @param string $description
      * @param string $moderator
-     * @param int $timestamp
+     * @param int $creation_time
+     * @param null|string $target
      * @return bool|null
      */
-    public function saveLog(int $type, string $message, string $moderator, int $timestamp) : ?bool {
+    public function saveLog(int $type, string $description, string $moderator, int $creation_time, string $target = null) : ?bool {
         if(!$this->checkConnection()) return null;
-        $stmt = $this->db->prepare("INSERT INTO logs(type, message, moderator, timestamp) VALUES(?, ?, ?, ?);");
-        $stmt->bind_param("issi", $type, $message, $moderator, $timestamp);
+        $stmt = $this->db->prepare("INSERT INTO logs(type, description, moderator, target, creation_time) VALUES(?, ?, ?, ?, ?);");
+        $stmt->bind_param("isssi", $type, $description, $moderator, $target, $creation_time);
         $result = $stmt->execute();
         $stmt->close();
         return $result;

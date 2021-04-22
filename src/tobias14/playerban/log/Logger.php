@@ -12,6 +12,10 @@ use tobias14\playerban\PlayerBan;
  */
 class Logger {
 
+    public const LOG_TYPE_CREATION = 0;
+    public const LOG_TYPE_DELETION = 1;
+    public const LOG_TYPE_ADAPTATION = 2;
+
     /**
      * Creates a new log and saves it into the database
      *
@@ -20,10 +24,11 @@ class Logger {
      */
     public static function log(Log $log) : ?bool {
         return PlayerBan::getInstance()->getDataManager()->saveLog(
-            $log->type,
-            $log->message,
+            $log->getType(),
+            $log->description,
             $log->moderator,
-            $log->timestamp
+            $log->getCreationTime(),
+            $log->target
         );
     }
 

@@ -8,55 +8,38 @@ namespace tobias14\playerban\log;
  * Class Log
  * @package tobias14\playerban\log
  */
-class Log {
-
-    public const TYPE_CREATION = 0;
-    public const TYPE_DELETION = 1;
-    public const TYPE_ADAPTATION = 2;
+abstract class Log {
 
     /** @var int $type */
-    public $type;
-    /** @var string $message */
-    public $message;
+    protected $type;
+    /** @var int $creation_time */
+    protected $creation_time;
+
+    /** @var string $description */
+    public $description;
     /** @var string $moderator */
     public $moderator;
-    /** @var int $timestamp */
-    public $timestamp;
+    /** @var string $target */
+    public $target;
 
     /**
-     * Log constructor.
-     *
-     * @param int $type
-     * @param string $message
-     * @param string $moderator
-     * @param int $timestamp
+     * @return int
      */
-    public function __construct(int $type = -1, string $message = "", string $moderator = "", int $timestamp = -1) {
-        $this->type = $type;
-        $this->message = $message;
-        $this->moderator = $moderator;
-        $this->timestamp = $timestamp;
+    public function getType() : int {
+        return $this->type;
     }
 
     /**
-     * @return bool
+     * @return int
      */
-    public function isValidType() : bool {
-        switch ($this->type) {
-            case self::TYPE_CREATION:
-            case self::TYPE_DELETION:
-            case self::TYPE_ADAPTATION:
-                return true;
-            default:
-                return false;
-        }
+    public function getCreationTime() : int {
+        return $this->creation_time;
     }
 
     /**
      * @return null|bool
      */
     public function save() : ?bool {
-        if(!$this->isValidType()) return false;
         return Logger::log($this);
     }
 

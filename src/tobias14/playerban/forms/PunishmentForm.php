@@ -6,7 +6,9 @@ use jojoe77777\FormAPI\CustomForm;
 use jojoe77777\FormAPI\SimpleForm;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat as C;
-use tobias14\playerban\log\Log;
+use tobias14\playerban\log\AdaptationLog;
+use tobias14\playerban\log\CreationLog;
+use tobias14\playerban\log\DeletionLog;
 use tobias14\playerban\PlayerBan;
 use tobias14\playerban\punishment\Punishment;
 use tobias14\playerban\utils\Converter;
@@ -89,11 +91,10 @@ class PunishmentForm {
                 return;
             }
 
-            $log = new Log();
-            $log->type = Log::TYPE_CREATION;
-            $log->message = PlayerBan::getInstance()->getLang()->translateString("logger.punishment.creation", [$id, $player->getName()]);
+            $log = new CreationLog();
+            $log->description = PlayerBan::getInstance()->getLang()->translateString("logger.punishment.creation");
             $log->moderator = $player->getName();
-            $log->timestamp = time();
+            $log->target = "PunId[" . $pun->id . "]";
             if(is_null($log->save())) {
                 $player->sendMessage(C::RED . PlayerBan::getInstance()->getLang()->translateString("command.error"));
                 return;
@@ -126,11 +127,10 @@ class PunishmentForm {
                     $player->sendMessage(C::RED . PlayerBan::getInstance()->getLang()->translateString("command.error"));
                     return;
                 }
-                $log = new Log();
-                $log->type = Log::TYPE_DELETION;
-                $log->message = PlayerBan::getInstance()->getLang()->translateString("logger.punishment.deletion", [$pun->id, $player->getName()]);
+                $log = new DeletionLog();
+                $log->description = PlayerBan::getInstance()->getLang()->translateString("logger.punishment.deletion");
                 $log->moderator = $player->getName();
-                $log->timestamp = time();
+                $log->target = "PunId[" . $pun->id . "]";
                 if(is_null($log->save())) {
                     $player->sendMessage(C::RED . PlayerBan::getInstance()->getLang()->translateString("command.error"));
                     return;
@@ -154,11 +154,10 @@ class PunishmentForm {
                 return;
             }
 
-            $log = new Log();
-            $log->type = Log::TYPE_ADAPTATION;
-            $log->message = PlayerBan::getInstance()->getLang()->translateString("logger.punishment.adaptation", [$pun->id, $player->getName()]);
+            $log = new AdaptationLog();
+            $log->description = PlayerBan::getInstance()->getLang()->translateString("logger.punishment.adaptation");
             $log->moderator = $player->getName();
-            $log->timestamp = time();
+            $log->target = "PunId[" . $pun->id . "]";
             if(is_null($log->save())) {
                 $player->sendMessage(C::RED . PlayerBan::getInstance()->getLang()->translateString("command.error"));
                 return;
