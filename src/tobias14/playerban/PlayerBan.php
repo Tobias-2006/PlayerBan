@@ -91,7 +91,7 @@ class PlayerBan extends PluginBase {
     public function onEnable() {
         $this->dataMgr = new DataManager($this, $this->getDatabaseSettings());
         $command_map = $this->getServer()->getCommandMap();
-        $commands = ["ban", "unban", "pardon", "ban-ip", "unban-ip"];
+        $commands = ["ban", "unban", "pardon", "ban-ip", "unban-ip", "banlist"];
         foreach ($commands as $cmd) {
             if(!is_null($command = $command_map->getCommand($cmd))) {
                 $command_map->unregister($command);
