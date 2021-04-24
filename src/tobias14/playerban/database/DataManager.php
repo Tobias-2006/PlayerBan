@@ -103,6 +103,42 @@ class DataManager {
     }
 
     /**
+     * @param int $site
+     * @param int $limit
+     * @return array|null
+     */
+    public function getLogs(int $site = 0, int $limit = 6): ?array {
+        if(!$this->checkConnection()) return null;
+        $site *= $limit;
+        $stmt = $this->db->prepare("SELECT * FROM logs ORDER BY creation_time DESC LIMIT ?, ?;");
+        $stmt->bind_param("ii",$site, $limit);
+        $stmt->execute();
+        if(false === $result = $stmt->get_result()) return null;
+        $data = [];
+        while ($row = $result->fetch_assoc()) {
+            $data[] = $row;
+        }
+        $stmt->close();
+        return $data;
+    }
+
+    /**
+     * @param int $limit
+     * @return int|null
+     */
+    public function getMaxLogPage(int $limit = 6) : ?int {
+        if(!$this->checkConnection()) return null;
+        $stmt = $this->db->prepare("SELECT COUNT(*) FROM logs");
+        $stmt->execute();
+        if(false === $result = $stmt->get_result()) return null;
+        $row_count = $result->fetch_row()[0];
+        $sites = $row_count / $limit;
+        if(($row_count % $limit) != 0)
+            $sites += 1;
+        return $sites;
+    }
+
+    /**
      * @param int $id
      * @return null|bool
      */
