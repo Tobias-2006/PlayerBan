@@ -135,6 +135,7 @@ class DataManager {
         $sites = $row_count / $limit;
         if(($row_count % $limit) != 0)
             $sites += 1;
+        $stmt->close();
         return $sites;
     }
 
