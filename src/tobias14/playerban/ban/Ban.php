@@ -2,7 +2,8 @@
 
 namespace tobias14\playerban\ban;
 
-use tobias14\playerban\database\Database;
+
+use tobias14\playerban\PlayerBan;
 
 /**
  * This class represents the ban instance
@@ -10,31 +11,30 @@ use tobias14\playerban\database\Database;
  * Class Ban
  * @package tobias14\playerban\ban
  */
-class Ban {
+abstract class Ban {
+
+    /** @var int $creation_time */
+    protected $creation_time;
 
     /** @var string $target */
-    private $target;
+    public $target;
+    /** @var string $moderator */
+    public $moderator;
     /** @var int $duration */
-    private $duration;
-    /** @var int $timestamp */
-    private $timestamp;
-
-    public function __construct($target = "", $duration = -1, $timestamp = -1) {
-        $this->target = $target;
-        $this->duration = $duration;
-        $this->timestamp = $timestamp;
-    }
+    public $duration;
 
     /**
      * Saving to the database
      *
-     * @return void
+     * @return null|bool
      */
-    public function save() {
-        if($this->target === "" or $this->duration === -1 or $this->timestamp === -1) return;
-        $database = Database::connect();
-        $database->query("INSERT INTO bans(target, duration, timestamp) VALUES('{$this->target}', '{$this->duration}', '{$this->timestamp}')");
-        $database->close();
+    public function save() : ?bool {
+        return PlayerBan::getInstance()->getDataManager()->saveBan(
+            $this->target,
+            $this->moderator,
+            $this->duration,
+            $this->creation_time
+        );
     }
 
 }

@@ -46,7 +46,7 @@ class DataManager {
      * @return void
      */
     private function init() {
-        $this->db->query("CREATE TABLE IF NOT EXISTS bans(id INT AUTO_INCREMENT, target VARCHAR(255) NOT NULL, duration INT NOT NULL, timestamp INT NOT NULL, PRIMARY KEY(id));");
+        $this->db->query("CREATE TABLE IF NOT EXISTS bans(id INT AUTO_INCREMENT, target VARCHAR(255) NOT NULL, moderator VARCHAR(255) NOT NULL, duration INT NOT NULL, creation_time INT NOT NULL, PRIMARY KEY(id));");
         $this->db->query("CREATE TABLE IF NOT EXISTS pending(id INT AUTO_INCREMENT, target VARCHAR(255) NOT NULL, duration INT NOT NULL, timestamp INT NOT NULL, moderator VARCHAR(255) NOT NULL, reason TEXT NOT NULL, PRIMARY KEY(id));");
         $this->db->query("CREATE TABLE IF NOT EXISTS punishments(id INT NOT NULL, duration INT NOT NULL, description VARCHAR(255) NOT NULL, PRIMARY KEY(id));");
         $this->db->query("CREATE TABLE IF NOT EXISTS logs(type INT NOT NULL, description TEXT NOT NULL, moderator VARCHAR(255) NOT NULL, target VARCHAR(255), creation_time INT NOT NULL);");
@@ -202,6 +202,22 @@ class DataManager {
         if(!$this->checkConnection()) return null;
         $stmt = $this->db->prepare("UPDATE punishments SET duration=?, description=? WHERE id=?;");
         $stmt->bind_param("isi", $duration, $description, $id);
+        $result = $stmt->execute();
+        $stmt->close();
+        return $result;
+    }
+
+    /**
+     * @param string $target
+     * @param string $moderator
+     * @param int $duration
+     * @param int $creation_time
+     * @return bool|null
+     */
+    public function saveBan(string $target, string $moderator, int $duration, int $creation_time) : ?bool {
+        if(!$this->checkConnection()) return null;
+        $stmt = $this->db->prepare("INSERT INTO bans(target, moderator, duration, creation_time), VALUES(?, ?, ?, ?)");
+        $stmt->bind_param("ssii", $target, $moderator, $duration, $creation_time);
         $result = $stmt->execute();
         $stmt->close();
         return $result;
