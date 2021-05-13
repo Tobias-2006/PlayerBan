@@ -48,7 +48,7 @@ class PlayerBan extends PluginBase {
             'Host' => $this->getConfig()->get("host", "127.0.0.1"),
             'Username' => $this->getConfig()->get("username", "root"),
             'Password' => $this->getConfig()->get("passwd", "password"),
-            'DataManager' => $this->getConfig()->get("dbname", "playerban"),
+            'Database' => $this->getConfig()->get("dbname", "playerban"),
             'Port' => $this->getConfig()->get("port", 3306)
         ];
     }
