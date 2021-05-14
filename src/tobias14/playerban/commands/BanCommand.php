@@ -6,6 +6,7 @@ use pocketmine\command\CommandSender;
 use pocketmine\plugin\Plugin;
 use pocketmine\utils\TextFormat as C;
 use tobias14\playerban\ban\Ban;
+use tobias14\playerban\log\CreationLog;
 
 /**
  * Class BanCommand
@@ -63,6 +64,11 @@ class BanCommand extends BaseCommand {
 
         if($ban->save()) {
             $sender->sendMessage($this->getLang()->translateString("command.ban.success", [$target]));
+            $log = new CreationLog();
+            $log->target = $target;
+            $log->moderator = $sender->getName();
+            $log->description = $this->getLang()->translateString("logger.ban.creation");
+            $log->save();
             return true;
         }
 

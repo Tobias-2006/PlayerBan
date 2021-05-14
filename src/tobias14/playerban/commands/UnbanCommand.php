@@ -5,6 +5,7 @@ namespace tobias14\playerban\commands;
 use pocketmine\command\CommandSender;
 use pocketmine\plugin\Plugin;
 use pocketmine\utils\TextFormat as C;
+use tobias14\playerban\log\DeletionLog;
 
 class UnbanCommand extends BaseCommand {
 
@@ -38,6 +39,11 @@ class UnbanCommand extends BaseCommand {
 
         if($this->getDataMgr()->removeBan($target)) {
             $sender->sendMessage($this->getLang()->translateString("command.unban.success", [$target]));
+            $log = new DeletionLog();
+            $log->target = $target;
+            $log->moderator = $sender->getName();
+            $log->description = $this->getLang()->translateString("logger.ban.deletion");
+            $log->save();
             return true;
         }
 
