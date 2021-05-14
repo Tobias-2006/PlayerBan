@@ -3,14 +3,12 @@
 namespace tobias14\playerban\commands;
 
 use pocketmine\command\CommandSender;
-use pocketmine\command\PluginCommand;
 use pocketmine\Player;
 use pocketmine\plugin\Plugin;
 use pocketmine\utils\TextFormat as C;
 use tobias14\playerban\forms\PunishmentForm;
-use tobias14\playerban\PlayerBan;
 
-class PunishmentsCommand extends PluginCommand {
+class PunishmentsCommand extends BaseCommand {
 
     public function __construct(Plugin $owner) {
         parent::__construct("punishments", $owner);
@@ -18,16 +16,20 @@ class PunishmentsCommand extends PluginCommand {
         $this->setDescription("Create or edit punishments");
     }
 
-    public function execute(CommandSender $sender, string $commandLabel, array $args) : bool{
-        if($this->getPlugin()->isDisabled()) {
-            $sender->sendMessage(C::RED . PlayerBan::getInstance()->getLang()->translateString("command.plugin.disabled"));
+    public function canUse(CommandSender $sender) : bool {
+        return $sender->hasPermission($this->getPermission()) and $sender instanceof Player;
+    }
+
+    public function execute(CommandSender $sender, string $commandLabel, array $args) : bool {
+        if(!$this->checkPluginState($this->getPlugin(), $sender))
+            return true;
+        if(!$this->canUse($sender)) {
+            $sender->sendMessage(C::RED . $this->getLang()->translateString("command.permission.denied"));
             return true;
         }
-        if(!$sender->hasPermission($this->getPermission()) or !$sender instanceof Player) {
-            $sender->sendMessage(C::RED . PlayerBan::getInstance()->getLang()->translateString("command.permission.denied"));
-            return true;
-        }
-        PunishmentForm::openMainForm($sender);
+        /** @var Player $player */
+        $player = &$sender;
+        PunishmentForm::openMainForm($player);
         return true;
     }
 
