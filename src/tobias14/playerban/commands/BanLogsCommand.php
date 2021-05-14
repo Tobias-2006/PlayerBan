@@ -7,7 +7,6 @@ use pocketmine\Player;
 use pocketmine\plugin\Plugin;
 use pocketmine\utils\TextFormat as C;
 use tobias14\playerban\forms\BanLogsForm;
-use tobias14\playerban\PlayerBan;
 
 class BanLogsCommand extends BaseCommand {
 
@@ -25,7 +24,7 @@ class BanLogsCommand extends BaseCommand {
         if(!$this->checkPluginState($this->getPlugin(), $sender))
             return true;
         if(!$this->canUse($sender)) {
-            $sender->sendMessage(C::RED . PlayerBan::getInstance()->getLang()->translateString("command.permission.denied"));
+            $sender->sendMessage(C::RED . $this->getLang()->translateString("command.permission.denied"));
             return true;
         }
         /** @var Player $player */
