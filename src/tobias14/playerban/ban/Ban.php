@@ -2,7 +2,6 @@
 
 namespace tobias14\playerban\ban;
 
-
 use tobias14\playerban\PlayerBan;
 
 /**
@@ -11,7 +10,7 @@ use tobias14\playerban\PlayerBan;
  * Class Ban
  * @package tobias14\playerban\ban
  */
-abstract class Ban {
+class Ban {
 
     /** @var int $creation_time */
     protected $creation_time;
@@ -20,8 +19,14 @@ abstract class Ban {
     public $target;
     /** @var string $moderator */
     public $moderator;
-    /** @var int $duration */
-    public $duration;
+    /** @var int $expiry_time */
+    public $expiry_time;
+    /** @var int $pun_id */
+    public $pun_id;
+
+    public function __construct() {
+        $this->creation_time = time();
+    }
 
     /**
      * Saving to the database
@@ -32,7 +37,8 @@ abstract class Ban {
         return PlayerBan::getInstance()->getDataManager()->saveBan(
             $this->target,
             $this->moderator,
-            $this->duration,
+            $this->expiry_time,
+            $this->pun_id,
             $this->creation_time
         );
     }
