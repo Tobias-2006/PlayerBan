@@ -1,0 +1,33 @@
+<?php
+
+namespace tobias14\playerban;
+
+use pocketmine\event\Listener;
+use pocketmine\event\player\PlayerPreLoginEvent;
+use pocketmine\utils\TextFormat as C;
+
+class EventListener implements Listener {
+
+    private function isBanned(string $target) : bool {
+        return PlayerBan::getInstance()->getDataManager()->isBanned($target);
+    }
+
+    public function onPreLogin(PlayerPreLoginEvent $event) {
+        $name = $event->getPlayer()->getName();
+        $address = $event->getPlayer()->getAddress();
+        $target = null;
+
+        if($this->isBanned($name))
+            $target = $name;
+        elseif($this->isBanned($address))
+            $target = $address;
+        if(is_null($target))
+            return;
+
+        $ban = PlayerBan::getInstance()->getDataManager()->getBanByName($target);
+        $expiry_time = date("d.m.Y | H:i", $ban['expiry_time']);
+        $msg = C::RED . "     You are banned!\n\n" . C::DARK_RED . "Expiry: " . C::WHITE . "{$expiry_time}";
+        $event->getPlayer()->kick($msg, false);
+    }
+
+}

@@ -271,6 +271,21 @@ class DataManager {
     }
 
     /**
+     * @param string $target
+     * @return array|null
+     */
+    public function getBanByName(string $target) : ?array {
+        if(!$this->checkConnection()) return null;
+        $time = time();
+        $stmt = $this->db->prepare("SELECT * FROM bans WHERE target=? AND expiry_time > ?;");
+        $stmt->bind_param("si", $target, $time);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $stmt->close();
+        return $result->fetch_assoc();
+    }
+
+    /**
      * @param int $site
      * @param int $limit
      * @return array|null

@@ -108,6 +108,7 @@ class PlayerBan extends PluginBase {
             new UnbanCommand($this),
             new BanListCommand($this)
         ]);
+        $this->getServer()->getPluginManager()->registerEvents(new EventListener(), $this);
     }
 
 }
