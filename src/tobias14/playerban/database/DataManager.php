@@ -148,6 +148,7 @@ class DataManager {
         $stmt->bind_param("i", $id);
         $stmt->execute();
         $result = $stmt->get_result();
+        $stmt->close();
         return $result->num_rows === 1;
     }
 
@@ -157,7 +158,11 @@ class DataManager {
      */
     public function getPunishment(int $id) : ?array {
         if(!$this->checkConnection()) return null;
-        $result = $this->db->query("SELECT * FROM punishments WHERE id='{$id}'");
+        $stmt = $this->db->prepare("SELECT * FROM punishments WHERE id=?;");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $stmt->close();
         return $result->fetch_assoc();
     }
 
