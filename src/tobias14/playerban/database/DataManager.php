@@ -270,4 +270,44 @@ class DataManager {
         return $result;
     }
 
+    /**
+     * @param int $site
+     * @param int $limit
+     * @return array|null
+     */
+    public function getAllCurrentBans(int $site = 0, int $limit = 6) : ?array {
+        if(!$this->checkConnection()) return null;
+        $time = time();
+        $site *= $limit;
+        $stmt = $this->db->prepare("SELECT * FROM bans WHERE expiry_time > ? ORDER BY creation_time DESC LIMIT ?, ?");
+        $stmt->bind_param("iii", $time, $site, $limit);
+        $stmt->execute();
+        if(false === $result = $stmt->get_result()) return null;
+        $data = [];
+        while ($row = $result->fetch_assoc()) {
+            $data[] = $row;
+        }
+        $stmt->close();
+        return $data;
+    }
+
+    /**
+     * @param int $limit
+     * @return int|null
+     */
+    public function getMaxBanPage(int $limit = 6) : ?int {
+        if(!$this->checkConnection()) return null;
+        $time = time();
+        $stmt = $this->db->prepare("SELECT COUNT(*) FROM bans WHERE expiry_time > ?");
+        $stmt->bind_param("i", $time);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row_count = $result->fetch_row()[0];
+        $sites = $row_count / $limit;
+        if(($row_count % $limit) != 0)
+            $sites += 1;
+        $stmt->close();
+        return $sites;
+    }
+
 }
