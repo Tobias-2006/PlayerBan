@@ -27,7 +27,7 @@ abstract class BaseCommand extends PluginCommand {
     }
 
     public function getDataMgr() : DataManager {
-        return PlayerBan::getInstance()-$this->getDataMgr();
+        return PlayerBan::getInstance()->getDataManager();
     }
 
 }
