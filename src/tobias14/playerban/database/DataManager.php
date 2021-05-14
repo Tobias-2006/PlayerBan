@@ -144,8 +144,10 @@ class DataManager {
      */
     public function punishmentExists(int $id) : ?bool {
         if(!$this->checkConnection()) return null;
-        $query = "SELECT * FROM punishments WHERE id='{$id}'";
-        $result = $this->db->query($query);
+        $stmt = $this->db->prepare("SELECT * FROM punishments WHERE id=?;");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $result = $stmt->get_result();
         return $result->num_rows === 1;
     }
 
@@ -223,7 +225,12 @@ class DataManager {
      */
     public function isBanned(string $target) : ?bool {
         if(!$this->checkConnection()) return null;
-        return $this->db->query("SELECT * FROM bans WHERE target='{$target}';")->num_rows === 1;
+        $stmt = $this->db->prepare("SELECT * FROM bans WHERE target=?;");
+        $stmt->bind_param("s", $target);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $stmt->close();
+        return $result->num_rows === 1;
     }
 
     /**

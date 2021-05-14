@@ -35,8 +35,8 @@ class BanCommand extends BaseCommand {
             $sender->sendMessage($this->getUsage());
             return true;
         }
-        $target = htmlspecialchars($args[0]);
-        $pun_id = htmlspecialchars($args[1]);
+        $target = &$args[0];
+        $pun_id = &$args[1];
         if(strlen($target) < 4) {
             $sender->sendMessage(C::RED . $this->getLang()->translateString("command.param.tooShort", ["<player|ip>", "4"]));
             return true;
