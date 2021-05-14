@@ -230,8 +230,9 @@ class DataManager {
      */
     public function isBanned(string $target) : ?bool {
         if(!$this->checkConnection()) return null;
-        $stmt = $this->db->prepare("SELECT * FROM bans WHERE target=?;");
-        $stmt->bind_param("s", $target);
+        $time = time();
+        $stmt = $this->db->prepare("SELECT * FROM bans WHERE target=? AND expiry_time > ?;");
+        $stmt->bind_param("si", $target, $time);
         $stmt->execute();
         $result = $stmt->get_result();
         $stmt->close();
@@ -250,6 +251,20 @@ class DataManager {
         if(!$this->checkConnection()) return null;
         $stmt = $this->db->prepare("INSERT INTO bans(target, moderator, expiry_time, pun_id, creation_time) VALUES(?, ?, ?, ?, ?);");
         $stmt->bind_param("ssiii", $target, $moderator, $expiry_time, $pun_id, $creation_time);
+        $result = $stmt->execute();
+        $stmt->close();
+        return $result;
+    }
+
+    /**
+     * @param $target
+     * @return bool|null
+     */
+    public function removeBan($target) : ?bool {
+        if(!$this->checkConnection()) return null;
+        $time = time();
+        $stmt = $this->db->prepare("UPDATE bans SET expiry_time=? WHERE target=? AND expiry_time > ?;");
+        $stmt->bind_param("isi", $time, $target, $time);
         $result = $stmt->execute();
         $stmt->close();
         return $result;

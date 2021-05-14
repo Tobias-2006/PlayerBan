@@ -8,6 +8,7 @@ use tobias14\playerban\commands\BanCommand;
 use tobias14\playerban\commands\BanLogsCommand;
 use tobias14\playerban\commands\PunishmentListCommand;
 use tobias14\playerban\commands\PunishmentsCommand;
+use tobias14\playerban\commands\UnbanCommand;
 use tobias14\playerban\database\DataManager;
 
 /**
@@ -102,7 +103,8 @@ class PlayerBan extends PluginBase {
             new PunishmentsCommand($this),
             new PunishmentListCommand($this),
             new BanLogsCommand($this),
-            new BanCommand($this)
+            new BanCommand($this),
+            new UnbanCommand($this)
         ]);
     }
 
