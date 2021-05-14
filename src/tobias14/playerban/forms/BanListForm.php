@@ -56,7 +56,7 @@ class BanListForm {
         $form->setTitle("BanInfo");
         $ban_creation = date("d.m.Y | H:i", $ban['creation_time']);
         $expiry_time = date("d.m.Y | H:i", $ban['expiry_time']);
-        $content = "» UNIQUE IDENTIFIER: {$ban['id']}\nCreation: {$ban_creation}\nTarget: {$ban['target']}\nModerator: {$ban['moderator']}\nExpiry: {$expiry_time}\nPunId: {$ban['pun_id']}";
+        $content = "» UNIQUE IDENTIFIER: {$ban['id']}\n\nCreation: {$ban_creation}\nTarget: {$ban['target']}\nModerator: {$ban['moderator']}\nExpiry: {$expiry_time}\nPunId: {$ban['pun_id']}";
         if(PlayerBan::getInstance()->getDataManager()->punishmentExists($ban['pun_id'])) {
             $punishment = PlayerBan::getInstance()->getDataManager()->getPunishment($ban['pun_id']);
             $duration = Converter::seconds_to_str($punishment['duration']);

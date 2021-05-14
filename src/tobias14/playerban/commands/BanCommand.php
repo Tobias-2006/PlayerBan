@@ -69,11 +69,20 @@ class BanCommand extends BaseCommand {
             $log->moderator = $sender->getName();
             $log->description = $this->getLang()->translateString("logger.ban.creation");
             $log->save();
+            $this->kickTarget($target);
             return true;
         }
 
         $sender->sendMessage(C::RED . $this->getLang()->translateString("command.error"));
         return true;
+    }
+
+    private function kickTarget(string $target) {
+        foreach ($this->getPlugin()->getServer()->getOnlinePlayers() as $player) {
+            if(strtolower($player->getName()) === strtolower($target) or $player->getAddress() === $target) {
+                $player->kick($this->getLang()->translateString("command.ban.playerKick"), false);
+            }
+        }
     }
 
 }
