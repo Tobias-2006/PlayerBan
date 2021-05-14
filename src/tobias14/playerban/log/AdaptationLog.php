@@ -4,6 +4,7 @@ namespace tobias14\playerban\log;
 
 /**
  * Class AdaptationLog
+ *
  * @package tobias14\playerban\log
  */
 class AdaptationLog extends Log {

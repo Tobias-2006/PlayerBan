@@ -10,10 +10,16 @@ use tobias14\playerban\log\CreationLog;
 
 /**
  * Class BanCommand
+ *
  * @package tobias14\playerban\commands
  */
 class BanCommand extends BaseCommand {
 
+    /**
+     * BanCommand constructor.
+     *
+     * @param Plugin $owner
+     */
     public function __construct(Plugin $owner) {
         parent::__construct("ban", $owner);
         $this->setPermission("playerban.command.ban");
@@ -77,6 +83,11 @@ class BanCommand extends BaseCommand {
         return true;
     }
 
+    /**
+     * Kicks the banned player(s) from the server.
+     *
+     * @param string $target
+     */
     private function kickTarget(string $target) {
         foreach ($this->getPlugin()->getServer()->getOnlinePlayers() as $player) {
             if(strtolower($player->getName()) === strtolower($target) or $player->getAddress() === $target) {

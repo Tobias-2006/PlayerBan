@@ -7,8 +7,18 @@ use pocketmine\plugin\Plugin;
 use pocketmine\utils\TextFormat as C;
 use tobias14\playerban\log\DeletionLog;
 
+/**
+ * Class UnbanCommand
+ *
+ * @package tobias14\playerban\commands
+ */
 class UnbanCommand extends BaseCommand {
 
+    /**
+     * UnbanCommand constructor.
+     *
+     * @param Plugin $owner
+     */
     public function __construct(Plugin $owner) {
         parent::__construct("unban", $owner);
         $this->setPermission("playerban.command.unban");

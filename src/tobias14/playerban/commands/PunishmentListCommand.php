@@ -7,6 +7,11 @@ use pocketmine\utils\TextFormat as C;
 use tobias14\playerban\PlayerBan;
 use tobias14\playerban\utils\Converter;
 
+/**
+ * Class PunishmentListCommand
+ *
+ * @package tobias14\playerban\commands
+ */
 class PunishmentListCommand extends BaseCommand {
 
     /**

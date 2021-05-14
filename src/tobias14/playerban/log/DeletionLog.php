@@ -4,6 +4,7 @@ namespace tobias14\playerban\log;
 
 /**
  * Class DeletionLog
+ *
  * @package tobias14\playerban\log
  */
 class DeletionLog extends Log {

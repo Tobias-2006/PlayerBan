@@ -49,7 +49,7 @@ class Punishment {
      * @return null|bool
      */
     public function delete() : ?bool {
-        if(!PlayerBan::getInstance()->punishmentExists($this->id)) return false;
+        if(!PlayerBan::getInstance()->getDataManager()->punishmentExists($this->id)) return false;
         return $this->getDataMgr()->deletePunishment($this->id);
     }
 
@@ -59,7 +59,7 @@ class Punishment {
      * @return null|bool
      */
     public function update() : ?bool {
-        if(!PlayerBan::getInstance()->punishmentExists($this->id)) return false;
+        if(!PlayerBan::getInstance()->getDataManager()->punishmentExists($this->id)) return false;
         return $this->getDataMgr()->updatePunishment($this->id, $this->duration, $this->description);
     }
 

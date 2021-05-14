@@ -9,7 +9,6 @@ use pocketmine\utils\TextFormat as C;
 use tobias14\playerban\log\AdaptationLog;
 use tobias14\playerban\log\CreationLog;
 use tobias14\playerban\log\DeletionLog;
-use tobias14\playerban\PlayerBan;
 use tobias14\playerban\punishment\Punishment;
 use tobias14\playerban\utils\Converter;
 
@@ -19,7 +18,7 @@ use tobias14\playerban\utils\Converter;
  * Class PunishmentForm
  * @package tobias14\playerban\forms
  */
-class PunishmentForm {
+class PunishmentForm extends BaseForm {
 
     /**
      * Main Form -> Will be opened when the /punishments command is executed
@@ -27,9 +26,9 @@ class PunishmentForm {
      * @param Player $player
      */
     public static function openMainForm(Player $player) {
-        $punishments = PlayerBan::getInstance()->getAllPunishments();
+        $punishments = self::getDataMgr()->getAllPunishments();
         if(is_null($punishments)) {
-            $player->sendMessage(C::RED . PlayerBan::getInstance()->getLang()->translateString("command.error"));
+            $player->sendMessage(C::RED . self::getLang()->translateString("command.error"));
             return;
         }
         $form = new SimpleForm(function (Player $player, $data) use($punishments) {
@@ -61,24 +60,24 @@ class PunishmentForm {
             $duration = &$data[2];
 
             if(!is_numeric($id)) {
-                $player->sendMessage(C::RED . PlayerBan::getInstance()->getLang()->translateString("command.param.incorrectFormat", ["id", "3 (0 to 999)"]));
+                $player->sendMessage(C::RED . self::getLang()->translateString("command.param.incorrectFormat", ["id", "3 (0 to 999)"]));
                 return;
             }
             $id = round($id);
-            if(PlayerBan::getInstance()->punishmentExists($id)) {
-                $player->sendMessage(C::RED . PlayerBan::getInstance()->getLang()->translateString("db.entry.alreadyExists", ["with the ID {$id}"]));
+            if(self::getDataMgr()->punishmentExists($id)) {
+                $player->sendMessage(C::RED . self::getLang()->translateString("db.entry.alreadyExists", ["with the ID $id"]));
                 return;
             }
             if((int) $id > 999) {
-                $player->sendMessage(C::RED . PlayerBan::getInstance()->getLang()->translateString("command.param.tooLong", ["id", "3"]));
+                $player->sendMessage(C::RED . self::getLang()->translateString("command.param.tooLong", ["id", "3"]));
                 return;
             }
             if(!preg_match("/(^[1-9][0-9]{0,2}[mhd])(,[1-9][0-9]{0,2}[mhd]){0,2}$/", $duration)) {
-                $player->sendMessage(C::RED . PlayerBan::getInstance()->getLang()->translateString("command.param.incorrectFormat", ["duration", "1d,12h Example2: 2d,5h,30m Example3: 30m"]));
+                $player->sendMessage(C::RED . self::getLang()->translateString("command.param.incorrectFormat", ["duration", "1d,12h Example2: 2d,5h,30m Example3: 30m"]));
                 return;
             }
             if(strlen($description) > 255 or strlen($description) < 3) {
-                $player->sendMessage(C::RED . PlayerBan::getInstance()->getLang()->translateString("command.param.tooLong", ["description", "3 to 255"]));
+                $player->sendMessage(C::RED . self::getLang()->translateString("command.param.tooLong", ["description", "3 to 255"]));
                 return;
             }
 
@@ -87,20 +86,20 @@ class PunishmentForm {
             $pun->description = $description;
             $pun->duration = Converter::str_to_seconds($duration);
             if(is_null($pun->save())) {
-                $player->sendMessage(C::RED . PlayerBan::getInstance()->getLang()->translateString("command.error"));
+                $player->sendMessage(C::RED . self::getLang()->translateString("command.error"));
                 return;
             }
 
             $log = new CreationLog();
-            $log->description = PlayerBan::getInstance()->getLang()->translateString("logger.punishment.creation");
+            $log->description = self::getLang()->translateString("logger.punishment.creation");
             $log->moderator = $player->getName();
             $log->target = "PunId[" . $pun->id . "]";
             if(is_null($log->save())) {
-                $player->sendMessage(C::RED . PlayerBan::getInstance()->getLang()->translateString("command.error"));
+                $player->sendMessage(C::RED . self::getLang()->translateString("command.error"));
                 return;
             }
 
-            $player->sendMessage(PlayerBan::getInstance()->getLang()->translateString("command.punishments.new.success", [$id]));
+            $player->sendMessage(self::getLang()->translateString("command.punishments.new.success", [$id]));
         });
         $form->setTitle("New Punishment");
         $form->addInput("Unique identifier:", "0");
@@ -124,46 +123,46 @@ class PunishmentForm {
 
             if($data[3]) {
                 if(is_null($pun->delete())) {
-                    $player->sendMessage(C::RED . PlayerBan::getInstance()->getLang()->translateString("command.error"));
+                    $player->sendMessage(C::RED . self::getLang()->translateString("command.error"));
                     return;
                 }
                 $log = new DeletionLog();
-                $log->description = PlayerBan::getInstance()->getLang()->translateString("logger.punishment.deletion");
+                $log->description = self::getLang()->translateString("logger.punishment.deletion");
                 $log->moderator = $player->getName();
                 $log->target = "PunId[" . $pun->id . "]";
                 if(is_null($log->save())) {
-                    $player->sendMessage(C::RED . PlayerBan::getInstance()->getLang()->translateString("command.error"));
+                    $player->sendMessage(C::RED . self::getLang()->translateString("command.error"));
                     return;
                 }
-                $player->sendMessage(PlayerBan::getInstance()->getLang()->translateString("command.punishments.delete.success", [$pun->id]));
+                $player->sendMessage(self::getLang()->translateString("command.punishments.delete.success", [$pun->id]));
                 return;
             }
             if(!preg_match("/(^[1-9][0-9]{0,2}[mhd])(,[1-9][0-9]{0,2}[mhd]){0,2}$/", $duration)) {
-                $player->sendMessage(C::RED . PlayerBan::getInstance()->getLang()->translateString("command.param.incorrectFormat", ["duration", "1d,12h Example2: 2d,5h,30m Example3: 30m"]));
+                $player->sendMessage(C::RED . self::getLang()->translateString("command.param.incorrectFormat", ["duration", "1d,12h Example2: 2d,5h,30m Example3: 30m"]));
                 return;
             }
             if(strlen($description) > 255 || strlen($description) < 3) {
-                $player->sendMessage(C::RED . PlayerBan::getInstance()->getLang()->translateString("command.param.tooLong", ["description", "3 to 255"]));
+                $player->sendMessage(C::RED . self::getLang()->translateString("command.param.tooLong", ["description", "3 to 255"]));
                 return;
             }
 
             $pun->description = $description;
             $pun->duration = Converter::str_to_seconds($duration);
             if(is_null($pun->update())) {
-                $player->sendMessage(C::RED . PlayerBan::getInstance()->getLang()->translateString("command.error"));
+                $player->sendMessage(C::RED . self::getLang()->translateString("command.error"));
                 return;
             }
 
             $log = new AdaptationLog();
-            $log->description = PlayerBan::getInstance()->getLang()->translateString("logger.punishment.adaptation");
+            $log->description = self::getLang()->translateString("logger.punishment.adaptation");
             $log->moderator = $player->getName();
             $log->target = "PunId[" . $pun->id . "]";
             if(is_null($log->save())) {
-                $player->sendMessage(C::RED . PlayerBan::getInstance()->getLang()->translateString("command.error"));
+                $player->sendMessage(C::RED . self::getLang()->translateString("command.error"));
                 return;
             }
 
-            $player->sendMessage(PlayerBan::getInstance()->getLang()->translateString("command.punishments.edit.success", [$pun->id]));
+            $player->sendMessage(self::getLang()->translateString("command.punishments.edit.success", [$pun->id]));
         });
         $form->setTitle("Edit Punishment");
         $form->addLabel("» UNIQUE IDENTIFIER: {$punishment['id']}", "desc");

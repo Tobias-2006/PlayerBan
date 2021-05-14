@@ -23,6 +23,8 @@ abstract class Log {
     public $target;
 
     /**
+     * Types: LOG_TYPE_CREATION, LOG_TYPE_DELETION, LOG_TYPE_ADAPTATION | (Logger.php)
+     *
      * @return int
      */
     public function getType() : int {
@@ -30,6 +32,8 @@ abstract class Log {
     }
 
     /**
+     * Current Unix-Timestamp
+     *
      * @return int
      */
     public function getCreationTime() : int {
@@ -37,6 +41,8 @@ abstract class Log {
     }
 
     /**
+     * Saves the log to the database
+     *
      * @return null|bool
      */
     public function save() : ?bool {

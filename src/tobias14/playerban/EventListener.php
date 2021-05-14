@@ -6,8 +6,19 @@ use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerPreLoginEvent;
 use pocketmine\utils\TextFormat as C;
 
+/**
+ * Class EventListener
+ *
+ * @package tobias14\playerban
+ */
 class EventListener implements Listener {
 
+    /**
+     * Checks if the target is banned
+     *
+     * @param string $target
+     * @return bool
+     */
     private function isBanned(string $target) : bool {
         return PlayerBan::getInstance()->getDataManager()->isBanned($target);
     }
@@ -26,7 +37,7 @@ class EventListener implements Listener {
 
         $ban = PlayerBan::getInstance()->getDataManager()->getBanByName($target);
         $expiry_time = date("d.m.Y | H:i", $ban['expiry_time']);
-        $msg = C::RED . "     You are banned!\n\n" . C::DARK_RED . "Expiry: " . C::WHITE . "{$expiry_time}";
+        $msg = C::RED . "     You are banned!\n\n" . C::DARK_RED . "Expiry: " . C::WHITE . "$expiry_time";
         $event->getPlayer()->kick($msg, false);
     }
 

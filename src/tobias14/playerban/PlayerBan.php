@@ -57,25 +57,6 @@ class PlayerBan extends PluginBase {
     }
 
     /**
-     * Checks if a punishment with id xy exists
-     *
-     * @param int $id
-     * @return null|bool
-     */
-    public function punishmentExists(int $id) : ?bool {
-        return $this->getDataManager()->punishmentExists($id);
-    }
-
-    /**
-     * Returns a list of all punishments (max. 25)
-     *
-     * @return null|array
-     */
-    public function getAllPunishments() : ?array {
-        return $this->getDataManager()->getAllPunishments();
-    }
-
-    /**
      * Class instance
      *
      * @return self

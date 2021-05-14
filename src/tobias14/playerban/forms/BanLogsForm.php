@@ -4,7 +4,6 @@ namespace tobias14\playerban\forms;
 
 use jojoe77777\FormAPI\SimpleForm;
 use pocketmine\Player;
-use tobias14\playerban\PlayerBan;
 
 /**
  * This class manages the log forms
@@ -12,14 +11,16 @@ use tobias14\playerban\PlayerBan;
  * Class BanLogsForm
  * @package tobias14\playerban\forms
  */
-class BanLogsForm {
+class BanLogsForm extends BaseForm {
 
     /**
+     * This form lists all logs.
+     *
      * @param Player $player
      * @param int $site
      */
     public static function openMainForm(Player $player, $site = 0) {
-        $logs = PlayerBan::getInstance()->getDataManager()->getLogs($site);
+        $logs = self::getDataMgr()->getLogs($site);
         $form = new SimpleForm(function (Player $player, $data) use ($logs, $site) {
             if(is_null($data)) return;
             if($data === (count($logs))) {
@@ -33,13 +34,15 @@ class BanLogsForm {
             $title = date("d.m.Y | H:i", $log['creation_time']) . "\nMOD: " . $log['moderator'];
             $form->addButton($title);
         }
-        if(PlayerBan::getInstance()->getDataManager()->getMaxLogPage() > ($site + 1)) {
+        if(self::getDataMgr()->getMaxLogPage() > ($site + 1)) {
             $form->addButton("Next Page");
         }
         $player->sendForm($form);
     }
 
     /**
+     * This form shows information about a log.
+     *
      * @param Player $player
      * @param array $log
      * @param $site
@@ -52,7 +55,7 @@ class BanLogsForm {
             }
         });
         $log_creation = date("d.m.Y | H:i", $log['creation_time']);
-        $information = ["Type: {$log['type']}", "Description: {$log['description']}", "Moderator: {$log['moderator']}", "Target: {$log['target']}", "Creation: {$log_creation}"];
+        $information = ["Type: {$log['type']}", "Description: {$log['description']}", "Moderator: {$log['moderator']}", "Target: {$log['target']}", "Creation: $log_creation"];
         $form->setTitle("LogInfo");
         $form->setContent(implode("\n", $information));
         $form->addButton("Back");

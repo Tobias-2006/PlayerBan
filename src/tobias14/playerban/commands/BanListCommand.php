@@ -8,8 +8,18 @@ use pocketmine\plugin\Plugin;
 use pocketmine\utils\TextFormat as C;
 use tobias14\playerban\forms\BanListForm;
 
+/**
+ * Class BanListCommand
+ *
+ * @package tobias14\playerban\commands
+ */
 class BanListCommand extends BaseCommand {
 
+    /**
+     * BanListCommand constructor.
+     *
+     * @param Plugin $owner
+     */
     public function __construct(Plugin $owner) {
         parent::__construct("banlist", $owner);
         $this->setPermission("playerban.command.banlist");
