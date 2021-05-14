@@ -22,7 +22,7 @@ class BanLogsCommand extends BaseCommand {
     }
 
     public function execute(CommandSender $sender, string $commandLabel, array $args) : bool {
-        if($this->checkPluginState($this->getPlugin(), $sender))
+        if(!$this->checkPluginState($this->getPlugin(), $sender))
             return true;
         if(!$this->canUse($sender)) {
             $sender->sendMessage(C::RED . PlayerBan::getInstance()->getLang()->translateString("command.permission.denied"));
