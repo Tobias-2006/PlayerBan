@@ -26,14 +26,14 @@ Congratulations, you're done!<br>
 For a detailed description of how which command works, feel free to check out the wiki on it.
 
 ## Commands & Permissions
-| Command | Alias | Parameters | Description | Permissions |
-| :-----: | :-------: | :-------: | :---------: | :-------: |
-| /ban | - | `<player\|ip>` `<punId>` | Ban a player from the server | `Op`, `playerban.command.ban` |
-| /unban | - | `<player\|ip>` | Unban someone from the server | `Op`, `playerban.command.unban` |
-| /banlist | - | - | Shows a list of all banned players | `Op`, `playerban.command.banlist` |
-| /banlogs | - | - | Shows a modification protocol | `Op`, `playerban.command.banlogs` |
-| /punishments | - | - | Create or edit punishments | `Op`, `playerban.command.punishments` |
-| /punlist | - | - | Displays a list of all punishments | `Op`, `playerban.command.punlist` |
+| Command | Parameters | Description | Permissions |
+| :-----: | :-------: | :---------: | :-------: |
+| /ban | `<player\|ip>` `<punId>` | Ban a player from the server | `Op`, `playerban.command.ban` |
+| /unban | `<player\|ip>` | Unban someone from the server | `Op`, `playerban.command.unban` |
+| /banlist | - | Shows a list of all banned players | `Op`, `playerban.command.banlist` |
+| /banlogs | - | Shows a modification protocol | `Op`, `playerban.command.banlogs` |
+| /punishments | - | Create or edit punishments | `Op`, `playerban.command.punishments` |
+| /punlist | - | Displays a list of all punishments | `Op`, `playerban.command.punlist` |
 
 ## License
 ```
