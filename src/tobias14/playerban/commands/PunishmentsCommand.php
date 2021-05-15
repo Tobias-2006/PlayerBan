@@ -18,12 +18,12 @@ class PunishmentsCommand extends BaseCommand {
     /**
      * PunishmentsCommand constructor.
      * 
-     * @param Plugin $owner
+     * @param Plugin $plugin
      */
-    public function __construct(Plugin $owner) {
-        parent::__construct("punishments", $owner);
-        $this->setPermission("playerban.command.punishments");
-        $this->setDescription("Create or edit punishments");
+    public function __construct(Plugin $plugin) {
+        parent::__construct($this->translate("punishments.name"), $plugin);
+        $this->setPermission($this->translate("punishments.punishments.permission"));
+        $this->setDescription($this->translate("punishments.description"));
     }
 
     public function canUse(CommandSender $sender) : bool {
@@ -34,7 +34,7 @@ class PunishmentsCommand extends BaseCommand {
         if(!$this->checkPluginState($this->getPlugin(), $sender))
             return true;
         if(!$this->canUse($sender)) {
-            $sender->sendMessage(C::RED . $this->getLang()->translateString("command.permission.denied"));
+            $sender->sendMessage(C::RED . $this->translate("permission.denied"));
             return true;
         }
         /** @var Player $player */

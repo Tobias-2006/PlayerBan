@@ -21,7 +21,7 @@ class BanListForm extends BaseForm {
      * @param Player $player
      * @param int $site
      */
-    public static function openMainForm(Player $player, $site = 0) {
+    public static function openMainForm(Player $player, int $site = 0) {
         $bans = self::getDataMgr()->getAllCurrentBans($site);
         $form = new SimpleForm(function(Player $player, $data) use ($bans, $site) {
             if(is_null($data)) return;
@@ -31,13 +31,13 @@ class BanListForm extends BaseForm {
             }
             self::openBanInfoForm($player, $bans[$data], $site);
         });
-        $form->setTitle("BanList");
+        $form->setTitle(self::translate("banlist.form.title"));
         foreach ($bans as $ban) {
-            $title = date("d.m.Y | H:i", $ban['creation_time']) . "\nTarget: " . $ban['target'];
-            $form->addButton($title);
+            $creation = date("d.m.Y | H:i", $ban['creation_time']);
+            $form->addButton(self::translate("banlist.form.button", [$creation, $ban['target']]));
         }
         if(self::getDataMgr()->getMaxBanPage() > ($site + 1)) {
-            $form->addButton("Next Page");
+            $form->addButton(self::translate("button.nextPage"));
         }
         $player->sendForm($form);
     }
@@ -49,7 +49,7 @@ class BanListForm extends BaseForm {
      * @param array $ban
      * @param int $site
      */
-    public static function openBanInfoForm(Player $player, array $ban, int $site) {
+    private static function openBanInfoForm(Player $player, array $ban, int $site) {
         $form = new SimpleForm(function (Player $player, $data) use($site, $ban) {
             if(is_null($data)) return;
             if($data === 0) {
@@ -58,19 +58,39 @@ class BanListForm extends BaseForm {
             }
             self::openMainForm($player, $site);
         });
-        $form->setTitle("BanInfo");
-        $ban_creation = date("d.m.Y | H:i", $ban['creation_time']);
-        $expiry_time = date("d.m.Y | H:i", $ban['expiry_time']);
-        $content = "» UNIQUE IDENTIFIER: {$ban['id']}\n\nCreation: $ban_creation\nTarget: {$ban['target']}\nModerator: {$ban['moderator']}\nExpiry: $expiry_time\nPunId: {$ban['pun_id']}";
-        if(self::getDataMgr()->punishmentExists($ban['pun_id'])) {
-            $punishment = self::getDataMgr()->getPunishment($ban['pun_id']);
-            $duration = Converter::seconds_to_str($punishment['duration']);
-            $content .= "\nReason: {$punishment['description']}\nDuration: $duration";
-        }
-        $form->setContent($content);
-        $form->addButton(C::RED . "Unban");
-        $form->addButton("Back");
+        $form->setTitle(self::translate("banlist.form2.title"));
+        $form->setContent(self::getBanInfoContent($ban));
+        $form->addButton(C::RED . self::translate("banlist.form2.button"));
+        $form->addButton(self::translate("button.back"));
         $player->sendForm($form);
+    }
+
+    /**
+     * Returns a string, with the information lines
+     *
+     * @param array $ban
+     * @return string
+     */
+    private static function getBanInfoContent(array $ban) : string {
+        $data = [];
+        $params = [$ban['id'], self::formatTime($ban['creation_time']), $ban['target'], $ban['moderator'], self::formatTime($ban['expiry_time']), $ban['pun_id']];
+        for ($i = 0; $i < 8; $i++) {
+            $line = $i + 1;
+            if($i === 6) {
+                if(self::getDataMgr()->punishmentExists($ban['pun_id'])) {
+                    $punishment = self::getDataMgr()->getPunishment($ban['pun_id']);
+                    $params[] = $punishment['description'];
+                    $params[] = Converter::seconds_to_str($punishment['duration']);
+                } else{
+                    break;
+                }
+            }
+            $str = self::translate("banlist.form2.line$line", [$params[$i]]);
+            if($i === 0)
+                $str .= "\n";
+            $data[] = $str;
+        }
+        return implode("\n", $data);
     }
 
 }

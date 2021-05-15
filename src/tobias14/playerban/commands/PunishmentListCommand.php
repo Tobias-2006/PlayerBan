@@ -17,12 +17,12 @@ class PunishmentListCommand extends BaseCommand {
     /**
      * PunishmentListCommand constructor.
      *
-     * @param PlayerBan $owner
+     * @param PlayerBan $plugin
      */
-    public function __construct(PlayerBan $owner) {
-        parent::__construct("punlist", $owner);
-        $this->setPermission("playerban.command.punlist");
-        $this->setDescription("Outputs a list of all punishments");
+    public function __construct(PlayerBan $plugin) {
+        parent::__construct($this->translate("punlist.name"), $plugin);
+        $this->setPermission($this->translate("punlist.permission"));
+        $this->setDescription($this->translate("punlist.description"));
     }
 
     public function canUse(CommandSender $sender) : bool {
@@ -33,18 +33,18 @@ class PunishmentListCommand extends BaseCommand {
         if(!$this->checkPluginState($this->getPlugin(), $sender))
             return true;
         if(!$this->canUse($sender)) {
-            $sender->sendMessage(C::RED . $this->getLang()->translateString("command.permission.denied"));
+            $sender->sendMessage(C::RED . $this->translate("permission.denied"));
             return true;
         }
         $data = $this->getDataMgr()->getAllPunishments();
         if(is_null($data)) {
-            $sender->sendMessage(C::RED . $this->getLang()->translateString("command.error"));
+            $sender->sendMessage(C::RED . $this->translate("error"));
             return true;
         }
-        $sender->sendMessage($this->getLang()->translateString("command.punlist.title"));
+        $sender->sendMessage($this->translate("punlist.headline"));
         foreach ($data as $row) {
-            $sender->sendMessage($this->getLang()->translateString(
-                "command.punlist.output",
+            $sender->sendMessage($this->translate(
+                "punlist.format",
                 [$row['id'], $row['description'], Converter::seconds_to_str($row['duration'])]
             ));
         }

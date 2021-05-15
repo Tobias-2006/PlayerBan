@@ -18,12 +18,12 @@ class BanLogsCommand extends BaseCommand {
     /**
      * BanLogsCommand constructor.
      *
-     * @param Plugin $owner
+     * @param Plugin $plugin
      */
-    public function __construct(Plugin $owner) {
-        parent::__construct("banlogs", $owner);
-        $this->setPermission("playerban.command.banlogs");
-        $this->setDescription("Modification protocol");
+    public function __construct(Plugin $plugin) {
+        parent::__construct($this->translate("banlogs.name"), $plugin);
+        $this->setPermission($this->translate("banlogs.permission"));
+        $this->setDescription($this->translate("banlogs.description"));
     }
 
     public function canUse(CommandSender $sender) : bool {
@@ -34,7 +34,7 @@ class BanLogsCommand extends BaseCommand {
         if(!$this->checkPluginState($this->getPlugin(), $sender))
             return true;
         if(!$this->canUse($sender)) {
-            $sender->sendMessage(C::RED . $this->getLang()->translateString("command.permission.denied"));
+            $sender->sendMessage(C::RED . $this->translate("permission.denied"));
             return true;
         }
         /** @var Player $player */

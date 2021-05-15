@@ -28,7 +28,7 @@ class PunishmentForm extends BaseForm {
     public static function openMainForm(Player $player) {
         $punishments = self::getDataMgr()->getAllPunishments();
         if(is_null($punishments)) {
-            $player->sendMessage(C::RED . self::getLang()->translateString("command.error"));
+            $player->sendMessage(C::RED . self::translate("error"));
             return;
         }
         $form = new SimpleForm(function (Player $player, $data) use($punishments) {
@@ -39,11 +39,11 @@ class PunishmentForm extends BaseForm {
                 self::openEditPUNForm($player, $punishments[$data]);
             }
         });
-        $form->setTitle("Punishments");
+        $form->setTitle(self::translate("punishment.form.title"));
         foreach ($punishments as $punishment) {
-            $form->addButton("ID: {$punishment['id']}\nDESC: {$punishment['description']}");
+            $form->addButton(self::translate("punishment.form.button", [$punishment['id'], $punishment['description']]));
         }
-        $form->addButton("New Punishment");
+        $form->addButton(self::translate("punishment.form.button2"));
         $player->sendForm($form);
     }
 
@@ -60,24 +60,24 @@ class PunishmentForm extends BaseForm {
             $duration = &$data[2];
 
             if(!is_numeric($id)) {
-                $player->sendMessage(C::RED . self::getLang()->translateString("command.param.incorrectFormat", ["id", "3 (0 to 999)"]));
+                $player->sendMessage(C::RED . self::translate("param.incorrect", ["id", "3 (0 to 999)"]));
                 return;
             }
             $id = round($id);
             if(self::getDataMgr()->punishmentExists($id)) {
-                $player->sendMessage(C::RED . self::getLang()->translateString("db.entry.alreadyExists", ["with the ID $id"]));
+                $player->sendMessage(C::RED . self::translate("punishment.exist", [$id]));
                 return;
             }
             if((int) $id > 999) {
-                $player->sendMessage(C::RED . self::getLang()->translateString("command.param.tooLong", ["id", "3"]));
+                $player->sendMessage(C::RED . self::translate("param.tooLong", ["id", "3"]));
                 return;
             }
             if(!preg_match("/(^[1-9][0-9]{0,2}[mhd])(,[1-9][0-9]{0,2}[mhd]){0,2}$/", $duration)) {
-                $player->sendMessage(C::RED . self::getLang()->translateString("command.param.incorrectFormat", ["duration", "1d,12h Example2: 2d,5h,30m Example3: 30m"]));
+                $player->sendMessage(C::RED . self::translate("param.incorrect", ["duration", "1d,12h Example2: 2d,5h,30m Example3: 30m"]));
                 return;
             }
             if(strlen($description) > 255 or strlen($description) < 3) {
-                $player->sendMessage(C::RED . self::getLang()->translateString("command.param.tooLong", ["description", "3 to 255"]));
+                $player->sendMessage(C::RED . self::translate("param.tooLong", ["description", "3 to 255"]));
                 return;
             }
 
@@ -86,25 +86,25 @@ class PunishmentForm extends BaseForm {
             $pun->description = $description;
             $pun->duration = Converter::str_to_seconds($duration);
             if(is_null($pun->save())) {
-                $player->sendMessage(C::RED . self::getLang()->translateString("command.error"));
+                $player->sendMessage(C::RED . self::translate("error"));
                 return;
             }
 
             $log = new CreationLog();
-            $log->description = self::getLang()->translateString("logger.punishment.creation");
+            $log->description = self::translate("logger.punishment.creation");
             $log->moderator = $player->getName();
             $log->target = "PunId[" . $pun->id . "]";
             if(is_null($log->save())) {
-                $player->sendMessage(C::RED . self::getLang()->translateString("command.error"));
+                $player->sendMessage(C::RED . self::translate("error"));
                 return;
             }
 
-            $player->sendMessage(self::getLang()->translateString("command.punishments.new.success", [$id]));
+            $player->sendMessage(self::translate("punishments.new.success", [$id]));
         });
-        $form->setTitle("New Punishment");
-        $form->addInput("Unique identifier:", "0");
-        $form->addInput("Description:", "Hacking...");
-        $form->addInput("Duration:", "1d,12h");
+        $form->setTitle(self::translate("punishment.form.button2"));
+        $form->addInput(self::translate("punishment.form2.input"), "0");
+        $form->addInput(self::translate("punishment.form2.input2"), "Hacking...");
+        $form->addInput(self::translate("punishment.form2.input3"), "1d,12h");
         $player->sendForm($form);
     }
 
@@ -123,52 +123,52 @@ class PunishmentForm extends BaseForm {
 
             if($data[3]) {
                 if(is_null($pun->delete())) {
-                    $player->sendMessage(C::RED . self::getLang()->translateString("command.error"));
+                    $player->sendMessage(C::RED . self::translate("error"));
                     return;
                 }
                 $log = new DeletionLog();
-                $log->description = self::getLang()->translateString("logger.punishment.deletion");
+                $log->description = self::translate("logger.punishment.deletion");
                 $log->moderator = $player->getName();
                 $log->target = "PunId[" . $pun->id . "]";
                 if(is_null($log->save())) {
-                    $player->sendMessage(C::RED . self::getLang()->translateString("command.error"));
+                    $player->sendMessage(C::RED . self::translate("error"));
                     return;
                 }
-                $player->sendMessage(self::getLang()->translateString("command.punishments.delete.success", [$pun->id]));
+                $player->sendMessage(self::translate("punishments.delete.success", [$pun->id]));
                 return;
             }
             if(!preg_match("/(^[1-9][0-9]{0,2}[mhd])(,[1-9][0-9]{0,2}[mhd]){0,2}$/", $duration)) {
-                $player->sendMessage(C::RED . self::getLang()->translateString("command.param.incorrectFormat", ["duration", "1d,12h Example2: 2d,5h,30m Example3: 30m"]));
+                $player->sendMessage(C::RED . self::translate("param.incorrect", ["duration", "1d,12h Example2: 2d,5h,30m Example3: 30m"]));
                 return;
             }
             if(strlen($description) > 255 || strlen($description) < 3) {
-                $player->sendMessage(C::RED . self::getLang()->translateString("command.param.tooLong", ["description", "3 to 255"]));
+                $player->sendMessage(C::RED . self::translate("param.tooLong", ["description", "3 to 255"]));
                 return;
             }
 
             $pun->description = $description;
             $pun->duration = Converter::str_to_seconds($duration);
             if(is_null($pun->update())) {
-                $player->sendMessage(C::RED . self::getLang()->translateString("command.error"));
+                $player->sendMessage(C::RED . self::translate("error"));
                 return;
             }
 
             $log = new AdaptationLog();
-            $log->description = self::getLang()->translateString("logger.punishment.adaptation");
+            $log->description = self::translate("logger.punishment.adaptation");
             $log->moderator = $player->getName();
             $log->target = "PunId[" . $pun->id . "]";
             if(is_null($log->save())) {
-                $player->sendMessage(C::RED . self::getLang()->translateString("command.error"));
+                $player->sendMessage(C::RED . self::translate("error"));
                 return;
             }
 
-            $player->sendMessage(self::getLang()->translateString("command.punishments.edit.success", [$pun->id]));
+            $player->sendMessage(self::translate("punishments.edit.success", [$pun->id]));
         });
-        $form->setTitle("Edit Punishment");
-        $form->addLabel("» UNIQUE IDENTIFIER: {$punishment['id']}", "desc");
-        $form->addInput("Description:", "Hacking...", $punishment['description'], "desc");
-        $form->addInput("Duration:", "1d,12h", Converter::seconds_to_str((int) $punishment['duration']));
-        $form->addToggle("[!] Delete Punishment");
+        $form->setTitle(self::translate("punishment.form3.title"));
+        $form->addLabel(self::translate("punishment.form3.label", [$punishment['id']]), "desc");
+        $form->addInput(self::translate("punishment.form3.input"), "Hacking...", $punishment['description'], "desc");
+        $form->addInput(self::translate("punishment.form3.input2"), "1d,12h", Converter::seconds_to_str((int) $punishment['duration']));
+        $form->addToggle(self::translate("punishment.form3.toggle"));
         $player->sendForm($form);
     }
 

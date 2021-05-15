@@ -21,9 +21,9 @@ class BanListCommand extends BaseCommand {
      * @param Plugin $owner
      */
     public function __construct(Plugin $owner) {
-        parent::__construct("banlist", $owner);
-        $this->setPermission("playerban.command.banlist");
-        $this->setDescription("Shows a list of all banned players");
+        parent::__construct($this->translate("banlist.name"), $owner);
+        $this->setPermission($this->translate("banlist.permission"));
+        $this->setDescription($this->translate("banlist.description"));
     }
 
     public function canUse(CommandSender $sender) : bool {
@@ -34,7 +34,7 @@ class BanListCommand extends BaseCommand {
         if(!$this->checkPluginState($this->getPlugin(), $sender))
             return true;
         if(!$this->canUse($sender)) {
-            $sender->sendMessage(C::RED . $this->getLang()->translateString("command.permission.denied"));
+            $sender->sendMessage(C::RED . $this->translate("permission.denied"));
             return true;
         }
         /** @var Player $player */

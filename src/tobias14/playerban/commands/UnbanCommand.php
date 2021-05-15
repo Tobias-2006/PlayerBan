@@ -20,10 +20,10 @@ class UnbanCommand extends BaseCommand {
      * @param Plugin $owner
      */
     public function __construct(Plugin $owner) {
-        parent::__construct("unban", $owner);
-        $this->setPermission("playerban.command.unban");
-        $this->setDescription("Unban someone from the server");
-        $this->setUsage("/unban <player|ip>");
+        parent::__construct($this->translate("unban.name"), $owner);
+        $this->setPermission($this->translate("unban.permission"));
+        $this->setDescription($this->translate("unban.description"));
+        $this->setUsage($this->translate("unban.usage"));
     }
 
     public function canUse(CommandSender $sender) : bool {
@@ -34,7 +34,7 @@ class UnbanCommand extends BaseCommand {
         if(!$this->checkPluginState($this->getPlugin(), $sender))
             return true;
         if(!$this->canUse($sender)) {
-            $sender->sendMessage(C::RED . $this->getLang()->translateString("command.permission.denied"));
+            $sender->sendMessage(C::RED . $this->translate("permission.denied"));
             return true;
         }
         if(!isset($args[0])) {
@@ -43,21 +43,21 @@ class UnbanCommand extends BaseCommand {
         }
         $target = $args[0];
         if(!$this->getDataMgr()->isBanned($target)) {
-            $sender->sendMessage(C::RED . $this->getLang()->translateString("command.target.isNotBanned", [$target]));
+            $sender->sendMessage(C::RED . $this->translate("target.notBanned", [$target]));
             return true;
         }
 
         if($this->getDataMgr()->removeBan($target)) {
-            $sender->sendMessage($this->getLang()->translateString("command.unban.success", [$target]));
+            $sender->sendMessage($this->translate("unban.success", [$target]));
             $log = new DeletionLog();
             $log->target = $target;
             $log->moderator = $sender->getName();
-            $log->description = $this->getLang()->translateString("logger.ban.deletion");
+            $log->description = $this->translate("logger.ban.deletion");
             $log->save();
             return true;
         }
 
-        $sender->sendMessage(C::RED . $this->getLang()->translateString("command.error"));
+        $sender->sendMessage(C::RED . $this->translate("error"));
         return true;
     }
 

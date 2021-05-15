@@ -33,7 +33,7 @@ class DataManager {
         try {
             $this->db = new mysqli($settings['Host'], $settings['Username'], $settings['Password'], $settings['Database'], $settings['Port']);
         } catch (Exception $e) {
-            $this->plugin->getLogger()->critical($this->plugin->getLang()->translateString("db.connection.failed"));
+            $this->plugin->getLogger()->critical($this->plugin->getLang()->translateString("connection.failed"));
             $this->plugin->getServer()->getPluginManager()->disablePlugin($this->plugin);
             return;
         }
@@ -61,7 +61,7 @@ class DataManager {
             $settings = $this->settings;
             $this->db = new mysqli($settings['Host'], $settings['Username'], $settings['Password'], $settings['Database'], $settings['Port']);
         } catch (Exception $e) {
-            $this->plugin->getLogger()->critical($this->plugin->getLang()->translateString("db.connection.failed"));
+            $this->plugin->getLogger()->critical($this->plugin->getLang()->translateString("connection.failed"));
             $this->plugin->getServer()->getPluginManager()->disablePlugin($this->plugin);
         }
     }

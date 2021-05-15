@@ -65,6 +65,14 @@ class PlayerBan extends PluginBase {
         return self::$instance;
     }
 
+    /**
+     * @param int $timestamp
+     * @return string
+     */
+    public function formatTime(int $timestamp) : string {
+        return date("d.m.Y | H:i", $timestamp);
+    }
+
     public function onLoad() {
         self::$instance = $this;
         $this->saveDefaultConfig();

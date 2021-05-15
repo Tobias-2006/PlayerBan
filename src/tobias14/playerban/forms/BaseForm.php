@@ -2,7 +2,6 @@
 
 namespace tobias14\playerban\forms;
 
-use pocketmine\lang\BaseLang;
 use tobias14\playerban\database\DataManager;
 use tobias14\playerban\PlayerBan;
 
@@ -14,10 +13,12 @@ use tobias14\playerban\PlayerBan;
 abstract class BaseForm {
 
     /**
-     * @return BaseLang
+     * @param string $str
+     * @param array $params
+     * @return string
      */
-    protected static function getLang() : BaseLang {
-        return PlayerBan::getInstance()->getLang();
+    protected static function translate(string $str, array $params = []) : string {
+        return PlayerBan::getInstance()->getLang()->translateString($str, $params);
     }
 
     /**
@@ -25,6 +26,14 @@ abstract class BaseForm {
      */
     protected static function getDataMgr() : DataManager {
         return PlayerBan::getInstance()->getDataManager();
+    }
+
+    /**
+     * @param int $timestamp
+     * @return string
+     */
+    protected static function formatTime(int $timestamp) : string {
+        return PlayerBan::getInstance()->formatTime($timestamp);
     }
 
 }

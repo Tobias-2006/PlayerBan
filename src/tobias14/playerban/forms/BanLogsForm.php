@@ -19,7 +19,7 @@ class BanLogsForm extends BaseForm {
      * @param Player $player
      * @param int $site
      */
-    public static function openMainForm(Player $player, $site = 0) {
+    public static function openMainForm(Player $player, int $site = 0) {
         $logs = self::getDataMgr()->getLogs($site);
         $form = new SimpleForm(function (Player $player, $data) use ($logs, $site) {
             if(is_null($data)) return;
@@ -29,13 +29,12 @@ class BanLogsForm extends BaseForm {
             }
             self::openLogInfoForm($player, $logs[$data], $site);
         });
-        $form->setTitle("BanLogs");
+        $form->setTitle(self::translate("banlogs.form.title"));
         foreach ($logs as $log) {
-            $title = date("d.m.Y | H:i", $log['creation_time']) . "\nMOD: " . $log['moderator'];
-            $form->addButton($title);
+            $form->addButton(self::translate("banlogs.form.button", [self::formatTime($log['creation_time']), $log['moderator']]));
         }
         if(self::getDataMgr()->getMaxLogPage() > ($site + 1)) {
-            $form->addButton("Next Page");
+            $form->addButton(self::translate("button.nextPage"));
         }
         $player->sendForm($form);
     }
@@ -54,12 +53,26 @@ class BanLogsForm extends BaseForm {
                 self::openMainForm($player, $site);
             }
         });
-        $log_creation = date("d.m.Y | H:i", $log['creation_time']);
-        $information = ["Type: {$log['type']}", "Description: {$log['description']}", "Moderator: {$log['moderator']}", "Target: {$log['target']}", "Creation: $log_creation"];
-        $form->setTitle("LogInfo");
-        $form->setContent(implode("\n", $information));
-        $form->addButton("Back");
+        $form->setTitle(self::translate("banlogs.form2.title"));
+        $form->setContent(self::getLogInfoContent($log));
+        $form->addButton(self::translate("button.back"));
         $player->sendForm($form);
+    }
+
+    /**
+     * Returns a string, with the information lines
+     *
+     * @param array $log
+     * @return string
+     */
+    private static function getLogInfoContent(array $log) : string {
+        $data = [];
+        $params = [$log['type'], $log['description'], $log['moderator'], $log['target'], self::formatTime($log['creation_time'])];
+        for($i = 0; $i < 5; $i++) {
+            $line = $i + 1;
+            $data[] = self::translate("banlogs.form2.line$line", [$params[$i]]);
+        }
+        return implode("\n", $data);
     }
 
 }

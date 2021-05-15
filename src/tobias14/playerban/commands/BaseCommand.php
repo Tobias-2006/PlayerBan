@@ -4,7 +4,6 @@ namespace tobias14\playerban\commands;
 
 use pocketmine\command\CommandSender;
 use pocketmine\command\PluginCommand;
-use pocketmine\lang\BaseLang;
 use pocketmine\plugin\Plugin;
 use pocketmine\utils\TextFormat as C;
 use tobias14\playerban\database\DataManager;
@@ -34,17 +33,19 @@ abstract class BaseCommand extends PluginCommand {
      */
     public function checkPluginState(Plugin $plugin, CommandSender $sender) : bool {
         if($plugin->isDisabled()) {
-            $sender->sendMessage(C::RED . $this->getLang()->translateString("command.plugin.disabled"));
+            $sender->sendMessage(C::RED . $this->translate("plugin.disabled"));
             return false;
         }
         return true;
     }
 
     /**
-     * @return BaseLang
+     * @param string $str
+     * @param array $params
+     * @return string
      */
-    public function getLang() : BaseLang {
-        return PlayerBan::getInstance()->getLang();
+    public function translate(string $str, array $params = []) : string {
+        return PlayerBan::getInstance()->getLang()->translateString($str, $params);
     }
 
     /**

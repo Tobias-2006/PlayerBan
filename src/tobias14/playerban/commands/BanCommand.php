@@ -21,10 +21,10 @@ class BanCommand extends BaseCommand {
      * @param Plugin $owner
      */
     public function __construct(Plugin $owner) {
-        parent::__construct("ban", $owner);
-        $this->setPermission("playerban.command.ban");
-        $this->setDescription("Ban a player from the server");
-        $this->setUsage("/ban <player|ip> <punId>");
+        parent::__construct($this->translate("ban.name"), $owner);
+        $this->setPermission($this->translate("ban.permission"));
+        $this->setDescription($this->translate("ban.description"));
+        $this->setUsage($this->translate("ban.usage"));
     }
 
     public function canUse(CommandSender $sender) : bool {
@@ -35,7 +35,7 @@ class BanCommand extends BaseCommand {
         if(!$this->checkPluginState($this->getPlugin(), $sender))
             return true;
         if(!$this->canUse($sender)) {
-            $sender->sendMessage(C::RED . $this->getLang()->translateString("command.permission.denied"));
+            $sender->sendMessage(C::RED . $this->translate("permission.denied"));
             return true;
         }
         if(!isset($args[0]) or !isset($args[1])) {
@@ -45,19 +45,19 @@ class BanCommand extends BaseCommand {
         $target = &$args[0];
         $pun_id = &$args[1];
         if(strlen($target) < 4) {
-            $sender->sendMessage(C::RED . $this->getLang()->translateString("command.param.tooShort", ["<player|ip>", "4"]));
+            $sender->sendMessage(C::RED . $this->translate("param.tooShort", ["<player|ip>", "4"]));
             return true;
         }
         if($this->getDataMgr()->isBanned($target)) {
-            $sender->sendMessage(C::RED . $this->getLang()->translateString("command.target.alreadyBanned"));
+            $sender->sendMessage(C::RED . $this->translate("target.isBanned"));
             return true;
         }
         if(!is_numeric($pun_id)) {
-            $sender->sendMessage(C::RED . $this->getLang()->translateString("command.param.incorrectFormat", ["<punId>", "3"]));
+            $sender->sendMessage(C::RED . $this->translate("param.incorrect", ["<punId>", "3"]));
             return true;
         }
         if(!$this->getDataMgr()->punishmentExists($pun_id)) {
-            $sender->sendMessage(C::RED . $this->getLang()->translateString("command.punishment.doesNotExist", [$pun_id]));
+            $sender->sendMessage(C::RED . $this->translate("punishment.notExist", [$pun_id]));
             return true;
         }
         $punishment = $this->getDataMgr()->getPunishment($pun_id);
@@ -69,17 +69,17 @@ class BanCommand extends BaseCommand {
         $ban->pun_id = $pun_id;
 
         if($ban->save()) {
-            $sender->sendMessage($this->getLang()->translateString("command.ban.success", [$target]));
+            $sender->sendMessage($this->translate("ban.success", [$target]));
             $log = new CreationLog();
             $log->target = $target;
             $log->moderator = $sender->getName();
-            $log->description = $this->getLang()->translateString("logger.ban.creation");
+            $log->description = $this->translate("logger.ban.creation");
             $log->save();
             $this->kickTarget($target);
             return true;
         }
 
-        $sender->sendMessage(C::RED . $this->getLang()->translateString("command.error"));
+        $sender->sendMessage(C::RED . $this->translate("error"));
         return true;
     }
 
@@ -91,7 +91,7 @@ class BanCommand extends BaseCommand {
     private function kickTarget(string $target) {
         foreach ($this->getPlugin()->getServer()->getOnlinePlayers() as $player) {
             if(strtolower($player->getName()) === strtolower($target) or $player->getAddress() === $target) {
-                $player->kick($this->getLang()->translateString("command.ban.playerKick"), false);
+                $player->kick($this->translate("ban.target.kick"), false);
             }
         }
     }
