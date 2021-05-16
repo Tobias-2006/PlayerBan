@@ -85,6 +85,16 @@ class DataManager {
     }
 
     /**
+     * @return void
+     */
+    public function close() {
+        try {
+            $this->db->close();
+        } catch (Exception $e) {//NOOP
+        }
+    }
+
+    /**
      * @param int $type
      * @param string $description
      * @param string $moderator

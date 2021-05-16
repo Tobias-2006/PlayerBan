@@ -100,4 +100,8 @@ class PlayerBan extends PluginBase {
         $this->getServer()->getPluginManager()->registerEvents(new EventListener(), $this);
     }
 
+    public function onDisable() {
+        $this->dataMgr->close();
+    }
+
 }
