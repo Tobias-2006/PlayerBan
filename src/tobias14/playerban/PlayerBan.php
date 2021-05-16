@@ -11,6 +11,8 @@ use tobias14\playerban\commands\PunishmentListCommand;
 use tobias14\playerban\commands\PunishmentsCommand;
 use tobias14\playerban\commands\UnbanCommand;
 use tobias14\playerban\database\DataManager;
+use tobias14\playerban\database\MysqlManager;
+use tobias14\playerban\database\SqliteManager;
 
 /**
  * This class represents the PlayerBan plugin
@@ -73,6 +75,24 @@ class PlayerBan extends PluginBase {
         return date("d.m.Y | H:i", $timestamp);
     }
 
+    /**
+     * @return void
+     */
+    private function setDataMgr() : void {
+        $datamanager = $this->getConfig()->get("datamanager", "sqlite");
+        switch ($datamanager) {
+            case "mysql":
+            case "MySql":
+            case "MySQL":
+                $this->dataMgr = new MysqlManager($this, $this->getDatabaseSettings());
+                break;
+            case "sqlite":
+            case "sqlite3":
+            default:
+                $this->dataMgr = new SqliteManager($this, []);
+        }
+    }
+
     public function onLoad() {
         self::$instance = $this;
         $this->saveDefaultConfig();
@@ -81,7 +101,7 @@ class PlayerBan extends PluginBase {
     }
 
     public function onEnable() {
-        $this->dataMgr = new DataManager($this, $this->getDatabaseSettings());
+        $this->setDataMgr();
         $command_map = $this->getServer()->getCommandMap();
         $commands = ["ban", "unban", "pardon", "ban-ip", "unban-ip", "banlist"];
         foreach ($commands as $cmd) {
