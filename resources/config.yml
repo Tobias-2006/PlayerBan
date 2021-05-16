@@ -9,6 +9,11 @@
 # Config File
 # Version: 1.0.0
 
+#Set your language here
+#English (eng),
+#German (deu)
+language: eng
+
 #MySQL Connection
 host: 127.0.0.1
 username: root

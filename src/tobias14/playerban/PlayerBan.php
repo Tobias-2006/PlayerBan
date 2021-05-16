@@ -76,8 +76,8 @@ class PlayerBan extends PluginBase {
     public function onLoad() {
         self::$instance = $this;
         $this->saveDefaultConfig();
-        $this->saveResource("eng.ini");
-        $this->baseLang = new BaseLang("eng", $this->getDataFolder());
+        $lang = $this->getConfig()->get("language", BaseLang::FALLBACK_LANGUAGE);
+        $this->baseLang = new BaseLang($lang, $this->getFile() . 'resources/');
     }
 
     public function onEnable() {
