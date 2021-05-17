@@ -33,7 +33,7 @@ abstract class DataManager {
     abstract public function updatePunishment(int $id, int $duration, string $description) : ?bool;
 
     abstract public function isBanned(string $target) : ?bool;
-    abstract public function saveBan(string $target, string $moderator, $expiry_time, $pun_id, $creation_time) : ?bool;
+    abstract public function saveBan(string $target, string $moderator, int $expiry_time, int $pun_id, int $creation_time) : ?bool;
     abstract public function removeBan(string $target) : ?bool;
     abstract public function getBanByName(string $target) : ?array;
     abstract public function getAllCurrentBans(int $site = 0, int $limit = 6) : ?array;

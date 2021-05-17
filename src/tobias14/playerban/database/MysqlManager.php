@@ -243,12 +243,12 @@ class MysqlManager extends DataManager {
     /**
      * @param string $target
      * @param string $moderator
-     * @param $expiry_time
-     * @param $pun_id
-     * @param $creation_time
+     * @param int $expiry_time
+     * @param int $pun_id
+     * @param int $creation_time
      * @return null|bool
      */
-    public function saveBan(string $target, string $moderator, $expiry_time, $pun_id, $creation_time) : ?bool {
+    public function saveBan(string $target, string $moderator, int $expiry_time, int $pun_id, int $creation_time) : ?bool {
         if(!$this->checkConnection()) return null;
         $stmt = $this->db->prepare("INSERT INTO bans(target, moderator, expiry_time, pun_id, creation_time) VALUES(?, ?, ?, ?, ?);");
         $stmt->bind_param("ssiii", $target, $moderator, $expiry_time, $pun_id, $creation_time);
