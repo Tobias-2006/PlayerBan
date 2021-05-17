@@ -53,7 +53,7 @@ class BanListForm extends BaseForm {
         $form = new SimpleForm(function (Player $player, $data) use($site, $ban) {
             if(is_null($data)) return;
             if($data === 0) {
-                $player->getServer()->dispatchCommand($player, "unban {$ban['target']}");
+                $player->getServer()->dispatchCommand($player, 'unban "' . $ban["target"] . '"');
                 return;
             }
             self::openMainForm($player, $site);
