@@ -37,8 +37,7 @@ class EventListener implements Listener {
 
         $ban = PlayerBan::getInstance()->getDataManager()->getBanByName($target);
         $expiry_time = PlayerBan::getInstance()->formatTime($ban['expiry_time']);
-        $msg = C::RED . "     You are banned!\n\n" . C::DARK_RED . "Expiry: " . C::WHITE . $expiry_time;
-        $event->getPlayer()->kick($msg, false);
+        $event->getPlayer()->kick(C::RED . "You are banned!\n\n" . C::DARK_RED . "Expiry: " . C::WHITE . $expiry_time, false);
     }
 
 }
