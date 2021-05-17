@@ -8,22 +8,13 @@
 - Put the plugin in the `/plugins` folder of your server
 - Now restart the server once
 
-## Configuration
-Now you need to specify the connection details of your MySQL database.
-- First change to the directory `/plugin_data/PlayerBan/`
-- Now you have to edit the `config.yml` file
-```yml
-# Here you have to enter your own connection data of your MySQL server
-host: 127.0.0.1
-username: root
-passwd: password
-dbname: playerban
-port: 3306
-```
-- Now save the file and restart the server
+## Why PlayerBan?
+PlayerBan is a ban system that is intended to make work easier for team members. Through the punishments, which are determined by the server management, there are uniform punishments for the same rule violations. In addition, you only have to enter an id instead of the reason and duration, which is much quicker to type in. The log of all changes makes it easy to track activities.
+<br>
 
-Congratulations, you're done!<br>
-For a detailed description of how which command works, feel free to check out the wiki on it.
+### Future plans
+- Discord Webhooks
+- More translations
 
 ## Commands & Permissions
 | Command | Parameters | Description | Permissions |
