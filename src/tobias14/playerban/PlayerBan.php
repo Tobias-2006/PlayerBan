@@ -76,6 +76,24 @@ class PlayerBan extends PluginBase {
     }
 
     /**
+     * @param string $name
+     * @return bool
+     */
+    public function isValidUserName(string $name) : bool {
+        $lname = strtolower($name);
+        $len = strlen($name);
+        return $lname !== "rcon" and $lname !== "console" and $len >= 1 and $len <= 16 and preg_match("/[^A-Za-z0-9_ ]/", $name) === 0;
+    }
+
+    /**
+     * @param string $address
+     * @return bool
+     */
+    public function isValidAddress(string $address) : bool {
+        return preg_match("/^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/", $address);
+    }
+
+    /**
      * @return void
      */
     private function setDataMgr() : void {

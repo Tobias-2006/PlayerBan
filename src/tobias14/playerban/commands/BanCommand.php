@@ -7,6 +7,7 @@ use pocketmine\plugin\Plugin;
 use pocketmine\utils\TextFormat as C;
 use tobias14\playerban\ban\Ban;
 use tobias14\playerban\log\CreationLog;
+use tobias14\playerban\PlayerBan;
 
 /**
  * Class BanCommand
@@ -18,10 +19,10 @@ class BanCommand extends BaseCommand {
     /**
      * BanCommand constructor.
      *
-     * @param Plugin $owner
+     * @param Plugin $plugin
      */
-    public function __construct(Plugin $owner) {
-        parent::__construct($this->translate("ban.name"), $owner);
+    public function __construct(Plugin $plugin) {
+        parent::__construct($this->translate("ban.name"), $plugin);
         $this->setPermission($this->translate("ban.permission"));
         $this->setDescription($this->translate("ban.description"));
         $this->setUsage($this->translate("ban.usage"));
@@ -44,8 +45,8 @@ class BanCommand extends BaseCommand {
         }
         $target = &$args[0];
         $pun_id = &$args[1];
-        if(strlen($target) < 4) {
-            $sender->sendMessage(C::RED . $this->translate("param.tooShort", ["<player|ip>", "4"]));
+        if(!PlayerBan::getInstance()->isValidUsername($target) && !PlayerBan::getInstance()->isValidAddress($target)) {
+            $sender->sendMessage(C::RED . $this->translate("param.incorrect", ["<player|ip>", "max123"]));
             return true;
         }
         if($this->getDataMgr()->isBanned($target)) {
