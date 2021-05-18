@@ -82,7 +82,7 @@ class PunishmentForm extends BaseForm {
             }
 
             $pun = new Punishment();
-            $pun->id = $id;
+            $pun->id = (int) $id;
             $pun->description = $description;
             $pun->duration = Converter::str_to_seconds($duration);
             if(is_null($pun->save())) {
@@ -112,9 +112,9 @@ class PunishmentForm extends BaseForm {
      * This form can be used to edit or delete punishments
      *
      * @param Player $player
-     * @param $punishment
+     * @param array $punishment
      */
-    public static function openEditPUNForm(Player $player, $punishment) {
+    public static function openEditPUNForm(Player $player, array $punishment) {
         $form = new CustomForm(function (Player $player, $data) use($punishment) {
             if(is_null($data)) return;
             $pun = new Punishment($punishment['id'], $punishment['duration'], $punishment['description']);
