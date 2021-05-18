@@ -201,12 +201,12 @@ class SqliteManager extends DataManager {
     /**
      * @param string $target
      * @param string $moderator
-     * @param $expiry_time
-     * @param $pun_id
-     * @param $creation_time
+     * @param int $expiry_time
+     * @param int $pun_id
+     * @param int $creation_time
      * @return bool|null
      */
-    public function saveBan(string $target, string $moderator, $expiry_time, $pun_id, $creation_time) : ?bool {
+    public function saveBan(string $target, string $moderator, int $expiry_time, int $pun_id, int $creation_time) : ?bool {
         $stmt = $this->db->prepare("INSERT INTO bans(target, moderator, expiry_time, pun_id, creation_time) VALUES(:target, :mod, :expiry, :pun_id, :creation);");
         $stmt->bindParam(":target", $target, SQLITE3_TEXT);
         $stmt->bindParam(":mod", $moderator, SQLITE3_TEXT);

@@ -67,7 +67,7 @@ class BanCommand extends BaseCommand {
         $ban->target = $target;
         $ban->moderator = $sender->getName();
         $ban->expiry_time = time() + $punishment['duration'];
-        $ban->pun_id = $pun_id;
+        $ban->pun_id = (int) $pun_id;
 
         if($ban->save()) {
             $sender->sendMessage($this->translate("ban.success", [$target]));
