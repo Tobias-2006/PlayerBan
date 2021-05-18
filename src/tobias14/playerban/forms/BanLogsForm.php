@@ -44,9 +44,9 @@ class BanLogsForm extends BaseForm {
      *
      * @param Player $player
      * @param array $log
-     * @param $site
+     * @param int $site
      */
-    private static function openLogInfoForm(Player $player, array $log, $site) {
+    private static function openLogInfoForm(Player $player, array $log, int $site) {
         $form = new SimpleForm(function (Player $player, $data) use ($site) {
             if(is_null($data)) return;
             if(0 === $data) {
