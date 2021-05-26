@@ -3,8 +3,8 @@
 namespace tobias14\playerban\commands;
 
 use pocketmine\command\CommandSender;
+use pocketmine\plugin\Plugin;
 use pocketmine\utils\TextFormat as C;
-use tobias14\playerban\PlayerBan;
 use tobias14\playerban\utils\Converter;
 
 /**
@@ -17,9 +17,9 @@ class PunishmentListCommand extends BaseCommand {
     /**
      * PunishmentListCommand constructor.
      *
-     * @param PlayerBan $plugin
+     * @param Plugin $plugin
      */
-    public function __construct(PlayerBan $plugin) {
+    public function __construct(Plugin $plugin) {
         parent::__construct($this->translate("punlist.name"), $plugin);
         $this->setPermission($this->translate("punlist.permission"));
         $this->setDescription($this->translate("punlist.description"));

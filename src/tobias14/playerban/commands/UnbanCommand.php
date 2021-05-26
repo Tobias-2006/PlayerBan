@@ -17,10 +17,10 @@ class UnbanCommand extends BaseCommand {
     /**
      * UnbanCommand constructor.
      *
-     * @param Plugin $owner
+     * @param Plugin $plugin
      */
-    public function __construct(Plugin $owner) {
-        parent::__construct($this->translate("unban.name"), $owner);
+    public function __construct(Plugin $plugin) {
+        parent::__construct($this->translate("unban.name"), $plugin);
         $this->setPermission($this->translate("unban.permission"));
         $this->setDescription($this->translate("unban.description"));
         $this->setUsage($this->translate("unban.usage"));

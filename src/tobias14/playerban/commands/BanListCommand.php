@@ -18,10 +18,10 @@ class BanListCommand extends BaseCommand {
     /**
      * BanListCommand constructor.
      *
-     * @param Plugin $owner
+     * @param Plugin $plugin
      */
-    public function __construct(Plugin $owner) {
-        parent::__construct($this->translate("banlist.name"), $owner);
+    public function __construct(Plugin $plugin) {
+        parent::__construct($this->translate("banlist.name"), $plugin);
         $this->setPermission($this->translate("banlist.permission"));
         $this->setDescription($this->translate("banlist.description"));
     }
