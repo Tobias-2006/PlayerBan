@@ -80,7 +80,7 @@ class BanListForm extends BaseForm {
                 if(self::getDataMgr()->punishmentExists($ban['pun_id'])) {
                     $punishment = self::getDataMgr()->getPunishment($ban['pun_id']);
                     $params[] = $punishment['description'];
-                    $params[] = Converter::seconds_to_str($punishment['duration']);
+                    $params[] = Converter::secondsToStr($punishment['duration']);
                 } else{
                     break;
                 }

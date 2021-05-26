@@ -89,14 +89,14 @@ class MysqlManager extends DataManager {
      * @param int $type
      * @param string $description
      * @param string $moderator
-     * @param int $creation_time
+     * @param int $creationTime
      * @param null|string $target
      * @return bool|null
      */
-    public function saveLog(int $type, string $description, string $moderator, int $creation_time, string $target = null) : ?bool {
+    public function saveLog(int $type, string $description, string $moderator, int $creationTime, string $target = null) : ?bool {
         if(!$this->checkConnection()) return null;
         $stmt = $this->db->prepare("INSERT INTO logs(type, description, moderator, target, creation_time) VALUES(?, ?, ?, ?, ?);");
-        $stmt->bind_param("isssi", $type, $description, $moderator, $target, $creation_time);
+        $stmt->bind_param("isssi", $type, $description, $moderator, $target, $creationTime);
         $result = $stmt->execute();
         $stmt->close();
         return $result;
@@ -131,9 +131,9 @@ class MysqlManager extends DataManager {
         $stmt = $this->db->prepare("SELECT COUNT(*) FROM logs");
         $stmt->execute();
         if(false === $result = $stmt->get_result()) return null;
-        $row_count = $result->fetch_row()[0];
-        $sites = $row_count / $limit;
-        if(($row_count % $limit) != 0)
+        $rowCount = $result->fetch_row()[0];
+        $sites = $rowCount / $limit;
+        if(($rowCount % $limit) != 0)
             $sites += 1;
         $stmt->close();
         return $sites;
@@ -243,15 +243,15 @@ class MysqlManager extends DataManager {
     /**
      * @param string $target
      * @param string $moderator
-     * @param int $expiry_time
-     * @param int $pun_id
-     * @param int $creation_time
+     * @param int $expiryTime
+     * @param int $punId
+     * @param int $creationTime
      * @return null|bool
      */
-    public function saveBan(string $target, string $moderator, int $expiry_time, int $pun_id, int $creation_time) : ?bool {
+    public function saveBan(string $target, string $moderator, int $expiryTime, int $punId, int $creationTime) : ?bool {
         if(!$this->checkConnection()) return null;
         $stmt = $this->db->prepare("INSERT INTO bans(target, moderator, expiry_time, pun_id, creation_time) VALUES(?, ?, ?, ?, ?);");
-        $stmt->bind_param("ssiii", $target, $moderator, $expiry_time, $pun_id, $creation_time);
+        $stmt->bind_param("ssiii", $target, $moderator, $expiryTime, $punId, $creationTime);
         $result = $stmt->execute();
         $stmt->close();
         return $result;
@@ -318,9 +318,9 @@ class MysqlManager extends DataManager {
         $stmt->bind_param("i", $time);
         $stmt->execute();
         $result = $stmt->get_result();
-        $row_count = $result->fetch_row()[0];
-        $sites = $row_count / $limit;
-        if(($row_count % $limit) != 0)
+        $rowCount = $result->fetch_row()[0];
+        $sites = $rowCount / $limit;
+        if(($rowCount % $limit) != 0)
             $sites += 1;
         $stmt->close();
         return $sites;

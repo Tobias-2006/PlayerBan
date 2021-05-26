@@ -11,7 +11,7 @@ class DeletionLog extends Log {
 
     public function __construct() {
         $this->type = Logger::LOG_TYPE_DELETION;
-        $this->creation_time = time();
+        $this->creationTime = time();
     }
 
 }

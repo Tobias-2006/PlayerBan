@@ -11,7 +11,7 @@ class CreationLog extends Log {
 
     public function __construct() {
         $this->type = Logger::LOG_TYPE_CREATION;
-        $this->creation_time = time();
+        $this->creationTime = time();
     }
 
 }

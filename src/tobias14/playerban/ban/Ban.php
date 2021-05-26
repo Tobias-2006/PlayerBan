@@ -12,20 +12,20 @@ use tobias14\playerban\PlayerBan;
  */
 class Ban {
 
-    /** @var int $creation_time */
-    protected $creation_time;
+    /** @var int $creationTime */
+    protected $creationTime;
 
     /** @var string $target */
     public $target;
     /** @var string $moderator */
     public $moderator;
-    /** @var int $expiry_time */
-    public $expiry_time;
-    /** @var int $pun_id */
-    public $pun_id;
+    /** @var int $expiryTime */
+    public $expiryTime;
+    /** @var int $punId */
+    public $punId;
 
     public function __construct() {
-        $this->creation_time = time();
+        $this->creationTime = time();
     }
 
     /**
@@ -37,9 +37,9 @@ class Ban {
         return PlayerBan::getInstance()->getDataManager()->saveBan(
             $this->target,
             $this->moderator,
-            $this->expiry_time,
-            $this->pun_id,
-            $this->creation_time
+            $this->expiryTime,
+            $this->punId,
+            $this->creationTime
         );
     }
 

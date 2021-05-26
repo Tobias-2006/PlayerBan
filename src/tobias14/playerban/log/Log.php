@@ -12,8 +12,8 @@ abstract class Log {
 
     /** @var int $type */
     protected $type;
-    /** @var int $creation_time */
-    protected $creation_time;
+    /** @var int $creationTime */
+    protected $creationTime;
 
     /** @var string $description */
     public $description;
@@ -37,7 +37,7 @@ abstract class Log {
      * @return int
      */
     public function getCreationTime() : int {
-        return $this->creation_time;
+        return $this->creationTime;
     }
 
     /**

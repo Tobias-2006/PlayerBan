@@ -44,17 +44,17 @@ class SqliteManager extends DataManager {
      * @param int $type
      * @param string $description
      * @param string $moderator
-     * @param int $creation_time
+     * @param int $creationTime
      * @param string|null $target
      * @return bool|null
      */
-    public function saveLog(int $type, string $description, string $moderator, int $creation_time, string $target = null) : ?bool {
+    public function saveLog(int $type, string $description, string $moderator, int $creationTime, string $target = null) : ?bool {
         $stmt = $this->db->prepare("INSERT INTO logs(type, description, moderator, target, creation_time) VALUES(:type, :desc, :mod, :target, :creation);");
         $stmt->bindParam(":type", $type, SQLITE3_INTEGER);
         $stmt->bindParam(":desc", $description, SQLITE3_TEXT);
         $stmt->bindParam(":mod", $moderator, SQLITE3_TEXT);
         $stmt->bindParam(":target", $target, SQLITE3_TEXT);
-        $stmt->bindParam(":creation", $creation_time, SQLITE3_INTEGER);
+        $stmt->bindParam(":creation", $creationTime, SQLITE3_INTEGER);
         $result = $stmt->execute() != false;
         $stmt->close();
         return $result;
@@ -88,9 +88,9 @@ class SqliteManager extends DataManager {
         $stmt = $this->db->prepare("SELECT COUNT(*) FROM logs");
         $result = $stmt->execute();
         if(false == $result) return null;
-        $row_count = $result->fetchArray(SQLITE3_NUM)[0];
-        $sites = $row_count / $limit;
-        if(($row_count % $limit) != 0)
+        $rowCount = $result->fetchArray(SQLITE3_NUM)[0];
+        $sites = $rowCount / $limit;
+        if(($rowCount % $limit) != 0)
             $sites += 1;
         $stmt->close();
         return $sites;
@@ -104,12 +104,12 @@ class SqliteManager extends DataManager {
         $stmt = $this->db->prepare("SELECT * FROM punishments WHERE id=:id;");
         $stmt->bindParam(":id", $id, SQLITE3_INTEGER);
         $result = $stmt->execute();
-        $num_rows = 0;
+        $numRows = 0;
         while($result->fetchArray()){
-            ++$num_rows;
+            ++$numRows;
         }
         $stmt->close();
-        return $num_rows === 1;
+        return $numRows === 1;
     }
 
     /**
@@ -190,29 +190,29 @@ class SqliteManager extends DataManager {
         $stmt->bindParam(":target", $target, SQLITE3_TEXT);
         $stmt->bindParam(":time", $time, SQLITE3_INTEGER);
         $result = $stmt->execute();
-        $num_rows = 0;
+        $numRows = 0;
         while($result->fetchArray()){
-            ++$num_rows;
+            ++$numRows;
         }
         $stmt->close();
-        return $num_rows === 1;
+        return $numRows === 1;
     }
 
     /**
      * @param string $target
      * @param string $moderator
-     * @param int $expiry_time
-     * @param int $pun_id
-     * @param int $creation_time
+     * @param int $expiryTime
+     * @param int $punId
+     * @param int $creationTime
      * @return bool|null
      */
-    public function saveBan(string $target, string $moderator, int $expiry_time, int $pun_id, int $creation_time) : ?bool {
+    public function saveBan(string $target, string $moderator, int $expiryTime, int $punId, int $creationTime) : ?bool {
         $stmt = $this->db->prepare("INSERT INTO bans(target, moderator, expiry_time, pun_id, creation_time) VALUES(:target, :mod, :expiry, :pun_id, :creation);");
         $stmt->bindParam(":target", $target, SQLITE3_TEXT);
         $stmt->bindParam(":mod", $moderator, SQLITE3_TEXT);
-        $stmt->bindParam(":expiry", $expiry_time, SQLITE3_INTEGER);
-        $stmt->bindParam(":pun_id", $pun_id, SQLITE3_INTEGER);
-        $stmt->bindParam(":creation", $creation_time, SQLITE3_INTEGER);
+        $stmt->bindParam(":expiry", $expiryTime, SQLITE3_INTEGER);
+        $stmt->bindParam(":pun_id", $punId, SQLITE3_INTEGER);
+        $stmt->bindParam(":creation", $creationTime, SQLITE3_INTEGER);
         $result = $stmt->execute() != false;
         $stmt->close();
         return $result;
@@ -277,9 +277,9 @@ class SqliteManager extends DataManager {
         $stmt = $this->db->prepare("SELECT COUNT(*) FROM bans WHERE expiry_time > :time");
         $stmt->bindParam(":time", $time, SQLITE3_INTEGER);
         $result = $stmt->execute();
-        $row_count = $result->fetchArray(SQLITE3_NUM)[0];
-        $sites = $row_count / $limit;
-        if(($row_count % $limit) != 0)
+        $rowCount = $result->fetchArray(SQLITE3_NUM)[0];
+        $sites = $rowCount / $limit;
+        if(($rowCount % $limit) != 0)
             $sites += 1;
         $stmt->close();
         return $sites;

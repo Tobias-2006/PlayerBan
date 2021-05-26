@@ -84,7 +84,7 @@ class PunishmentForm extends BaseForm {
             $pun = new Punishment();
             $pun->id = (int) $id;
             $pun->description = $description;
-            $pun->duration = Converter::str_to_seconds($duration);
+            $pun->duration = Converter::strToSeconds($duration);
             if(is_null($pun->save())) {
                 $player->sendMessage(C::RED . self::translate("error"));
                 return;
@@ -147,7 +147,7 @@ class PunishmentForm extends BaseForm {
             }
 
             $pun->description = $description;
-            $pun->duration = Converter::str_to_seconds($duration);
+            $pun->duration = Converter::strToSeconds($duration);
             if(is_null($pun->update())) {
                 $player->sendMessage(C::RED . self::translate("error"));
                 return;
@@ -167,7 +167,7 @@ class PunishmentForm extends BaseForm {
         $form->setTitle(self::translate("punishment.form3.title"));
         $form->addLabel(self::translate("punishment.form3.label", [$punishment['id']]), "desc");
         $form->addInput(self::translate("punishment.form3.input"), "Hacking...", $punishment['description'], "desc");
-        $form->addInput(self::translate("punishment.form3.input2"), "1d,12h", Converter::seconds_to_str((int) $punishment['duration']));
+        $form->addInput(self::translate("punishment.form3.input2"), "1d,12h", Converter::secondsToStr((int) $punishment['duration']));
         $form->addToggle(self::translate("punishment.form3.toggle"));
         $player->sendForm($form);
     }

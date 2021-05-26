@@ -120,14 +120,14 @@ class PlayerBan extends PluginBase {
 
     public function onEnable() {
         $this->setDataMgr();
-        $command_map = $this->getServer()->getCommandMap();
+        $commandMap = $this->getServer()->getCommandMap();
         $commands = ["ban", "unban", "pardon", "ban-ip", "unban-ip", "banlist"];
         foreach ($commands as $cmd) {
-            if(!is_null($command = $command_map->getCommand($cmd))) {
-                $command_map->unregister($command);
+            if(!is_null($command = $commandMap->getCommand($cmd))) {
+                $commandMap->unregister($command);
             }
         }
-        $command_map->registerAll("PlayerBan", [
+        $commandMap->registerAll("PlayerBan", [
             new PunishmentsCommand($this),
             new PunishmentListCommand($this),
             new BanLogsCommand($this),

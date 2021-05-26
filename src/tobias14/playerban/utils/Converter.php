@@ -7,7 +7,7 @@ const MINUTES = "m", HOURS = "h", DAYS = "d";
 
 class Converter {
 
-    public static function str_to_seconds(string $string) : ?int {
+    public static function strToSeconds(string $string) : ?int {
         // FORMAT: 12d,3h,20m
         if(!preg_match("/(^[1-9][0-9]{0,2}[mhd])(,[1-9][0-9]{0,2}[mhd]){0,2}$/", $string)) {
             return null;
@@ -31,7 +31,7 @@ class Converter {
         return $time;
     }
 
-    public static function seconds_to_str(int $seconds) : string {
+    public static function secondsToStr(int $seconds) : string {
         $days = floor($seconds / 86400);
         $hours = floor(($seconds % 86400) / 3600);
         $minutes = floor((($seconds % 86400) % 3600) / 60);

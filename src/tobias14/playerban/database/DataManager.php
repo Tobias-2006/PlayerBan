@@ -21,7 +21,7 @@ abstract class DataManager {
     abstract protected function init();
     abstract public function close();
 
-    abstract public function saveLog(int $type, string $description, string $moderator, int $creation_time, string $target = null) : ?bool;
+    abstract public function saveLog(int $type, string $description, string $moderator, int $creationTime, string $target = null) : ?bool;
     abstract public function getLogs(int $site = 0, int $limit = 6) : ?array;
     abstract public function getMaxLogPage(int $limit = 6) : ?int;
 
@@ -33,7 +33,7 @@ abstract class DataManager {
     abstract public function updatePunishment(int $id, int $duration, string $description) : ?bool;
 
     abstract public function isBanned(string $target) : ?bool;
-    abstract public function saveBan(string $target, string $moderator, int $expiry_time, int $pun_id, int $creation_time) : ?bool;
+    abstract public function saveBan(string $target, string $moderator, int $expiryTime, int $punId, int $creationTime) : ?bool;
     abstract public function removeBan(string $target) : ?bool;
     abstract public function getBanByName(string $target) : ?array;
     abstract public function getAllCurrentBans(int $site = 0, int $limit = 6) : ?array;

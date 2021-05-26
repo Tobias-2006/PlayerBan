@@ -44,7 +44,7 @@ class BanCommand extends BaseCommand {
             return true;
         }
         $target = &$args[0];
-        $pun_id = &$args[1];
+        $punId = &$args[1];
         if(!PlayerBan::getInstance()->isValidUsername($target) && !PlayerBan::getInstance()->isValidAddress($target)) {
             $sender->sendMessage(C::RED . $this->translate("param.incorrect", ["<player|ip>", "max123"]));
             return true;
@@ -53,21 +53,21 @@ class BanCommand extends BaseCommand {
             $sender->sendMessage(C::RED . $this->translate("target.isBanned"));
             return true;
         }
-        if(!is_numeric($pun_id)) {
+        if(!is_numeric($punId)) {
             $sender->sendMessage(C::RED . $this->translate("param.incorrect", ["<punId>", "3"]));
             return true;
         }
-        if(!$this->getDataMgr()->punishmentExists($pun_id)) {
-            $sender->sendMessage(C::RED . $this->translate("punishment.notExist", [$pun_id]));
+        if(!$this->getDataMgr()->punishmentExists($punId)) {
+            $sender->sendMessage(C::RED . $this->translate("punishment.notExist", [$punId]));
             return true;
         }
-        $punishment = $this->getDataMgr()->getPunishment($pun_id);
+        $punishment = $this->getDataMgr()->getPunishment($punId);
 
         $ban = new Ban();
         $ban->target = $target;
         $ban->moderator = $sender->getName();
-        $ban->expiry_time = time() + $punishment['duration'];
-        $ban->pun_id = (int) $pun_id;
+        $ban->expiryTime = time() + $punishment['duration'];
+        $ban->punId = (int) $punId;
 
         if($ban->save()) {
             $sender->sendMessage($this->translate("ban.success", [$target]));
