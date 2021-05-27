@@ -84,11 +84,11 @@ class PlayerBan extends PluginBase {
     }
 
     /**
-     * Returns a list of the connection details
+     * Returns a list of the mysql connection details
      *
      * @return string[]
      */
-    private function getDatabaseSettings() : array {
+    private function getMySQLSettings() : array {
         return [
             'Host' => $this->getConfig()->get("host", "127.0.0.1"),
             'Username' => $this->getConfig()->get("username", "root"),
@@ -109,7 +109,7 @@ class PlayerBan extends PluginBase {
             case "mysql":
             case "MySql":
             case "MySQL":
-                $this->dataMgr = new MysqlManager($this, $this->getDatabaseSettings());
+                $this->dataMgr = new MysqlManager($this, $this->getMySQLSettings());
                 break;
             case "sqlite":
             case "sqlite3":
