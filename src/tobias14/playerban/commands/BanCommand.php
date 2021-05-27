@@ -53,6 +53,7 @@ class BanCommand extends BaseCommand {
             $sender->sendMessage(C::RED . $this->translate("param.incorrect", ["<punId>", "3"]));
             return true;
         }
+        $punId = (int) round($punId);
         if(!$this->getDataMgr()->punishmentExists($punId)) {
             $sender->sendMessage(C::RED . $this->translate("punishment.notExist", [$punId]));
             return true;

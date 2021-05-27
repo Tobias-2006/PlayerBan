@@ -7,6 +7,7 @@ use pocketmine\command\CommandSender;
 use pocketmine\plugin\Plugin;
 use pocketmine\utils\TextFormat as C;
 use tobias14\playerban\log\DeletionLog;
+use tobias14\playerban\PlayerBan;
 
 class UnbanCommand extends BaseCommand {
 
@@ -38,6 +39,10 @@ class UnbanCommand extends BaseCommand {
             return true;
         }
         $target = $args[0];
+        if(!PlayerBan::getInstance()->isValidUsername($target) && !PlayerBan::getInstance()->isValidAddress($target)) {
+            $sender->sendMessage(C::RED . $this->translate("param.incorrect", ["<player|ip>", "max123"]));
+            return true;
+        }
         if(!$this->getDataMgr()->isBanned($target)) {
             $sender->sendMessage(C::RED . $this->translate("target.notBanned", [$target]));
             return true;

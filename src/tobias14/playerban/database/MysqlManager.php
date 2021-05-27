@@ -131,7 +131,7 @@ class MysqlManager extends DataManager {
         if(($rowCount % $limit) != 0)
             $sites += 1;
         $stmt->close();
-        return $sites;
+        return (int) floor($sites);
     }
 
     /**
@@ -318,7 +318,7 @@ class MysqlManager extends DataManager {
         if(($rowCount % $limit) != 0)
             $sites += 1;
         $stmt->close();
-        return $sites;
+        return (int) floor($sites);
     }
 
 }

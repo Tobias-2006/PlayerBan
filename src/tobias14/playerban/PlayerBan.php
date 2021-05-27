@@ -80,7 +80,7 @@ class PlayerBan extends PluginBase {
      * @return bool
      */
     public function isValidAddress(string $address) : bool {
-        return preg_match("/^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/", $address);
+        return preg_match("/^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/", $address) === 1;
     }
 
     /**
