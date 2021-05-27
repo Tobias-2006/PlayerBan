@@ -20,10 +20,10 @@ class Logger {
     public static function log(Log $log) : ?bool {
         return PlayerBan::getInstance()->getDataManager()->saveLog(
             $log->getType(),
-            $log->description,
-            $log->moderator,
+            $log->getDescription(),
+            $log->getModerator(),
             $log->getCreationTime(),
-            $log->target
+            $log->getTarget()
         );
     }
 

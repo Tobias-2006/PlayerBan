@@ -7,15 +7,27 @@ abstract class Log {
 
     /** @var int $type */
     protected $type;
+    /** @var string $description */
+    protected $description;
+    /** @var string $moderator */
+    protected $moderator;
+    /** @var string $target */
+    protected $target;
     /** @var int $creationTime */
     protected $creationTime;
 
-    /** @var string $description */
-    public $description;
-    /** @var string $moderator */
-    public $moderator;
-    /** @var string $target */
-    public $target;
+    /**
+     * Log constructor.
+     *
+     * @param string $description
+     * @param string $moderator
+     * @param string $target
+     */
+    public function __construct(string $description, string $moderator, string $target) {
+        $this->description = $description;
+        $this->moderator = $moderator;
+        $this->target = $target;
+    }
 
     /**
      * Types: LOG_TYPE_CREATION, LOG_TYPE_DELETION, LOG_TYPE_ADAPTATION | (Logger.php)
@@ -24,6 +36,27 @@ abstract class Log {
      */
     public function getType() : int {
         return $this->type;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescription() : string {
+        return $this->description;
+    }
+
+    /**
+     * @return string
+     */
+    public function getModerator() : string {
+        return $this->moderator;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTarget() : string {
+        return $this->target;
     }
 
     /**

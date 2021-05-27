@@ -5,7 +5,15 @@ namespace tobias14\playerban\log;
 
 class AdaptationLog extends Log {
 
-    public function __construct() {
+    /**
+     * AdaptationLog constructor.
+     *
+     * @param string $description
+     * @param string $moderator
+     * @param string $target
+     */
+    public function __construct(string $description, string $moderator, string $target) {
+        parent::__construct($description, $moderator, $target);
         $this->type = Logger::LOG_TYPE_ADAPTATION;
         $this->creationTime = time();
     }

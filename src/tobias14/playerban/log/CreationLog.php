@@ -5,7 +5,15 @@ namespace tobias14\playerban\log;
 
 class CreationLog extends Log {
 
-    public function __construct() {
+    /**
+     * CreationLog constructor.
+     *
+     * @param string $description
+     * @param string $moderator
+     * @param string $target
+     */
+    public function __construct(string $description, string $moderator, string $target) {
+        parent::__construct($description, $moderator, $target);
         $this->type = Logger::LOG_TYPE_CREATION;
         $this->creationTime = time();
     }

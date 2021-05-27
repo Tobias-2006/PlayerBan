@@ -85,10 +85,7 @@ class PunishmentForm extends BaseForm {
                 return;
             }
 
-            $log = new CreationLog();
-            $log->description = self::translate("logger.punishment.creation");
-            $log->moderator = $player->getName();
-            $log->target = "PunId[" . $pun->id . "]";
+            $log = new CreationLog(self::translate("logger.punishment.creation"), $player->getName(), "PunId[" . $pun->id . "]");
             if(is_null($log->save())) {
                 $player->sendMessage(C::RED . self::translate("error"));
                 return;
@@ -121,10 +118,7 @@ class PunishmentForm extends BaseForm {
                     $player->sendMessage(C::RED . self::translate("error"));
                     return;
                 }
-                $log = new DeletionLog();
-                $log->description = self::translate("logger.punishment.deletion");
-                $log->moderator = $player->getName();
-                $log->target = "PunId[" . $pun->id . "]";
+                $log = new DeletionLog(self::translate("logger.punishment.deletion"), $player->getName(), "PunId[" . $pun->id . "]");
                 if(is_null($log->save())) {
                     $player->sendMessage(C::RED . self::translate("error"));
                     return;
@@ -148,10 +142,7 @@ class PunishmentForm extends BaseForm {
                 return;
             }
 
-            $log = new AdaptationLog();
-            $log->description = self::translate("logger.punishment.adaptation");
-            $log->moderator = $player->getName();
-            $log->target = "PunId[" . $pun->id . "]";
+            $log = new AdaptationLog(self::translate("logger.punishment.adaptation"), $player->getName(), "PunId[" . $pun->id . "]");
             if(is_null($log->save())) {
                 $player->sendMessage(C::RED . self::translate("error"));
                 return;

@@ -50,10 +50,7 @@ class UnbanCommand extends BaseCommand {
 
         if($this->getDataMgr()->removeBan($target)) {
             $sender->sendMessage($this->translate("unban.success", [$target]));
-            $log = new DeletionLog();
-            $log->target = $target;
-            $log->moderator = $sender->getName();
-            $log->description = $this->translate("logger.ban.deletion");
+            $log = new DeletionLog($this->translate("logger.ban.deletion"), $sender->getName(), $target);
             $log->save();
             return true;
         }

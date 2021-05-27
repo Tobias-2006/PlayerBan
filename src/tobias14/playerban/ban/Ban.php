@@ -7,19 +7,30 @@ use tobias14\playerban\PlayerBan;
 
 class Ban {
 
+    /** @var string $target */
+    protected $target;
+    /** @var string $moderator */
+    protected $moderator;
+    /** @var int $expiryTime */
+    protected $expiryTime;
+    /** @var int $punId */
+    protected $punId;
     /** @var int $creationTime */
     protected $creationTime;
 
-    /** @var string $target */
-    public $target;
-    /** @var string $moderator */
-    public $moderator;
-    /** @var int $expiryTime */
-    public $expiryTime;
-    /** @var int $punId */
-    public $punId;
-
-    public function __construct() {
+    /**
+     * Ban constructor.
+     *
+     * @param string $target
+     * @param string $moderator
+     * @param int $expiryTime
+     * @param int $punId
+     */
+    public function __construct(string $target, string $moderator, int $expiryTime, int $punId) {
+        $this->target = $target;
+        $this->moderator = $moderator;
+        $this->expiryTime = $expiryTime;
+        $this->punId = $punId;
         $this->creationTime = time();
     }
 
