@@ -86,7 +86,7 @@ class PlayerBan extends PluginBase {
     /**
      * Returns a list of the connection details
      *
-     * @return array
+     * @return string[]
      */
     private function getDatabaseSettings() : array {
         return [

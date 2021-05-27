@@ -20,7 +20,7 @@ class PunishmentForm extends BaseForm {
      *
      * @param Player $player
      */
-    public static function openMainForm(Player $player) {
+    public static function openMainForm(Player $player) : void {
         $punishments = self::getDataMgr()->getAllPunishments();
         if(is_null($punishments)) {
             $player->sendMessage(C::RED . self::translate("error"));
@@ -47,7 +47,7 @@ class PunishmentForm extends BaseForm {
      *
      * @param Player $player
      */
-    public static function openNewPUNForm(Player $player) {
+    public static function openNewPUNForm(Player $player) : void {
         $form = new CustomForm(function (Player $player, $data) {
             if(is_null($data)) return;
             $id = &$data[0];
@@ -107,9 +107,9 @@ class PunishmentForm extends BaseForm {
      * This form can be used to edit or delete punishments
      *
      * @param Player $player
-     * @param array $punishment
+     * @param string[]|int[] $punishment
      */
-    public static function openEditPUNForm(Player $player, array $punishment) {
+    public static function openEditPUNForm(Player $player, array $punishment) : void {
         $form = new CustomForm(function (Player $player, $data) use($punishment) {
             if(is_null($data)) return;
             $pun = new Punishment($punishment['id'], $punishment['duration'], $punishment['description']);

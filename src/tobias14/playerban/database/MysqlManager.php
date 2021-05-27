@@ -13,13 +13,13 @@ class MysqlManager extends DataManager {
      * DataManager constructor.
      *
      * @param PlayerBan $plugin
-     * @param array $settings
+     * @param string[] $settings
      */
     public function __construct(PlayerBan $plugin, array $settings) {
         $this->plugin = $plugin;
         $this->settings = $settings;
         try {
-            $this->db = new mysqli($settings['Host'], $settings['Username'], $settings['Password'], $settings['Database'], $settings['Port']);
+            $this->db = new mysqli($settings['Host'], $settings['Username'], $settings['Password'], $settings['Database'], (int) $settings['Port']);
         } catch (Exception $e) {
             $this->plugin->getLogger()->critical($this->plugin->getLang()->translateString("connection.failed"));
             $this->plugin->getServer()->getPluginManager()->disablePlugin($this->plugin);
@@ -45,7 +45,7 @@ class MysqlManager extends DataManager {
     private function reconnect() {
         try {
             $settings = $this->settings;
-            $this->db = new mysqli($settings['Host'], $settings['Username'], $settings['Password'], $settings['Database'], $settings['Port']);
+            $this->db = new mysqli($settings['Host'], $settings['Username'], $settings['Password'], $settings['Database'], (int) $settings['Port']);
         } catch (Exception $e) {
             $this->plugin->getLogger()->critical($this->plugin->getLang()->translateString("connection.failed"));
             $this->plugin->getServer()->getPluginManager()->disablePlugin($this->plugin);
@@ -100,7 +100,7 @@ class MysqlManager extends DataManager {
     /**
      * @param int $page
      * @param int $limit
-     * @return array|null
+     * @return array[]|null
      */
     public function getLogs(int $page = 0, int $limit = 6): ?array {
         if(!$this->checkConnection()) return null;
@@ -123,7 +123,7 @@ class MysqlManager extends DataManager {
      */
     public function getMaxLogPage(int $limit = 6) : ?int {
         if(!$this->checkConnection()) return null;
-        $stmt = $this->db->prepare("SELECT COUNT(*) FROM logs");
+        $stmt = $this->db->prepare("SELECT COUNT(*) FROM logs;");
         $stmt->execute();
         if(false === $result = $stmt->get_result()) return null;
         $rowCount = $result->fetch_row()[0];
@@ -150,7 +150,7 @@ class MysqlManager extends DataManager {
 
     /**
      * @param int $id
-     * @return array|null
+     * @return string[]|null
      */
     public function getPunishment(int $id) : ?array {
         if(!$this->checkConnection()) return null;
@@ -165,11 +165,11 @@ class MysqlManager extends DataManager {
     /**
      * Returns a list of all punishments
      *
-     * @return null|array
+     * @return array[]|null
      */
     public function getAllPunishments() : ?array {
         if(!$this->checkConnection()) return null;
-        $result = $this->db->query("SELECT * FROM punishments");
+        $result = $this->db->query("SELECT * FROM punishments;");
         $data = [];
         while ($row = $result->fetch_assoc()) {
             $data[] = $row;
@@ -268,7 +268,7 @@ class MysqlManager extends DataManager {
 
     /**
      * @param string $target
-     * @return array|null
+     * @return string[]|null
      */
     public function getBanByName(string $target) : ?array {
         if(!$this->checkConnection()) return null;
@@ -284,13 +284,13 @@ class MysqlManager extends DataManager {
     /**
      * @param int $page
      * @param int $limit
-     * @return array|null
+     * @return array[]|null
      */
     public function getAllCurrentBans(int $page = 0, int $limit = 6) : ?array {
         if(!$this->checkConnection()) return null;
         $time = time();
         $page *= $limit;
-        $stmt = $this->db->prepare("SELECT * FROM bans WHERE expiry_time > ? ORDER BY creation_time DESC LIMIT ?, ?");
+        $stmt = $this->db->prepare("SELECT * FROM bans WHERE expiry_time > ? ORDER BY creation_time DESC LIMIT ?, ?;");
         $stmt->bind_param("iii", $time, $page, $limit);
         $stmt->execute();
         if(false === $result = $stmt->get_result()) return null;
@@ -309,7 +309,7 @@ class MysqlManager extends DataManager {
     public function getMaxBanPage(int $limit = 6) : ?int {
         if(!$this->checkConnection()) return null;
         $time = time();
-        $stmt = $this->db->prepare("SELECT COUNT(*) FROM bans WHERE expiry_time > ?");
+        $stmt = $this->db->prepare("SELECT COUNT(*) FROM bans WHERE expiry_time > ?;");
         $stmt->bind_param("i", $time);
         $stmt->execute();
         $result = $stmt->get_result();

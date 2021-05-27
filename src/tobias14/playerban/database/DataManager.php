@@ -13,14 +13,14 @@ abstract class DataManager {
     protected $db;
     /** @var PlayerBan $plugin */
     protected $plugin;
-    /** @var array $settings */
+    /** @var string[] $settings */
     protected $settings;
 
     /**
      * DataManager constructor.
      *
      * @param PlayerBan $plugin
-     * @param array $settings
+     * @param string[] $settings
      */
     abstract public function __construct(PlayerBan $plugin, array $settings);
 
@@ -55,7 +55,7 @@ abstract class DataManager {
      *
      * @param int $page
      * @param int $limit
-     * @return array|null
+     * @return array[]|null
      */
     abstract public function getLogs(int $page = 0, int $limit = 6) : ?array;
 
@@ -79,14 +79,14 @@ abstract class DataManager {
      * Returns a punishment as assoc array
      *
      * @param int $id
-     * @return array|null
+     * @return string[]|int[]|null
      */
     abstract public function getPunishment(int $id) : ?array;
 
     /**
      * Returns a list of all punishments as assoc array
      *
-     * @return array|null
+     * @return array[]|null
      */
     abstract public function getAllPunishments() : ?array;
 
@@ -150,7 +150,7 @@ abstract class DataManager {
      * Returns a ban as assoc array
      *
      * @param string $target
-     * @return array|null
+     * @return string[]|int[]|null
      */
     abstract public function getBanByName(string $target) : ?array;
 
@@ -159,7 +159,7 @@ abstract class DataManager {
      *
      * @param int $page
      * @param int $limit
-     * @return array|null
+     * @return array[]|null
      */
     abstract public function getAllCurrentBans(int $page = 0, int $limit = 6) : ?array;
 

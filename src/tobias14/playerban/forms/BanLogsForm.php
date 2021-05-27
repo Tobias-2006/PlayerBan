@@ -14,7 +14,7 @@ class BanLogsForm extends BaseForm {
      * @param Player $player
      * @param int $page
      */
-    public static function openMainForm(Player $player, int $page = 0) {
+    public static function openMainForm(Player $player, int $page = 0) : void {
         $logs = self::getDataMgr()->getLogs($page);
         $form = new SimpleForm(function (Player $player, $data) use ($logs, $page) {
             if(is_null($data)) return;
@@ -38,10 +38,10 @@ class BanLogsForm extends BaseForm {
      * This form shows information about a log.
      *
      * @param Player $player
-     * @param array $log
+     * @param string[]|int[] $log
      * @param int $page
      */
-    private static function openLogInfoForm(Player $player, array $log, int $page) {
+    private static function openLogInfoForm(Player $player, array $log, int $page) : void {
         $form = new SimpleForm(function (Player $player, $data) use ($page) {
             if(is_null($data)) return;
             if(0 === $data) {
@@ -57,7 +57,7 @@ class BanLogsForm extends BaseForm {
     /**
      * Returns a string, with the information lines
      *
-     * @param array $log
+     * @param string[]|int[] $log
      * @return string
      */
     private static function getLogInfoContent(array $log) : string {

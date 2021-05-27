@@ -16,7 +16,7 @@ class BanListForm extends BaseForm {
      * @param Player $player
      * @param int $page
      */
-    public static function openMainForm(Player $player, int $page = 0) {
+    public static function openMainForm(Player $player, int $page = 0) : void {
         $bans = self::getDataMgr()->getAllCurrentBans($page);
         $form = new SimpleForm(function(Player $player, $data) use ($bans, $page) {
             if(is_null($data)) return;
@@ -41,10 +41,10 @@ class BanListForm extends BaseForm {
      * This form displays information about a selected ban.
      *
      * @param Player $player
-     * @param array $ban
+     * @param string[]|int[] $ban
      * @param int $page
      */
-    private static function openBanInfoForm(Player $player, array $ban, int $page) {
+    private static function openBanInfoForm(Player $player, array $ban, int $page) : void {
         $form = new SimpleForm(function (Player $player, $data) use($page, $ban) {
             if(is_null($data)) return;
             if($data === 0) {
@@ -63,7 +63,7 @@ class BanListForm extends BaseForm {
     /**
      * Returns a string, with the information lines
      *
-     * @param array $ban
+     * @param string[]|int[] $ban
      * @return string
      */
     private static function getBanInfoContent(array $ban) : string {

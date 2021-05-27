@@ -53,7 +53,7 @@ class BanCommand extends BaseCommand {
             $sender->sendMessage(C::RED . $this->translate("param.incorrect", ["<punId>", "3"]));
             return true;
         }
-        $punId = (int) round($punId);
+        $punId = (int) round((float) $punId);
         if(!$this->getDataMgr()->punishmentExists($punId)) {
             $sender->sendMessage(C::RED . $this->translate("punishment.notExist", [$punId]));
             return true;
@@ -63,8 +63,8 @@ class BanCommand extends BaseCommand {
         $ban = new Ban();
         $ban->target = $target;
         $ban->moderator = $sender->getName();
-        $ban->expiryTime = time() + $punishment['duration'];
-        $ban->punId = (int) $punId;
+        $ban->expiryTime = time() + (int) $punishment['duration'];
+        $ban->punId = $punId;
 
         if($ban->save()) {
             $sender->sendMessage($this->translate("ban.success", [$target]));
@@ -86,7 +86,7 @@ class BanCommand extends BaseCommand {
      *
      * @param string $target
      */
-    private function kickTarget(string $target) {
+    private function kickTarget(string $target) : void {
         foreach ($this->getPlugin()->getServer()->getOnlinePlayers() as $player) {
             if(strtolower($player->getName()) === strtolower($target) or $player->getAddress() === $target) {
                 $player->kick($this->translate("ban.target.kick"), false);

@@ -12,7 +12,7 @@ abstract class BaseForm {
      * Massage Management
      *
      * @param string $str
-     * @param array $params
+     * @param int[]|float[]|string[] $params
      * @return string
      */
     protected static function translate(string $str, array $params = []) : string {

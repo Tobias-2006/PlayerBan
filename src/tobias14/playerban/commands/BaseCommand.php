@@ -39,7 +39,7 @@ abstract class BaseCommand extends PluginCommand {
      * Massage Management
      *
      * @param string $str
-     * @param array $params
+     * @param float[]|int[]|string[] $params
      * @return string
      */
     public function translate(string $str, array $params = []) : string {

@@ -9,7 +9,7 @@ use pocketmine\utils\TextFormat as C;
 
 class EventListener implements Listener {
 
-    public function onPreLogin(PlayerPreLoginEvent $event) {
+    public function onPreLogin(PlayerPreLoginEvent $event) : void {
         $name = $event->getPlayer()->getName();
         $address = $event->getPlayer()->getAddress();
         $target = null;
@@ -31,7 +31,7 @@ class EventListener implements Listener {
      * @return bool
      */
     private function isBanned(string $target) : bool {
-        return PlayerBan::getInstance()->getDataManager()->isBanned($target);
+        return PlayerBan::getInstance()->getDataManager()->isBanned($target) === true;
     }
 
 }
