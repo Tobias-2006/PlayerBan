@@ -1,15 +1,10 @@
 <?php
+declare(strict_types=1);
 
 namespace tobias14\playerban\ban;
 
 use tobias14\playerban\PlayerBan;
 
-/**
- * This class represents the ban instance
- *
- * Class Ban
- * @package tobias14\playerban\ban
- */
 class Ban {
 
     /** @var int $creationTime */

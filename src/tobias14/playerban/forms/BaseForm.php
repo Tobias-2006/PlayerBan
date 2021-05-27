@@ -1,18 +1,16 @@
 <?php
+declare(strict_types=1);
 
 namespace tobias14\playerban\forms;
 
 use tobias14\playerban\database\DataManager;
 use tobias14\playerban\PlayerBan;
 
-/**
- * Class BaseForm
- *
- * @package tobias14\playerban\forms
- */
 abstract class BaseForm {
 
     /**
+     * Massage Management
+     *
      * @param string $str
      * @param array $params
      * @return string
@@ -22,6 +20,8 @@ abstract class BaseForm {
     }
 
     /**
+     * Database Management
+     *
      * @return DataManager
      */
     protected static function getDataMgr() : DataManager {

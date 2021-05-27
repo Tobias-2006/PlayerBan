@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace tobias14\playerban\database;
 
@@ -6,10 +7,6 @@ use tobias14\playerban\PlayerBan;
 use mysqli;
 use Exception;
 
-/**
- * Class MysqlManager
- * @package tobias14\playerban\database
- */
 class MysqlManager extends DataManager {
 
     /**
@@ -32,11 +29,9 @@ class MysqlManager extends DataManager {
     }
 
     /**
-     * Initializes the DataManager
-     *
      * @return void
      */
-    protected function init() {
+    protected function init() : void {
         $this->db->query("CREATE TABLE IF NOT EXISTS bans(id INT AUTO_INCREMENT, target VARCHAR(255) NOT NULL, moderator VARCHAR(255) NOT NULL, expiry_time INT NOT NULL, pun_id INT NOT NULL, creation_time INT NOT NULL, PRIMARY KEY(id));");
         $this->db->query("CREATE TABLE IF NOT EXISTS punishments(id INT NOT NULL, duration INT NOT NULL, description VARCHAR(255) NOT NULL, PRIMARY KEY(id));");
         $this->db->query("CREATE TABLE IF NOT EXISTS logs(type INT NOT NULL, description TEXT NOT NULL, moderator VARCHAR(255) NOT NULL, target VARCHAR(255), creation_time INT NOT NULL);");
@@ -78,7 +73,7 @@ class MysqlManager extends DataManager {
     /**
      * @return void
      */
-    public function close() {
+    public function close() : void {
         try {
             $this->db->close();
         } catch (Exception $e) {//NOOP
@@ -103,15 +98,15 @@ class MysqlManager extends DataManager {
     }
 
     /**
-     * @param int $site
+     * @param int $page
      * @param int $limit
      * @return array|null
      */
-    public function getLogs(int $site = 0, int $limit = 6): ?array {
+    public function getLogs(int $page = 0, int $limit = 6): ?array {
         if(!$this->checkConnection()) return null;
-        $site *= $limit;
+        $page *= $limit;
         $stmt = $this->db->prepare("SELECT * FROM logs ORDER BY creation_time DESC LIMIT ?, ?;");
-        $stmt->bind_param("ii",$site, $limit);
+        $stmt->bind_param("ii", $page, $limit);
         $stmt->execute();
         if(false === $result = $stmt->get_result()) return null;
         $data = [];
@@ -287,16 +282,16 @@ class MysqlManager extends DataManager {
     }
 
     /**
-     * @param int $site
+     * @param int $page
      * @param int $limit
      * @return array|null
      */
-    public function getAllCurrentBans(int $site = 0, int $limit = 6) : ?array {
+    public function getAllCurrentBans(int $page = 0, int $limit = 6) : ?array {
         if(!$this->checkConnection()) return null;
         $time = time();
-        $site *= $limit;
+        $page *= $limit;
         $stmt = $this->db->prepare("SELECT * FROM bans WHERE expiry_time > ? ORDER BY creation_time DESC LIMIT ?, ?");
-        $stmt->bind_param("iii", $time, $site, $limit);
+        $stmt->bind_param("iii", $time, $page, $limit);
         $stmt->execute();
         if(false === $result = $stmt->get_result()) return null;
         $data = [];

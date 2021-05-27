@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace tobias14\playerban\commands;
 
@@ -9,11 +10,6 @@ use pocketmine\utils\TextFormat as C;
 use tobias14\playerban\database\DataManager;
 use tobias14\playerban\PlayerBan;
 
-/**
- * Parent class of all commands.
- *
- * @package tobias14\playerban\commands
- */
 abstract class BaseCommand extends PluginCommand {
 
     /**
@@ -40,6 +36,8 @@ abstract class BaseCommand extends PluginCommand {
     }
 
     /**
+     * Massage Management
+     *
      * @param string $str
      * @param array $params
      * @return string
@@ -49,6 +47,8 @@ abstract class BaseCommand extends PluginCommand {
     }
 
     /**
+     * Database Management
+     *
      * @return DataManager
      */
     public function getDataMgr() : DataManager {

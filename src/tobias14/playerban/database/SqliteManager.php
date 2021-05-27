@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace tobias14\playerban\database;
 
@@ -6,12 +7,14 @@ use Exception;
 use SQLite3;
 use tobias14\playerban\PlayerBan;
 
-/**
- * Class SqliteManager
- * @package tobias14\playerban\database
- */
 class SqliteManager extends DataManager {
 
+    /**
+     * SqliteManager constructor.
+     *
+     * @param PlayerBan $plugin
+     * @param array $settings
+     */
     public function __construct(PlayerBan $plugin, array $settings) {
         $this->plugin = $plugin;
         $this->settings = $settings;
@@ -20,11 +23,9 @@ class SqliteManager extends DataManager {
     }
 
     /**
-     * Initializes the DataManager
-     *
      * @return void
      */
-    protected function init() {
+    protected function init() : void {
         $this->db->query("CREATE TABLE IF NOT EXISTS bans(id INT AUTO_INCREMENT, target VARCHAR(255) NOT NULL, moderator VARCHAR(255) NOT NULL, expiry_time INT NOT NULL, pun_id INT NOT NULL, creation_time INT NOT NULL, PRIMARY KEY(id));");
         $this->db->query("CREATE TABLE IF NOT EXISTS punishments(id INT NOT NULL, duration INT NOT NULL, description VARCHAR(255) NOT NULL, PRIMARY KEY(id));");
         $this->db->query("CREATE TABLE IF NOT EXISTS logs(type INT NOT NULL, description TEXT NOT NULL, moderator VARCHAR(255) NOT NULL, target VARCHAR(255), creation_time INT NOT NULL);");
@@ -33,7 +34,7 @@ class SqliteManager extends DataManager {
     /**
      * @return void
      */
-    public function close() {
+    public function close() : void {
         try {
             $this->db->close();
         } catch (Exception $e) {//NOOP
@@ -61,14 +62,14 @@ class SqliteManager extends DataManager {
     }
 
     /**
-     * @param int $site
+     * @param int $page
      * @param int $limit
      * @return array|null
      */
-    public function getLogs(int $site = 0, int $limit = 6) : ?array {
-        $site *= $limit;
+    public function getLogs(int $page = 0, int $limit = 6) : ?array {
+        $page *= $limit;
         $stmt = $this->db->prepare("SELECT * FROM logs ORDER BY creation_time DESC LIMIT :x, :y;");
-        $stmt->bindParam(":x", $site, SQLITE3_INTEGER);
+        $stmt->bindParam(":x", $page, SQLITE3_INTEGER);
         $stmt->bindParam(":y", $limit, SQLITE3_INTEGER);
         $result = $stmt->execute();
         if(false == $result) return null;
@@ -247,16 +248,16 @@ class SqliteManager extends DataManager {
     }
 
     /**
-     * @param int $site
+     * @param int $page
      * @param int $limit
      * @return array|null
      */
-    public function getAllCurrentBans(int $site = 0, int $limit = 6) : ?array {
+    public function getAllCurrentBans(int $page = 0, int $limit = 6) : ?array {
         $time = time();
-        $site *= $limit;
+        $page *= $limit;
         $stmt = $this->db->prepare("SELECT * FROM bans WHERE expiry_time > :time ORDER BY creation_time DESC LIMIT :site, :limit");
         $stmt->bindParam(":time", $time, SQLITE3_INTEGER);
-        $stmt->bindParam(":site", $site, SQLITE3_INTEGER);
+        $stmt->bindParam(":site", $page, SQLITE3_INTEGER);
         $stmt->bindParam(":limit", $limit, SQLITE3_INTEGER);
         $result = $stmt->execute();
         if(false == $result) return null;

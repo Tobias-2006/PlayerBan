@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace tobias14\playerban\commands;
 
@@ -9,11 +10,6 @@ use tobias14\playerban\ban\Ban;
 use tobias14\playerban\log\CreationLog;
 use tobias14\playerban\PlayerBan;
 
-/**
- * Class BanCommand
- *
- * @package tobias14\playerban\commands
- */
 class BanCommand extends BaseCommand {
 
     /**

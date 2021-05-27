@@ -1,13 +1,8 @@
 <?php
+declare(strict_types=1);
 
 namespace tobias14\playerban\log;
 
-/**
- * This class represents the log instance
- *
- * Class Log
- * @package tobias14\playerban\log
- */
 abstract class Log {
 
     /** @var int $type */

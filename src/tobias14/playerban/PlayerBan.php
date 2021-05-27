@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace tobias14\playerban;
 
@@ -14,12 +15,6 @@ use tobias14\playerban\database\DataManager;
 use tobias14\playerban\database\MysqlManager;
 use tobias14\playerban\database\SqliteManager;
 
-/**
- * This class represents the PlayerBan plugin
- *
- * Class PlayerBan
- * @package tobias14\playerban
- */
 class PlayerBan extends PluginBase {
 
     /** @var self $instance */
@@ -39,23 +34,12 @@ class PlayerBan extends PluginBase {
     }
 
     /**
+     * Database management
+     *
      * @return DataManager
      */
     public function getDataManager() : DataManager {
         return $this->dataMgr;
-    }
-
-    /**
-     * @return array
-     */
-    public function getDatabaseSettings() : array {
-        return [
-            'Host' => $this->getConfig()->get("host", "127.0.0.1"),
-            'Username' => $this->getConfig()->get("username", "root"),
-            'Password' => $this->getConfig()->get("passwd", "password"),
-            'Database' => $this->getConfig()->get("dbname", "playerban"),
-            'Port' => $this->getConfig()->get("port", 3306)
-        ];
     }
 
     /**
@@ -68,6 +52,8 @@ class PlayerBan extends PluginBase {
     }
 
     /**
+     * Formats a timestamp into a string
+     *
      * @param int $timestamp
      * @return string
      */
@@ -76,6 +62,8 @@ class PlayerBan extends PluginBase {
     }
 
     /**
+     * Checks if a username is valid
+     *
      * @param string $name
      * @return bool
      */
@@ -86,6 +74,8 @@ class PlayerBan extends PluginBase {
     }
 
     /**
+     * Checks if an ip address is valid
+     *
      * @param string $address
      * @return bool
      */
@@ -94,6 +84,23 @@ class PlayerBan extends PluginBase {
     }
 
     /**
+     * Returns a list of the connection details
+     *
+     * @return array
+     */
+    private function getDatabaseSettings() : array {
+        return [
+            'Host' => $this->getConfig()->get("host", "127.0.0.1"),
+            'Username' => $this->getConfig()->get("username", "root"),
+            'Password' => $this->getConfig()->get("passwd", "password"),
+            'Database' => $this->getConfig()->get("dbname", "playerban"),
+            'Port' => $this->getConfig()->get("port", 3306)
+        ];
+    }
+
+    /**
+     * Sets the chosen DataManager
+     *
      * @return void
      */
     private function setDataMgr() : void {

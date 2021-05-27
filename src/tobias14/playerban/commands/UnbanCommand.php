@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace tobias14\playerban\commands;
 
@@ -7,11 +8,6 @@ use pocketmine\plugin\Plugin;
 use pocketmine\utils\TextFormat as C;
 use tobias14\playerban\log\DeletionLog;
 
-/**
- * Class UnbanCommand
- *
- * @package tobias14\playerban\commands
- */
 class UnbanCommand extends BaseCommand {
 
     /**

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace tobias14\playerban\forms;
 
@@ -12,12 +13,6 @@ use tobias14\playerban\log\DeletionLog;
 use tobias14\playerban\punishment\Punishment;
 use tobias14\playerban\utils\Converter;
 
-/**
- * This class regulates the forms for the management of punishments
- *
- * Class PunishmentForm
- * @package tobias14\playerban\forms
- */
 class PunishmentForm extends BaseForm {
 
     /**
@@ -64,7 +59,7 @@ class PunishmentForm extends BaseForm {
                 return;
             }
             $id = round($id);
-            if(self::getDataMgr()->punishmentExists($id)) {
+            if(self::getDataMgr()->punishmentExists((int) $id)) {
                 $player->sendMessage(C::RED . self::translate("punishment.exist", [$id]));
                 return;
             }

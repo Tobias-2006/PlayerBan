@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace tobias14\playerban\forms;
 
@@ -7,36 +8,30 @@ use pocketmine\Player;
 use pocketmine\utils\TextFormat as C;
 use tobias14\playerban\utils\Converter;
 
-/**
- * This class manages the banlist forms.
- *
- * Class BanListForm
- * @package tobias14\playerban\forms
- */
 class BanListForm extends BaseForm {
 
     /**
      * This form shows all current bans.
      *
      * @param Player $player
-     * @param int $site
+     * @param int $page
      */
-    public static function openMainForm(Player $player, int $site = 0) {
-        $bans = self::getDataMgr()->getAllCurrentBans($site);
-        $form = new SimpleForm(function(Player $player, $data) use ($bans, $site) {
+    public static function openMainForm(Player $player, int $page = 0) {
+        $bans = self::getDataMgr()->getAllCurrentBans($page);
+        $form = new SimpleForm(function(Player $player, $data) use ($bans, $page) {
             if(is_null($data)) return;
             if(count($bans) === $data) {
-                self::openMainForm($player, ($site + 1));
+                self::openMainForm($player, ($page + 1));
                 return;
             }
-            self::openBanInfoForm($player, $bans[$data], $site);
+            self::openBanInfoForm($player, $bans[$data], $page);
         });
         $form->setTitle(self::translate("banlist.form.title"));
         foreach ($bans as $ban) {
             $creation = date("d.m.Y | H:i", $ban['creation_time']);
             $form->addButton(self::translate("banlist.form.button", [$creation, $ban['target']]));
         }
-        if(self::getDataMgr()->getMaxBanPage() > ($site + 1)) {
+        if(self::getDataMgr()->getMaxBanPage() > ($page + 1)) {
             $form->addButton(self::translate("button.nextPage"));
         }
         $player->sendForm($form);
@@ -47,16 +42,16 @@ class BanListForm extends BaseForm {
      *
      * @param Player $player
      * @param array $ban
-     * @param int $site
+     * @param int $page
      */
-    private static function openBanInfoForm(Player $player, array $ban, int $site) {
-        $form = new SimpleForm(function (Player $player, $data) use($site, $ban) {
+    private static function openBanInfoForm(Player $player, array $ban, int $page) {
+        $form = new SimpleForm(function (Player $player, $data) use($page, $ban) {
             if(is_null($data)) return;
             if($data === 0) {
                 $player->getServer()->dispatchCommand($player, 'unban "' . $ban["target"] . '"');
                 return;
             }
-            self::openMainForm($player, $site);
+            self::openMainForm($player, $page);
         });
         $form->setTitle(self::translate("banlist.form2.title"));
         $form->setContent(self::getBanInfoContent($ban));

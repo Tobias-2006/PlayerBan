@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace tobias14\playerban\commands;
 
@@ -8,11 +9,6 @@ use pocketmine\plugin\Plugin;
 use pocketmine\utils\TextFormat as C;
 use tobias14\playerban\forms\BanListForm;
 
-/**
- * Class BanListCommand
- *
- * @package tobias14\playerban\commands
- */
 class BanListCommand extends BaseCommand {
 
     /**

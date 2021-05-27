@@ -1,12 +1,8 @@
 <?php
+declare(strict_types=1);
 
 namespace tobias14\playerban\log;
 
-/**
- * Class CreationLog
- *
- * @package tobias14\playerban\log
- */
 class CreationLog extends Log {
 
     public function __construct() {
