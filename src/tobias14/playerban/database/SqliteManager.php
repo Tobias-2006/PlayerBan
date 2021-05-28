@@ -26,9 +26,9 @@ class SqliteManager extends DataManager {
      * @return void
      */
     protected function init() : void {
-        $this->db->query("CREATE TABLE IF NOT EXISTS bans(id INT AUTO_INCREMENT, target VARCHAR(255) NOT NULL, moderator VARCHAR(255) NOT NULL, expiry_time INT NOT NULL, pun_id INT NOT NULL, creation_time INT NOT NULL, PRIMARY KEY(id));");
-        $this->db->query("CREATE TABLE IF NOT EXISTS punishments(id INT NOT NULL, duration INT NOT NULL, description VARCHAR(255) NOT NULL, PRIMARY KEY(id));");
-        $this->db->query("CREATE TABLE IF NOT EXISTS logs(type INT NOT NULL, description TEXT NOT NULL, moderator VARCHAR(255) NOT NULL, target VARCHAR(255), creation_time INT NOT NULL);");
+        $this->db->query("CREATE TABLE IF NOT EXISTS bans(id INTEGER PRIMARY KEY AUTOINCREMENT, target TEXT NOT NULL, moderator TEXT NOT NULL, expiry_time INTEGER NOT NULL, pun_id INTEGER NOT NULL, creation_time INTEGER NOT NULL);");
+        $this->db->query("CREATE TABLE IF NOT EXISTS punishments(id INTEGER PRIMARY KEY NOT NULL, duration INTEGER NOT NULL, description TEXT NOT NULL);");
+        $this->db->query("CREATE TABLE IF NOT EXISTS logs(type INTEGER NOT NULL, description TEXT NOT NULL, moderator TEXT NOT NULL, target TEXT, creation_time INTEGER NOT NULL);");
     }
 
     /**
