@@ -41,7 +41,7 @@ class PunishmentListCommand extends BaseCommand {
         foreach ($data as $row) {
             $sender->sendMessage($this->translate(
                 "punlist.format",
-                [$row['id'], $row['description'], Converter::secondsToStr($row['duration'])]
+                [$row['id'], $row['description'], Converter::secondsToStr((int) $row['duration'])]
             ));
         }
         return true;
