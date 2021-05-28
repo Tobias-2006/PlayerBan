@@ -35,7 +35,7 @@ class BanListCommand extends BaseCommand {
         }
         /** @var Player $player */
         $player = &$sender;
-        BanListForm::openMainForm($player);
+        $player->sendForm(new BanListForm());
         return true;
     }
 

@@ -35,7 +35,7 @@ class PunishmentsCommand extends BaseCommand {
         }
         /** @var Player $player */
         $player = &$sender;
-        PunishmentForm::openMainForm($player);
+        $player->sendForm(new PunishmentForm());
         return true;
     }
 
