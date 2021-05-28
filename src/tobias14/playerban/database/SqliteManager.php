@@ -252,7 +252,7 @@ class SqliteManager extends DataManager {
      * @param int $limit
      * @return array[]|null
      */
-    public function getAllCurrentBans(int $page = 0, int $limit = 6) : ?array {
+    public function getCurrentBans(int $page = 0, int $limit = 6) : ?array {
         $time = time();
         $page *= $limit;
         $stmt = $this->db->prepare("SELECT * FROM bans WHERE expiry_time > :time ORDER BY creation_time DESC LIMIT :site, :limit;");

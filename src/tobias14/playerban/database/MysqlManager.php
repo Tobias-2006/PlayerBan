@@ -286,7 +286,7 @@ class MysqlManager extends DataManager {
      * @param int $limit
      * @return array[]|null
      */
-    public function getAllCurrentBans(int $page = 0, int $limit = 6) : ?array {
+    public function getCurrentBans(int $page = 0, int $limit = 6) : ?array {
         if(!$this->checkConnection()) return null;
         $time = time();
         $page *= $limit;

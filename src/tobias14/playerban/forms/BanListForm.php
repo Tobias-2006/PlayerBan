@@ -14,7 +14,7 @@ class BanListForm extends SimpleBaseForm {
      * @param int $page form page
      */
     public function __construct(int $page = 0) {
-        $bans = $this->getDataMgr()->getAllCurrentBans($page);
+        $bans = $this->getDataMgr()->getCurrentBans($page);
         parent::__construct($this->onCall($bans, $page));
         $this->setTitle($this->translate("banlist.form.title"));
         foreach ($bans as $ban)

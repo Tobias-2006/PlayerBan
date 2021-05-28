@@ -161,7 +161,7 @@ abstract class DataManager {
      * @param int $limit
      * @return array[]|null
      */
-    abstract public function getAllCurrentBans(int $page = 0, int $limit = 6) : ?array;
+    abstract public function getCurrentBans(int $page = 0, int $limit = 6) : ?array;
 
     /**
      * Returns the number of banlist pages
