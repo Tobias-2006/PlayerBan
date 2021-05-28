@@ -155,7 +155,7 @@ abstract class DataManager {
     abstract public function getBanByName(string $target) : ?array;
 
     /**
-     * Returns a list of all active bans
+     * Returns a list of all active bans for the requested page
      *
      * @param int $page
      * @param int $limit
