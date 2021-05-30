@@ -1,7 +1,7 @@
 <h1 align="center">PlayerBan</h1>
 <p align="center">BanSystem Plugin for Minecraft BE (<a href="https://github.com/pmmp/PocketMine-MP">Pocketmine-MP</a>)</p>
 <p align="center">This plugin allows you to ban players from your server who do not follow the rules</p>
-<p align="center"><img alt="GitHub top language" src="https://img.shields.io/github/languages/top/Tobias-2006/PlayerBan"> <img alt="GitHub forks" src="https://img.shields.io/github/forks/Tobias-2006/PlayerBan?style=social"> <img alt="GitHub repo size" src="https://img.shields.io/github/repo-size/Tobias-2006/PlayerBan"></p>
+<p align="center"><img alt="GitHub top language" src="https://img.shields.io/github/languages/top/Tobias-2006/PlayerBan"> <a href="https://poggit.pmmp.io/p/PlayerBan"><img src="https://poggit.pmmp.io/shield.state/PlayerBan" alt="poggit state"></a> <img alt="GitHub repo size" src="https://img.shields.io/github/repo-size/Tobias-2006/PlayerBan"></p>
 
 ## Installation
 - Download the latest release
@@ -17,15 +17,15 @@ PlayerBan is a ban system that is intended to make work easier for team members.
 - More translations
 
 ## Commands & Permissions
-| Command | Parameters | Description | Permissions |
-| :-----: | :-------: | :---------: | :-------: |
-| /ban | `<player\|ip>` `<punId>` | Ban a player from the server | `Op`, `playerban.command.ban` |
-| /unban | `<player\|ip>` | Unban someone from the server | `Op`, `playerban.command.unban` |
-| /banlist | - | Shows a list of all banned players | `Op`, `playerban.command.banlist` |
-| /banlogs | - | Shows a modification protocol | `Op`, `playerban.command.banlogs` |
-| /punishments | - | Create or edit punishments | `Op`, `playerban.command.punishments` |
-| /punlist | - | Displays a list of all punishments | `Op`, `playerban.command.punlist` |
-| /banhistory | `<player\|ip>` | Shows a list of all bans of a player | `Op`, `playerban.command.banhistory` |
+| Command | Description | Permissions |
+| :-----: | :---------: | :-------: |
+| /ban `<player\|ip>` `<punId>` | Ban a player from the server | `Op`, `playerban.command.ban` |
+| /unban `<player\|ip>` | Unban someone from the server | `Op`, `playerban.command.unban` |
+| /banlist | Shows a list of all banned players | `Op`, `playerban.command.banlist` |
+| /banlogs | Shows a modification protocol | `Op`, `playerban.command.banlogs` |
+| /punishments | Create or edit punishments | `Op`, `playerban.command.punishments` |
+| /punlist | Displays a list of all punishments | `Op`, `playerban.command.punlist` |
+| /banhistory `<player\|ip>` | Shows a list of all bans of a player | `Op`, `playerban.command.banhistory` |
 
 ## License
 ```
