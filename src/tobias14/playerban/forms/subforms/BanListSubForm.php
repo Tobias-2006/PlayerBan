@@ -49,14 +49,14 @@ class BanListSubForm extends SimpleBaseForm {
      */
     private function getFormContent(array $ban) : string {
         $data = [];
-        $params = [$ban['id'], $this->formatTime($ban['creation_time']), $ban['target'], $ban['moderator'], $this->formatTime($ban['expiry_time']), $ban['pun_id']];
+        $params = [$ban['id'], $this->formatTime((int) $ban['creation_time']), $ban['target'], $ban['moderator'], $this->formatTime((int) $ban['expiry_time']), $ban['pun_id']];
         for ($i = 0; $i < 8; $i++) {
             $line = $i + 1;
             if($i === 6) {
-                if($this->getDataMgr()->punishmentExists($ban['pun_id'])) {
-                    $punishment = $this->getDataMgr()->getPunishment($ban['pun_id']);
+                if($this->getDataMgr()->punishmentExists((int) $ban['pun_id'])) {
+                    $punishment = $this->getDataMgr()->getPunishment((int) $ban['pun_id']);
                     $params[] = $punishment['description'];
-                    $params[] = Converter::secondsToStr($punishment['duration']);
+                    $params[] = Converter::secondsToStr((int) $punishment['duration']);
                 } else{
                     break;
                 }

@@ -9,6 +9,9 @@ use Exception;
 
 class MysqlManager extends DataManager {
 
+    /** @var mysqli $db */
+    protected $db;
+
     /**
      * DataManager constructor.
      *
@@ -91,6 +94,7 @@ class MysqlManager extends DataManager {
     public function saveLog(int $type, string $description, string $moderator, int $creationTime, string $target = null) : ?bool {
         if(!$this->checkConnection()) return null;
         $stmt = $this->db->prepare("INSERT INTO logs(type, description, moderator, target, creation_time) VALUES(?, ?, ?, ?, ?);");
+        if(!$stmt) return false;
         $stmt->bind_param("isssi", $type, $description, $moderator, $target, $creationTime);
         $result = $stmt->execute();
         $stmt->close();
@@ -106,6 +110,7 @@ class MysqlManager extends DataManager {
         if(!$this->checkConnection()) return null;
         $page *= $limit;
         $stmt = $this->db->prepare("SELECT * FROM logs ORDER BY creation_time DESC LIMIT ?, ?;");
+        if(!$stmt) return null;
         $stmt->bind_param("ii", $page, $limit);
         $stmt->execute();
         if(false === $result = $stmt->get_result()) return null;
@@ -124,6 +129,7 @@ class MysqlManager extends DataManager {
     public function getMaxLogPage(int $limit = 6) : ?int {
         if(!$this->checkConnection()) return null;
         $stmt = $this->db->prepare("SELECT COUNT(*) FROM logs;");
+        if(!$stmt) return null;
         $stmt->execute();
         if(false === $result = $stmt->get_result()) return null;
         $rowCount = $result->fetch_row()[0];
@@ -141,10 +147,12 @@ class MysqlManager extends DataManager {
     public function punishmentExists(int $id) : ?bool {
         if(!$this->checkConnection()) return null;
         $stmt = $this->db->prepare("SELECT * FROM punishments WHERE id=?;");
+        if(!$stmt) return null;
         $stmt->bind_param("i", $id);
         $stmt->execute();
         $result = $stmt->get_result();
         $stmt->close();
+        if(!$result) return null;
         return $result->num_rows === 1;
     }
 
@@ -155,10 +163,12 @@ class MysqlManager extends DataManager {
     public function getPunishment(int $id) : ?array {
         if(!$this->checkConnection()) return null;
         $stmt = $this->db->prepare("SELECT * FROM punishments WHERE id=?;");
+        if(!$stmt) return null;
         $stmt->bind_param("i", $id);
         $stmt->execute();
         $result = $stmt->get_result();
         $stmt->close();
+        if(!$result) return null;
         return $result->fetch_assoc();
     }
 
@@ -170,6 +180,7 @@ class MysqlManager extends DataManager {
     public function getAllPunishments() : ?array {
         if(!$this->checkConnection()) return null;
         $result = $this->db->query("SELECT * FROM punishments;");
+        if(!$result or $result === true) return null;
         $data = [];
         while ($row = $result->fetch_assoc()) {
             $data[] = $row;
@@ -186,6 +197,7 @@ class MysqlManager extends DataManager {
     public function savePunishment(int $id, int $duration, string $description) : ?bool {
         if(!$this->checkConnection()) return null;
         $stmt = $this->db->prepare("INSERT INTO punishments(id, duration, description) VALUES(?, ?, ?);");
+        if(!$stmt) return false;
         $stmt->bind_param("iis", $id, $duration, $description);
         $result = $stmt->execute();
         $stmt->close();
@@ -199,6 +211,7 @@ class MysqlManager extends DataManager {
     public function deletePunishment(int $id) : ?bool {
         if(!$this->checkConnection()) return null;
         $stmt = $this->db->prepare("DELETE FROM punishments WHERE id=?;");
+        if(!$stmt) return false;
         $stmt->bind_param("i", $id);
         $result = $stmt->execute();
         $stmt->close();
@@ -214,6 +227,7 @@ class MysqlManager extends DataManager {
     public function updatePunishment(int $id, int $duration, string $description) : ?bool {
         if(!$this->checkConnection()) return null;
         $stmt = $this->db->prepare("UPDATE punishments SET duration=?, description=? WHERE id=?;");
+        if(!$stmt) return false;
         $stmt->bind_param("isi", $duration, $description, $id);
         $result = $stmt->execute();
         $stmt->close();
@@ -228,9 +242,11 @@ class MysqlManager extends DataManager {
         if(!$this->checkConnection()) return null;
         $time = time();
         $stmt = $this->db->prepare("SELECT * FROM bans WHERE target=? AND expiry_time > ?;");
+        if(!$stmt) return null;
         $stmt->bind_param("si", $target, $time);
         $stmt->execute();
         $result = $stmt->get_result();
+        if(!$result) return null;
         $stmt->close();
         return $result->num_rows === 1;
     }
@@ -246,6 +262,7 @@ class MysqlManager extends DataManager {
     public function saveBan(string $target, string $moderator, int $expiryTime, int $punId, int $creationTime) : ?bool {
         if(!$this->checkConnection()) return null;
         $stmt = $this->db->prepare("INSERT INTO bans(target, moderator, expiry_time, pun_id, creation_time) VALUES(?, ?, ?, ?, ?);");
+        if(!$stmt) return false;
         $stmt->bind_param("ssiii", $target, $moderator, $expiryTime, $punId, $creationTime);
         $result = $stmt->execute();
         $stmt->close();
@@ -260,6 +277,7 @@ class MysqlManager extends DataManager {
         if(!$this->checkConnection()) return null;
         $time = time();
         $stmt = $this->db->prepare("UPDATE bans SET expiry_time=? WHERE target=? AND expiry_time > ?;");
+        if(!$stmt) return false;
         $stmt->bind_param("isi", $time, $target, $time);
         $result = $stmt->execute();
         $stmt->close();
@@ -274,9 +292,11 @@ class MysqlManager extends DataManager {
         if(!$this->checkConnection()) return null;
         $time = time();
         $stmt = $this->db->prepare("SELECT * FROM bans WHERE target=? AND expiry_time > ?;");
+        if(!$stmt) return null;
         $stmt->bind_param("si", $target, $time);
         $stmt->execute();
         $result = $stmt->get_result();
+        if(!$result) return null;
         $stmt->close();
         return $result->fetch_assoc();
     }
@@ -288,6 +308,7 @@ class MysqlManager extends DataManager {
     public function getBanHistory(string $target) : ?array {
         if(!$this->checkConnection()) return null;
         $stmt = $this->db->prepare("SELECT * FROM bans WHERE target=? ORDER BY creation_time DESC;");
+        if(!$stmt) return null;
         $stmt->bind_param("s", $target);
         $stmt->execute();
         if(!$result = $stmt->get_result()) return null;
@@ -309,6 +330,7 @@ class MysqlManager extends DataManager {
         $time = time();
         $page *= $limit;
         $stmt = $this->db->prepare("SELECT * FROM bans WHERE expiry_time > ? ORDER BY creation_time DESC LIMIT ?, ?;");
+        if(!$stmt) return null;
         $stmt->bind_param("iii", $time, $page, $limit);
         $stmt->execute();
         if(false === $result = $stmt->get_result()) return null;
@@ -328,9 +350,11 @@ class MysqlManager extends DataManager {
         if(!$this->checkConnection()) return null;
         $time = time();
         $stmt = $this->db->prepare("SELECT COUNT(*) FROM bans WHERE expiry_time > ?;");
+        if(!$stmt) return null;
         $stmt->bind_param("i", $time);
         $stmt->execute();
         $result = $stmt->get_result();
+        if(!$result) return null;
         $rowCount = $result->fetch_row()[0];
         $sites = $rowCount / $limit;
         if(($rowCount % $limit) != 0)

@@ -42,7 +42,7 @@ class BanLogsSubForm extends SimpleBaseForm {
      */
     private function getFormContent(array $log) : string {
         $data = [];
-        $params = [$log['type'], $log['description'], $log['moderator'], $log['target'], $this->formatTime($log['creation_time'])];
+        $params = [$log['type'], $log['description'], $log['moderator'], $log['target'], $this->formatTime((int) $log['creation_time'])];
         for($i = 0; $i < 5; $i++) {
             $line = $i + 1;
             $data[] = $this->translate("banlogs.form2.line$line", [$params[$i]]);

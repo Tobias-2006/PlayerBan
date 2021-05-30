@@ -22,7 +22,7 @@ class PunishmentSubForm2 extends CustomBaseForm {
         parent::__construct($this->onCall($punishment));
         $this->setTitle($this->translate("punishments.form3.title"));
         $this->addLabel($this->translate("punishments.form3.label", [$punishment['id']]), "desc");
-        $this->addInput($this->translate("punishments.form3.input"), "Hacking...", $punishment['description'], "desc");
+        $this->addInput($this->translate("punishments.form3.input"), "Hacking...", (string) $punishment['description'], "desc");
         $this->addInput($this->translate("punishments.form3.input2"), "1d,12h", Converter::secondsToStr((int) $punishment['duration']));
         $this->addToggle($this->translate("punishments.form3.toggle"));
     }
@@ -34,7 +34,7 @@ class PunishmentSubForm2 extends CustomBaseForm {
     protected function onCall(array $punishment) : callable {
         return function (Player $player, $data) use ($punishment) {
             if(is_null($data)) return;
-            $pun = new Punishment((int) $punishment['id'], (int) $punishment['duration'], $punishment['description']);
+            $pun = new Punishment((int) $punishment['id'], (int) $punishment['duration'], (string) $punishment['description']);
             $description = &$data["desc"];
             $duration = &$data[2];
             if($data[3]) {

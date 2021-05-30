@@ -17,6 +17,7 @@ class Converter {
         $parts = explode(",", $string);
         foreach($parts as $part) {
             $chars = str_split($part, (strlen($part) - 1));
+            if(!$chars) return null;
             switch ($chars[1]) {
                 case MINUTES:
                     $time += ((int) $chars[0] * 60);

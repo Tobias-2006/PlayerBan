@@ -30,7 +30,7 @@ class PunishmentSubForm extends CustomBaseForm {
                 $player->sendMessage(C::RED . $this->translate("param.incorrect", ["id", "3 (0 to 999)"]));
                 return;
             }
-            $id = round($id);
+            $id = round((float) $id);
             if($this->getDataMgr()->punishmentExists((int) $id)) {
                 $player->sendMessage(C::RED . $this->translate("punishment.exist", [$id]));
                 return;

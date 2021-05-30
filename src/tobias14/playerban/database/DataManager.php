@@ -3,14 +3,10 @@ declare(strict_types=1);
 
 namespace tobias14\playerban\database;
 
-use mysqli;
-use SQLite3;
 use tobias14\playerban\PlayerBan;
 
 abstract class DataManager {
 
-    /** @var SQLite3|mysqli $db */
-    protected $db;
     /** @var PlayerBan $plugin */
     protected $plugin;
     /** @var string[] $settings */
