@@ -1,25 +1,21 @@
 <?php
+declare(strict_types=1);
 
 namespace tobias14\playerban\commands;
 
 use pocketmine\command\CommandSender;
+use pocketmine\plugin\Plugin;
 use pocketmine\utils\TextFormat as C;
-use tobias14\playerban\PlayerBan;
 use tobias14\playerban\utils\Converter;
 
-/**
- * Class PunishmentListCommand
- *
- * @package tobias14\playerban\commands
- */
 class PunishmentListCommand extends BaseCommand {
 
     /**
      * PunishmentListCommand constructor.
      *
-     * @param PlayerBan $plugin
+     * @param Plugin $plugin
      */
-    public function __construct(PlayerBan $plugin) {
+    public function __construct(Plugin $plugin) {
         parent::__construct($this->translate("punlist.name"), $plugin);
         $this->setPermission($this->translate("punlist.permission"));
         $this->setDescription($this->translate("punlist.description"));
@@ -45,7 +41,7 @@ class PunishmentListCommand extends BaseCommand {
         foreach ($data as $row) {
             $sender->sendMessage($this->translate(
                 "punlist.format",
-                [$row['id'], $row['description'], Converter::seconds_to_str($row['duration'])]
+                [$row['id'], $row['description'], Converter::secondsToStr((int) $row['duration'])]
             ));
         }
         return true;

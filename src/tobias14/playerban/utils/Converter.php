@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace tobias14\playerban\utils;
 
@@ -7,7 +8,7 @@ const MINUTES = "m", HOURS = "h", DAYS = "d";
 
 class Converter {
 
-    public static function str_to_seconds(string $string) : ?int {
+    public static function strToSeconds(string $string) : ?int {
         // FORMAT: 12d,3h,20m
         if(!preg_match("/(^[1-9][0-9]{0,2}[mhd])(,[1-9][0-9]{0,2}[mhd]){0,2}$/", $string)) {
             return null;
@@ -16,6 +17,7 @@ class Converter {
         $parts = explode(",", $string);
         foreach($parts as $part) {
             $chars = str_split($part, (strlen($part) - 1));
+            if(!$chars) return null;
             switch ($chars[1]) {
                 case MINUTES:
                     $time += ((int) $chars[0] * 60);
@@ -31,7 +33,7 @@ class Converter {
         return $time;
     }
 
-    public static function seconds_to_str(int $seconds) : string {
+    public static function secondsToStr(int $seconds) : string {
         $days = floor($seconds / 86400);
         $hours = floor(($seconds % 86400) / 3600);
         $minutes = floor((($seconds % 86400) % 3600) / 60);

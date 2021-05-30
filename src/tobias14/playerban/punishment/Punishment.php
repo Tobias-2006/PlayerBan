@@ -1,16 +1,11 @@
 <?php
+declare(strict_types=1);
 
 namespace tobias14\playerban\punishment;
 
 use tobias14\playerban\database\DataManager;
 use tobias14\playerban\PlayerBan;
 
-/**
- * This class represents the instance of a punishment
- *
- * Class Punishment
- * @package tobias14\playerban\punishment
- */
 class Punishment {
 
     /** @var int $id */
@@ -64,6 +59,8 @@ class Punishment {
     }
 
     /**
+     * Database Management
+     *
      * @return DataManager
      */
     private function getDataMgr() : DataManager {

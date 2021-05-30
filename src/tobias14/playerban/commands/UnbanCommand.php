@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace tobias14\playerban\commands;
 
@@ -6,21 +7,17 @@ use pocketmine\command\CommandSender;
 use pocketmine\plugin\Plugin;
 use pocketmine\utils\TextFormat as C;
 use tobias14\playerban\log\DeletionLog;
+use tobias14\playerban\PlayerBan;
 
-/**
- * Class UnbanCommand
- *
- * @package tobias14\playerban\commands
- */
 class UnbanCommand extends BaseCommand {
 
     /**
      * UnbanCommand constructor.
      *
-     * @param Plugin $owner
+     * @param Plugin $plugin
      */
-    public function __construct(Plugin $owner) {
-        parent::__construct($this->translate("unban.name"), $owner);
+    public function __construct(Plugin $plugin) {
+        parent::__construct($this->translate("unban.name"), $plugin);
         $this->setPermission($this->translate("unban.permission"));
         $this->setDescription($this->translate("unban.description"));
         $this->setUsage($this->translate("unban.usage"));
@@ -42,6 +39,10 @@ class UnbanCommand extends BaseCommand {
             return true;
         }
         $target = $args[0];
+        if(!PlayerBan::getInstance()->isValidUsername($target) && !PlayerBan::getInstance()->isValidAddress($target)) {
+            $sender->sendMessage(C::RED . $this->translate("param.incorrect", ["<player|ip>", "max123"]));
+            return true;
+        }
         if(!$this->getDataMgr()->isBanned($target)) {
             $sender->sendMessage(C::RED . $this->translate("target.notBanned", [$target]));
             return true;
@@ -49,10 +50,7 @@ class UnbanCommand extends BaseCommand {
 
         if($this->getDataMgr()->removeBan($target)) {
             $sender->sendMessage($this->translate("unban.success", [$target]));
-            $log = new DeletionLog();
-            $log->target = $target;
-            $log->moderator = $sender->getName();
-            $log->description = $this->translate("logger.ban.deletion");
+            $log = new DeletionLog($this->translate("logger.ban.deletion"), $sender->getName(), $target);
             $log->save();
             return true;
         }

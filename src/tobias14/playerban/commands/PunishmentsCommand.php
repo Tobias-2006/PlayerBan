@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace tobias14\playerban\commands;
 
@@ -8,11 +9,6 @@ use pocketmine\plugin\Plugin;
 use pocketmine\utils\TextFormat as C;
 use tobias14\playerban\forms\PunishmentForm;
 
-/**
- * Class PunishmentsCommand
- *
- * @package tobias14\playerban\commands
- */
 class PunishmentsCommand extends BaseCommand {
 
     /**
@@ -39,7 +35,7 @@ class PunishmentsCommand extends BaseCommand {
         }
         /** @var Player $player */
         $player = &$sender;
-        PunishmentForm::openMainForm($player);
+        $player->sendForm(new PunishmentForm());
         return true;
     }
 

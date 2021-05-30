@@ -1,31 +1,37 @@
 <?php
+declare(strict_types=1);
 
 namespace tobias14\playerban\ban;
 
 use tobias14\playerban\PlayerBan;
 
-/**
- * This class represents the ban instance
- *
- * Class Ban
- * @package tobias14\playerban\ban
- */
 class Ban {
 
-    /** @var int $creation_time */
-    protected $creation_time;
-
     /** @var string $target */
-    public $target;
+    protected $target;
     /** @var string $moderator */
-    public $moderator;
-    /** @var int $expiry_time */
-    public $expiry_time;
-    /** @var int $pun_id */
-    public $pun_id;
+    protected $moderator;
+    /** @var int $expiryTime */
+    protected $expiryTime;
+    /** @var int $punId */
+    protected $punId;
+    /** @var int $creationTime */
+    protected $creationTime;
 
-    public function __construct() {
-        $this->creation_time = time();
+    /**
+     * Ban constructor.
+     *
+     * @param string $target
+     * @param string $moderator
+     * @param int $expiryTime
+     * @param int $punId
+     */
+    public function __construct(string $target, string $moderator, int $expiryTime, int $punId) {
+        $this->target = $target;
+        $this->moderator = $moderator;
+        $this->expiryTime = $expiryTime;
+        $this->punId = $punId;
+        $this->creationTime = time();
     }
 
     /**
@@ -37,9 +43,9 @@ class Ban {
         return PlayerBan::getInstance()->getDataManager()->saveBan(
             $this->target,
             $this->moderator,
-            $this->expiry_time,
-            $this->pun_id,
-            $this->creation_time
+            $this->expiryTime,
+            $this->punId,
+            $this->creationTime
         );
     }
 

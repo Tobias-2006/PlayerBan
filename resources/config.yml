@@ -7,7 +7,7 @@
 #                 __/ |
 #                |___/
 # Config File
-# Version: 1.0.0
+# Version: 1.1.0
 
 #Set your language here
 #English (eng),
@@ -24,3 +24,13 @@ username: root
 passwd: password
 dbname: playerban
 port: 3306
+
+#Specify here your date format
+#Available: dd.mm.yyyy, mm.dd.yyyy, yyyy.mm.dd
+date-format: 'dd.mm.yyyy'
+
+#Set here the message that appears when a banned player wants to enter the server
+#Moderator: {moderator}
+#Expiration date: {expiry}
+#New line: {new_line}
+kick-message: '§cYou are banned!{new_line}{new_line}§4Expiry: §f{expiry}'

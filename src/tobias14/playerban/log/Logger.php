@@ -1,15 +1,10 @@
 <?php
+declare(strict_types=1);
 
 namespace tobias14\playerban\log;
 
 use tobias14\playerban\PlayerBan;
 
-/**
- * This class represents the LogManager
- *
- * Class Logger
- * @package tobias14\playerban\log
- */
 class Logger {
 
     public const LOG_TYPE_CREATION = 0;
@@ -25,10 +20,10 @@ class Logger {
     public static function log(Log $log) : ?bool {
         return PlayerBan::getInstance()->getDataManager()->saveLog(
             $log->getType(),
-            $log->description,
-            $log->moderator,
+            $log->getDescription(),
+            $log->getModerator(),
             $log->getCreationTime(),
-            $log->target
+            $log->getTarget()
         );
     }
 

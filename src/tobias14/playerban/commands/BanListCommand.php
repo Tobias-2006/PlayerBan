@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace tobias14\playerban\commands;
 
@@ -8,20 +9,15 @@ use pocketmine\plugin\Plugin;
 use pocketmine\utils\TextFormat as C;
 use tobias14\playerban\forms\BanListForm;
 
-/**
- * Class BanListCommand
- *
- * @package tobias14\playerban\commands
- */
 class BanListCommand extends BaseCommand {
 
     /**
      * BanListCommand constructor.
      *
-     * @param Plugin $owner
+     * @param Plugin $plugin
      */
-    public function __construct(Plugin $owner) {
-        parent::__construct($this->translate("banlist.name"), $owner);
+    public function __construct(Plugin $plugin) {
+        parent::__construct($this->translate("banlist.name"), $plugin);
         $this->setPermission($this->translate("banlist.permission"));
         $this->setDescription($this->translate("banlist.description"));
     }
@@ -39,7 +35,7 @@ class BanListCommand extends BaseCommand {
         }
         /** @var Player $player */
         $player = &$sender;
-        BanListForm::openMainForm($player);
+        $player->sendForm(new BanListForm());
         return true;
     }
 

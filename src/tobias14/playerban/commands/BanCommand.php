@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace tobias14\playerban\commands;
 
@@ -9,11 +10,6 @@ use tobias14\playerban\ban\Ban;
 use tobias14\playerban\log\CreationLog;
 use tobias14\playerban\PlayerBan;
 
-/**
- * Class BanCommand
- *
- * @package tobias14\playerban\commands
- */
 class BanCommand extends BaseCommand {
 
     /**
@@ -44,7 +40,7 @@ class BanCommand extends BaseCommand {
             return true;
         }
         $target = &$args[0];
-        $pun_id = &$args[1];
+        $punId = &$args[1];
         if(!PlayerBan::getInstance()->isValidUsername($target) && !PlayerBan::getInstance()->isValidAddress($target)) {
             $sender->sendMessage(C::RED . $this->translate("param.incorrect", ["<player|ip>", "max123"]));
             return true;
@@ -53,28 +49,23 @@ class BanCommand extends BaseCommand {
             $sender->sendMessage(C::RED . $this->translate("target.isBanned"));
             return true;
         }
-        if(!is_numeric($pun_id)) {
+        if(!is_numeric($punId)) {
             $sender->sendMessage(C::RED . $this->translate("param.incorrect", ["<punId>", "3"]));
             return true;
         }
-        if(!$this->getDataMgr()->punishmentExists($pun_id)) {
-            $sender->sendMessage(C::RED . $this->translate("punishment.notExist", [$pun_id]));
+        $punId = (int) round((float) $punId);
+        if(!$this->getDataMgr()->punishmentExists($punId)) {
+            $sender->sendMessage(C::RED . $this->translate("punishment.notExist", [$punId]));
             return true;
         }
-        $punishment = $this->getDataMgr()->getPunishment($pun_id);
+        $punishment = $this->getDataMgr()->getPunishment($punId);
 
-        $ban = new Ban();
-        $ban->target = $target;
-        $ban->moderator = $sender->getName();
-        $ban->expiry_time = time() + $punishment['duration'];
-        $ban->pun_id = (int) $pun_id;
+        $expiryTime = time() + (int) $punishment['duration'];
+        $ban = new Ban($target, $sender->getName(), $expiryTime, $punId);
 
         if($ban->save()) {
             $sender->sendMessage($this->translate("ban.success", [$target]));
-            $log = new CreationLog();
-            $log->target = $target;
-            $log->moderator = $sender->getName();
-            $log->description = $this->translate("logger.ban.creation");
+            $log = new CreationLog($this->translate("logger.ban.creation"), $sender->getName(), $target);
             $log->save();
             $this->kickTarget($target);
             return true;
@@ -89,7 +80,7 @@ class BanCommand extends BaseCommand {
      *
      * @param string $target
      */
-    private function kickTarget(string $target) {
+    private function kickTarget(string $target) : void {
         foreach ($this->getPlugin()->getServer()->getOnlinePlayers() as $player) {
             if(strtolower($player->getName()) === strtolower($target) or $player->getAddress() === $target) {
                 $player->kick($this->translate("ban.target.kick"), false);
