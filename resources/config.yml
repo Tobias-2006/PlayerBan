@@ -25,6 +25,10 @@ passwd: password
 dbname: playerban
 port: 3306
 
+#Specify here your date format
+#Available: dd.mm.yyyy, mm.dd.yyyy, yyyy.mm.dd
+date-format: 'dd.mm.yyyy'
+
 #Set here the message that appears when a banned player wants to enter the server
 #Moderator: {moderator}
 #Expiration date: {expiry}

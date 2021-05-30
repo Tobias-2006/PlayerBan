@@ -75,7 +75,7 @@ class PlayerBan extends PluginBase {
      * @return string
      */
     public function formatTime(int $timestamp) : string {
-        return date("d.m.Y | H:i", $timestamp);
+        return date($this->getDateFormat(), $timestamp);
     }
 
     /**
@@ -98,6 +98,27 @@ class PlayerBan extends PluginBase {
      */
     public function isValidAddress(string $address) : bool {
         return preg_match("/^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/", $address) === 1;
+    }
+
+    /**
+     * Returns the specified date format
+     *
+     * @return string
+     */
+    private function getDateFormat() : string {
+        $dateFormat = $this->getConfig()->get('date-format', 'dd.mm.yyyy');
+        switch ($dateFormat) {
+            case 'mm.dd.yyyy':
+                $format = 'm.d.Y | H:i';
+                break;
+            case 'yyyy.mm.dd':
+                $format = 'Y.m.d | H:i';
+                break;
+            case 'dd.mm.yyyy':
+            default:
+                $format = 'd.m.Y | H:i';
+        }
+        return $format;
     }
 
     /**
