@@ -6,6 +6,7 @@ namespace tobias14\playerban;
 use pocketmine\lang\BaseLang;
 use pocketmine\plugin\PluginBase;
 use tobias14\playerban\commands\BanCommand;
+use tobias14\playerban\commands\BanHistoryCommand;
 use tobias14\playerban\commands\BanListCommand;
 use tobias14\playerban\commands\BanLogsCommand;
 use tobias14\playerban\commands\PunishmentListCommand;
@@ -140,7 +141,8 @@ class PlayerBan extends PluginBase {
             new BanLogsCommand($this),
             new BanCommand($this),
             new UnbanCommand($this),
-            new BanListCommand($this)
+            new BanListCommand($this),
+            new BanHistoryCommand($this)
         ]);
         $this->getServer()->getPluginManager()->registerEvents(new EventListener(), $this);
     }

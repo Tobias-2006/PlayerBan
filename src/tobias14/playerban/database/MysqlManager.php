@@ -282,6 +282,23 @@ class MysqlManager extends DataManager {
     }
 
     /**
+     * @param string $target
+     * @return array[]|null
+     */
+    public function getBanHistory(string $target) : ?array {
+        if(!$this->checkConnection()) return null;
+        $stmt = $this->db->prepare("SELECT * FROM bans WHERE target=? ORDER BY creation_time DESC;");
+        $stmt->bind_param("s", $target);
+        $stmt->execute();
+        $data = [];
+        while ($row = $stmt->get_result()->fetch_assoc()) {
+            $data[] = $row;
+        }
+        $stmt->close();
+        return $data;
+    }
+
+    /**
      * @param int $page
      * @param int $limit
      * @return array[]|null

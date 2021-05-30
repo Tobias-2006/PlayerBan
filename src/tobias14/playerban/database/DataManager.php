@@ -155,6 +155,14 @@ abstract class DataManager {
     abstract public function getBanByName(string $target) : ?array;
 
     /**
+     * Returns a list of all bans of a player or an ip address
+     *
+     * @param string $target
+     * @return array[]|null
+     */
+    abstract public function getBanHistory(string $target) : ?array;
+
+    /**
      * Returns a list of all active bans for the requested page
      *
      * @param int $page

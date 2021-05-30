@@ -248,6 +248,22 @@ class SqliteManager extends DataManager {
     }
 
     /**
+     * @param string $target
+     * @return array[]|null
+     */
+    public function getBanHistory(string $target) : ?array {
+        $stmt = $this->db->prepare("SELECT * FROM bans WHERE target=:target ORDER BY creation_time DESC;");
+        $stmt->bindParam(":target", $target, SQLITE3_TEXT);
+        $result = $stmt->execute();
+        $data = [];
+        while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
+            $data[] = $row;
+        }
+        $stmt->close();
+        return $data;
+    }
+
+    /**
      * @param int $page
      * @param int $limit
      * @return array[]|null

@@ -25,6 +25,7 @@ PlayerBan is a ban system that is intended to make work easier for team members.
 | /banlogs | - | Shows a modification protocol | `Op`, `playerban.command.banlogs` |
 | /punishments | - | Create or edit punishments | `Op`, `playerban.command.punishments` |
 | /punlist | - | Displays a list of all punishments | `Op`, `playerban.command.punlist` |
+| /banhistory | <player\|ip> | Shows a list of all bans of a player | `Op`, `playerban.command.banhistory` |
 
 ## License
 ```
