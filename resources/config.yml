@@ -24,3 +24,9 @@ username: root
 passwd: password
 dbname: playerban
 port: 3306
+
+#Set here the message that appears when a banned player wants to enter the server
+#Moderator: {moderator}
+#Expiration date: {expiry}
+#New line: {new_line}
+kick-message: '§cYou are banned!{new_line}{new_line}§4Expiry: §f{expiry}'
