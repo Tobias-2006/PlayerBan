@@ -34,7 +34,7 @@ class PunishmentSubForm2 extends CustomBaseForm {
     protected function onCall(array $punishment) : callable {
         return function (Player $player, $data) use ($punishment) {
             if(is_null($data)) return;
-            $pun = new Punishment($punishment['id'], $punishment['duration'], $punishment['description']);
+            $pun = new Punishment((int) $punishment['id'], (int) $punishment['duration'], $punishment['description']);
             $description = &$data["desc"];
             $duration = &$data[2];
             if($data[3]) {

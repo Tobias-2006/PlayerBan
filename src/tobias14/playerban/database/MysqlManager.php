@@ -290,8 +290,9 @@ class MysqlManager extends DataManager {
         $stmt = $this->db->prepare("SELECT * FROM bans WHERE target=? ORDER BY creation_time DESC;");
         $stmt->bind_param("s", $target);
         $stmt->execute();
+        if(!$result = $stmt->get_result()) return null;
         $data = [];
-        while ($row = $stmt->get_result()->fetch_assoc()) {
+        while ($row = $result->fetch_assoc()) {
             $data[] = $row;
         }
         $stmt->close();
