@@ -3,3 +3,26 @@ api: 3.0.0
 version: 1.1.0
 main: tobias14\playerban\PlayerBan
 author: tobias14
+
+permissions:
+  playerban.command.ban:
+    default: op
+    description: Allows to use the /ban command
+  playerban.command.unban:
+    default: op
+    description: Allows to use the /unban command
+  playerban.command.banlist:
+    default: op
+    description: Allows to use the /banlist command
+  playerban.command.banlogs:
+    default: op
+    description: Allows to use the /banlogs command
+  playerban.command.punishments:
+    default: op
+    description: Allows to use the /punishments command
+  playerban.command.punlist:
+    default: op
+    description: Allows to use the /punlist command
+  playerban.command.banhistory:
+    default: op
+    description: Allows to use the /banhistory command
