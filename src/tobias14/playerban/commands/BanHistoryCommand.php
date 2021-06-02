@@ -7,6 +7,7 @@ use pocketmine\command\CommandSender;
 use pocketmine\command\ConsoleCommandSender;
 use pocketmine\Player;
 use pocketmine\plugin\Plugin;
+use pocketmine\utils\TextFormat as C;
 use tobias14\playerban\forms\BanHistoryForm;
 use tobias14\playerban\PlayerBan;
 
@@ -32,7 +33,7 @@ class BanHistoryCommand extends BaseCommand {
         if(!$this->checkPluginState($this->getPlugin(), $sender))
             return true;
         if(!$this->canUse($sender)) {
-            $sender->sendMessage($this->translate("permission.denied"));
+            $sender->sendMessage(C::RED . $this->translate("permission.denied"));
             return true;
         }
         if(!isset($args[0])) {
@@ -40,12 +41,16 @@ class BanHistoryCommand extends BaseCommand {
             return true;
         }
         $target = $args[0];
+        $bans = $this->getDataMgr()->getBanHistory($target);
+        if(is_null($bans)) {
+            $sender->sendMessage($this->translate(C::RED . "error"));
+            return true;
+        }
+        if(count($bans) === 0) {
+            $sender->sendMessage(C::RED . $this->translate("target.neverBanned", [$target]));
+            return true;
+        }
         if($sender instanceof ConsoleCommandSender) {
-            $bans = $this->getDataMgr()->getBanHistory($target);
-            if(is_null($bans)) {
-                $sender->sendMessage($this->translate("error"));
-                return true;
-            }
             foreach ($bans as $ban) {
                 $banCreation = PlayerBan::getInstance()->formatTime($ban['creation_time']);
                 $punishment = $this->getDataMgr()->getPunishment($ban['pun_id']) ?? ['description' => 'undefined'];
@@ -53,7 +58,8 @@ class BanHistoryCommand extends BaseCommand {
             }
             return true;
         }
-        if(!$sender instanceof Player) return true;
+        if(!$sender instanceof Player)
+            return true;
         $sender->sendForm(new BanHistoryForm($target));
         return true;
     }
