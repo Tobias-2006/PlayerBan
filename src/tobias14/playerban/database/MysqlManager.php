@@ -26,7 +26,7 @@ class MysqlManager extends DataManager {
         try {
             $this->db = new mysqli($settings['Host'], $settings['Username'], $settings['Password'], $settings['Database'], (int) $settings['Port']);
         } catch (Exception $e) {
-            $this->plugin->getLogger()->critical($this->plugin->getLang()->translateString("connection.failed"));
+            $this->plugin->getLogger()->critical($this->plugin->getLanguage()->translateString("connection.failed"));
             $this->plugin->getServer()->getPluginManager()->disablePlugin($this->plugin);
             return;
         }
@@ -52,7 +52,7 @@ class MysqlManager extends DataManager {
             $settings = $this->settings;
             $this->db = new mysqli($settings['Host'], $settings['Username'], $settings['Password'], $settings['Database'], (int) $settings['Port']);
         } catch (Exception $e) {
-            $this->plugin->getLogger()->critical($this->plugin->getLang()->translateString("connection.failed"));
+            $this->plugin->getLogger()->critical($this->plugin->getLanguage()->translateString("connection.failed"));
             $this->plugin->getServer()->getPluginManager()->disablePlugin($this->plugin);
         }
     }

@@ -43,7 +43,7 @@ abstract class BaseCommand extends PluginCommand {
      * @return string
      */
     public function translate(string $str, array $params = []) : string {
-        return PlayerBan::getInstance()->getLang()->translateString($str, $params);
+        return PlayerBan::getInstance()->getLanguage()->translateString($str, $params);
     }
 
     /**

@@ -26,7 +26,7 @@ abstract class CustomBaseForm extends CustomForm {
      * @return string
      */
     protected function translate(string $str, array $params = []) : string {
-        return PlayerBan::getInstance()->getLang()->translateString($str, $params);
+        return PlayerBan::getInstance()->getLanguage()->translateString($str, $params);
     }
 
     /**

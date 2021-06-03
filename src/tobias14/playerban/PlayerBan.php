@@ -27,11 +27,20 @@ class PlayerBan extends PluginBase {
     private $dataMgr;
 
     /**
+     * Class instance
+     *
+     * @return self
+     */
+    public static function getInstance() : self {
+        return self::$instance;
+    }
+
+    /**
      * Message management
      *
      * @return BaseLang
      */
-    public function getLang() : BaseLang {
+    public function getLanguage() : BaseLang {
         return $this->baseLang;
     }
 
@@ -58,15 +67,6 @@ class PlayerBan extends PluginBase {
             $message = str_replace($search, $replace, $message);
         }
         return $message;
-    }
-
-    /**
-     * Class instance
-     *
-     * @return self
-     */
-    public static function getInstance() : self {
-        return self::$instance;
     }
 
     /**
@@ -142,7 +142,7 @@ class PlayerBan extends PluginBase {
      *
      * @return void
      */
-    private function setDataMgr() : void {
+    private function setDataManager() : void {
         $datamanager = $this->getConfig()->get("datamanager", "sqlite");
         switch ($datamanager) {
             case "mysql":
@@ -165,7 +165,7 @@ class PlayerBan extends PluginBase {
     }
 
     public function onEnable() {
-        $this->setDataMgr();
+        $this->setDataManager();
         $commandMap = $this->getServer()->getCommandMap();
         $commands = ["ban", "unban", "pardon", "ban-ip", "unban-ip", "banlist"];
         foreach ($commands as $cmd) {
