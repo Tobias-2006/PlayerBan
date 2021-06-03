@@ -22,19 +22,14 @@ class UnbanCommand extends BaseCommand {
         $this->setPermission($this->translate("unban.permission"));
         $this->setDescription($this->translate("unban.description"));
         $this->setUsage($this->translate("unban.usage"));
-    }
-
-    public function canUse(CommandSender $sender) : bool {
-        return $sender->hasPermission($this->getPermission());
+        $this->setPermissionMessage(C::RED . $this->translate("permission.denied"));
     }
 
     public function execute(CommandSender $sender, string $commandLabel, array $args) : bool {
         if(!$this->checkPluginState($this->getPlugin(), $sender))
             return true;
-        if(!$this->canUse($sender)) {
-            $sender->sendMessage(C::RED . $this->translate("permission.denied"));
+        if(!$this->testPermission($sender))
             return true;
-        }
         if(count($args) === 0)
             throw new InvalidCommandSyntaxException();
         $target = $args[0];

@@ -20,17 +20,16 @@ class PunishmentsCommand extends BaseCommand {
         parent::__construct($this->translate("punishments.name"), $plugin);
         $this->setPermission($this->translate("punishments.punishments.permission"));
         $this->setDescription($this->translate("punishments.description"));
-    }
-
-    public function canUse(CommandSender $sender) : bool {
-        return $sender->hasPermission($this->getPermission()) and $sender instanceof Player;
+        $this->setPermissionMessage(C::RED . $this->translate("permission.denied"));
     }
 
     public function execute(CommandSender $sender, string $commandLabel, array $args) : bool {
         if(!$this->checkPluginState($this->getPlugin(), $sender))
             return true;
-        if(!$this->canUse($sender)) {
-            $sender->sendMessage(C::RED . $this->translate("permission.denied"));
+        if(!$this->testPermission($sender))
+            return true;
+        if(!$sender instanceof Player) {
+            $sender->sendMessage($this->getPermissionMessage());
             return true;
         }
         /** @var Player $player */

@@ -23,19 +23,14 @@ class BanCommand extends BaseCommand {
         $this->setPermission($this->translate("ban.permission"));
         $this->setDescription($this->translate("ban.description"));
         $this->setUsage($this->translate("ban.usage"));
-    }
-
-    public function canUse(CommandSender $sender) : bool {
-        return $sender->hasPermission($this->getPermission());
+        $this->setPermissionMessage(C::RED . $this->translate("permission.denied"));
     }
 
     public function execute(CommandSender $sender, string $commandLabel, array $args) : bool {
         if(!$this->checkPluginState($this->getPlugin(), $sender))
             return true;
-        if(!$this->canUse($sender)) {
-            $sender->sendMessage(C::RED . $this->translate("permission.denied"));
+        if(!$this->testPermission($sender))
             return true;
-        }
         if(count($args) < 2)
             throw new InvalidCommandSyntaxException();
         $target = &$args[0];

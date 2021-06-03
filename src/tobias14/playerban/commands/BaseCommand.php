@@ -13,14 +13,6 @@ use tobias14\playerban\PlayerBan;
 abstract class BaseCommand extends PluginCommand {
 
     /**
-     * Checks if the player has the required permission for the command.
-     *
-     * @param CommandSender $sender
-     * @return bool
-     */
-    abstract function canUse(CommandSender $sender) : bool;
-
-    /**
      * Checks if the plugin is enabled/disabled.
      *
      * @param Plugin $plugin
