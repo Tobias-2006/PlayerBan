@@ -7,6 +7,7 @@ use Exception;
 use SQLite3;
 use tobias14\playerban\ban\Ban;
 use tobias14\playerban\PlayerBan;
+use tobias14\playerban\punishment\Punishment;
 
 class SqliteManager extends DataManager {
 
@@ -126,74 +127,71 @@ class SqliteManager extends DataManager {
 
     /**
      * @param int $id
-     * @return mixed[]|null
+     * @return Punishment|null
      */
-    public function getPunishment(int $id) : ?array {
+    public function getPunishment(int $id) : ?Punishment {
         $stmt = $this->db->prepare("SELECT * FROM punishments WHERE id = :id;");
         if(!$stmt) return null;
         $stmt->bindParam(":id", $id, SQLITE3_INTEGER);
         $result = $stmt->execute();
         if(!$result) return null;
         $result = $result->fetchArray(SQLITE3_ASSOC);
+        if(!$result) return null;
         $stmt->close();
-        return !$result ? null : $result;
+        return new Punishment((int) $result['id'], (int) $result['duration'], $result['description']);
     }
 
     /**
-     * @return array[]|null
+     * @return Punishment[]|null
      */
     public function getAllPunishments() : ?array {
         $result = $this->db->query("SELECT * FROM punishments;");
         if(!$result) return null;
         $data = [];
         while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
-            $data[] = $row;
+            $data[] = new Punishment((int) $row['id'], (int) $row['duration'], $row['description']);
         }
         return $data;
     }
 
     /**
-     * @param int $id
-     * @param int $duration
-     * @param string $description
+     * @param Punishment $punishment
      * @return bool|null
      */
-    public function savePunishment(int $id, int $duration, string $description) : ?bool {
+    public function savePunishment(Punishment $punishment) : ?bool {
         $stmt = $this->db->prepare("INSERT INTO punishments(id, duration, description) VALUES(:id, :duration, :desc);");
         if(!$stmt) return false;
-        $stmt->bindParam(":id", $id, SQLITE3_INTEGER);
-        $stmt->bindParam(":duration", $duration, SQLITE3_INTEGER);
-        $stmt->bindParam(":desc", $description, SQLITE3_TEXT);
+        $stmt->bindParam(":id", $punishment->id, SQLITE3_INTEGER);
+        $stmt->bindParam(":duration", $punishment->duration, SQLITE3_INTEGER);
+        $stmt->bindParam(":desc", $punishment->description, SQLITE3_TEXT);
         $result = $stmt->execute() != false;
         $stmt->close();
         return $result;
     }
 
     /**
-     * @param int $id
+     * @param Punishment $punishment
      * @return bool|null
      */
-    public function deletePunishment(int $id) : ?bool {
+    public function deletePunishment(Punishment $punishment) : ?bool {
         $stmt = $this->db->prepare("DELETE FROM punishments WHERE id=:id;");
         if(!$stmt) return false;
-        $stmt->bindParam(":id", $id, SQLITE3_INTEGER);
+        $stmt->bindParam(":id", $punishment->id, SQLITE3_INTEGER);
         $result = $stmt->execute() != false;
         $stmt->close();
         return $result;
     }
 
     /**
-     * @param int $id
-     * @param int $duration
-     * @param string $description
+     * @param Punishment $punishment
      * @return bool|null
      */
-    public function updatePunishment(int $id, int $duration, string $description) : ?bool {
+    public function updatePunishment(Punishment $punishment) : ?bool {
         $stmt = $this->db->prepare("UPDATE punishments SET duration=:duration, description=:desc WHERE id=:id;");
         if(!$stmt) return false;
-        $stmt->bindParam(":duration", $duration, SQLITE3_INTEGER);
-        $stmt->bindParam(":desc", $description, SQLITE3_TEXT);
-        $stmt->bindParam(":id", $id, SQLITE3_INTEGER);
+        $stmt->bindParam(":duration", $punishment->duration, SQLITE3_INTEGER);
+        $stmt->bindParam(":desc", $punishment->description, SQLITE3_TEXT);
+        $stmt->bindParam(":id", $punishment->id, SQLITE3_INTEGER);
         $result = $stmt->execute() != false;
         $stmt->close();
         return $result;

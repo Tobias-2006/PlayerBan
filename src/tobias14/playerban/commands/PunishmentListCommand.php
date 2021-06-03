@@ -32,16 +32,18 @@ class PunishmentListCommand extends BaseCommand {
             $sender->sendMessage(C::RED . $this->translate("permission.denied"));
             return true;
         }
-        $data = $this->getDataMgr()->getAllPunishments();
-        if(is_null($data)) {
+        $punishments = $this->getDataMgr()->getAllPunishments();
+        if(is_null($punishments)) {
             $sender->sendMessage(C::RED . $this->translate("error"));
             return true;
         }
         $sender->sendMessage($this->translate("punlist.headline"));
-        foreach ($data as $row) {
-            $sender->sendMessage($this->translate(
-                "punlist.format",
-                [$row['id'], $row['description'], Converter::secondsToStr((int) $row['duration'])]
+        foreach ($punishments as $punishment) {
+            $sender->sendMessage($this->translate("punlist.format", [
+                    $punishment->id,
+                    $punishment->description,
+                    Converter::secondsToStr($punishment->duration)
+                ]
             ));
         }
         return true;

@@ -11,6 +11,7 @@ use pocketmine\plugin\Plugin;
 use pocketmine\utils\TextFormat as C;
 use tobias14\playerban\forms\BanHistoryForm;
 use tobias14\playerban\PlayerBan;
+use tobias14\playerban\punishment\Punishment;
 
 class BanHistoryCommand extends BaseCommand {
 
@@ -52,8 +53,8 @@ class BanHistoryCommand extends BaseCommand {
         if($sender instanceof ConsoleCommandSender) {
             foreach ($bans as $ban) {
                 $banCreation = PlayerBan::getInstance()->formatTime($ban->creationTime);
-                $punishment = $this->getDataMgr()->getPunishment($ban->punId) ?? ['description' => 'undefined'];
-                $sender->sendMessage($this->translate("banhistory.consoleFormat", [$banCreation, $punishment['description']]));
+                $punishment = $this->getDataMgr()->getPunishment($ban->punId) ?? new Punishment(-1, -1, "undefined");
+                $sender->sendMessage($this->translate("banhistory.consoleFormat", [$banCreation, $punishment->description]));
             }
             return true;
         }

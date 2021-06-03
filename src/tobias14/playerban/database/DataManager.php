@@ -5,6 +5,7 @@ namespace tobias14\playerban\database;
 
 use tobias14\playerban\ban\Ban;
 use tobias14\playerban\PlayerBan;
+use tobias14\playerban\punishment\Punishment;
 
 abstract class DataManager {
 
@@ -73,47 +74,43 @@ abstract class DataManager {
     abstract public function punishmentExists(int $id) : ?bool;
 
     /**
-     * Returns a punishment as assoc array
+     * Returns a punishment or null
      *
      * @param int $id
-     * @return string[]|int[]|null
+     * @return Punishment|null
      */
-    abstract public function getPunishment(int $id) : ?array;
+    abstract public function getPunishment(int $id) : ?Punishment;
 
     /**
-     * Returns a list of all punishments as assoc array
+     * Returns a list of all punishments
      *
-     * @return array[]|null
+     * @return Punishment[]|null
      */
     abstract public function getAllPunishments() : ?array;
 
     /**
      * Saves a punishment to the database
      *
-     * @param int $id
-     * @param int $duration
-     * @param string $description
+     * @param Punishment $punishment
      * @return bool|null
      */
-    abstract public function savePunishment(int $id, int $duration, string $description) : ?bool;
+    abstract public function savePunishment(Punishment $punishment) : ?bool;
 
     /**
      * Deletes a punishment from the database
      *
-     * @param int $id
+     * @param Punishment $punishment
      * @return bool|null
      */
-    abstract public function deletePunishment(int $id) : ?bool;
+    abstract public function deletePunishment(Punishment $punishment) : ?bool;
 
     /**
      * Allows to edit an existing punishment
      *
-     * @param int $id
-     * @param int $duration
-     * @param string $description
+     * @param Punishment $punishment
      * @return bool|null
      */
-    abstract public function updatePunishment(int $id, int $duration, string $description) : ?bool;
+    abstract public function updatePunishment(Punishment $punishment) : ?bool;
 
     /**
      * Checks if a player or an ip address is banned

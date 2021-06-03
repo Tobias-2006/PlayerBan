@@ -47,15 +47,12 @@ class PunishmentSubForm extends CustomBaseForm {
                 $player->sendMessage(C::RED . $this->translate("param.tooLong", ["description", "3 to 255"]));
                 return;
             }
-            $pun = new Punishment();
-            $pun->id = (int) $id;
-            $pun->description = $description;
-            $pun->duration = Converter::strToSeconds($duration);
-            if(is_null($pun->save())) {
+            $punishment = new Punishment((int) $id, Converter::strToSeconds((string) $duration), $description);
+            if(!$this->getDataMgr()->savePunishment($punishment)) {
                 $player->sendMessage(C::RED . $this->translate("error"));
                 return;
             }
-            $log = new CreationLog($this->translate("logger.punishment.creation"), $player->getName(), "PunId[" . $pun->id . "]");
+            $log = new CreationLog($this->translate("logger.punishment.creation"), $player->getName(), "PunId[" . $punishment->id . "]");
             if(is_null($log->save())) {
                 $player->sendMessage(C::RED . $this->translate("error"));
                 return;

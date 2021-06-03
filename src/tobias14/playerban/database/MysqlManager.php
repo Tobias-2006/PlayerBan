@@ -7,6 +7,7 @@ use tobias14\playerban\ban\Ban;
 use tobias14\playerban\PlayerBan;
 use mysqli;
 use Exception;
+use tobias14\playerban\punishment\Punishment;
 
 class MysqlManager extends DataManager {
 
@@ -159,24 +160,26 @@ class MysqlManager extends DataManager {
 
     /**
      * @param int $id
-     * @return string[]|null
+     * @return Punishment|null
      */
-    public function getPunishment(int $id) : ?array {
+    public function getPunishment(int $id) : ?Punishment {
         if(!$this->checkConnection()) return null;
         $stmt = $this->db->prepare("SELECT * FROM punishments WHERE id=?;");
         if(!$stmt) return null;
         $stmt->bind_param("i", $id);
         $stmt->execute();
         $result = $stmt->get_result();
-        $stmt->close();
         if(!$result) return null;
-        return $result->fetch_assoc();
+        $result = $result->fetch_assoc();
+        if(is_null($result)) return null;
+        $stmt->close();
+        return new Punishment((int) $result['id'], (int) $result['duration'], $result['description']);
     }
 
     /**
      * Returns a list of all punishments
      *
-     * @return array[]|null
+     * @return Punishment[]|null
      */
     public function getAllPunishments() : ?array {
         if(!$this->checkConnection()) return null;
@@ -184,52 +187,48 @@ class MysqlManager extends DataManager {
         if(!$result or $result === true) return null;
         $data = [];
         while ($row = $result->fetch_assoc()) {
-            $data[] = $row;
+            $data[] = new Punishment((int) $row['id'], (int) $row['duration'], $row['description']);
         }
         return $data;
     }
 
     /**
-     * @param int $id
-     * @param int $duration
-     * @param string $description
+     * @param Punishment $punishment
      * @return null|bool
      */
-    public function savePunishment(int $id, int $duration, string $description) : ?bool {
+    public function savePunishment(Punishment $punishment) : ?bool {
         if(!$this->checkConnection()) return null;
         $stmt = $this->db->prepare("INSERT INTO punishments(id, duration, description) VALUES(?, ?, ?);");
         if(!$stmt) return false;
-        $stmt->bind_param("iis", $id, $duration, $description);
+        $stmt->bind_param("iis", $punishment->id, $punishment->duration, $punishment->description);
         $result = $stmt->execute();
         $stmt->close();
         return $result;
     }
 
     /**
-     * @param int $id
+     * @param Punishment $punishment
      * @return null|bool
      */
-    public function deletePunishment(int $id) : ?bool {
+    public function deletePunishment(Punishment $punishment) : ?bool {
         if(!$this->checkConnection()) return null;
         $stmt = $this->db->prepare("DELETE FROM punishments WHERE id=?;");
         if(!$stmt) return false;
-        $stmt->bind_param("i", $id);
+        $stmt->bind_param("i", $punishment->id);
         $result = $stmt->execute();
         $stmt->close();
         return $result;
     }
 
     /**
-     * @param int $id
-     * @param int $duration
-     * @param string $description
+     * @param Punishment $punishment
      * @return null|bool
      */
-    public function updatePunishment(int $id, int $duration, string $description) : ?bool {
+    public function updatePunishment(Punishment $punishment) : ?bool {
         if(!$this->checkConnection()) return null;
         $stmt = $this->db->prepare("UPDATE punishments SET duration=?, description=? WHERE id=?;");
         if(!$stmt) return false;
-        $stmt->bind_param("isi", $duration, $description, $id);
+        $stmt->bind_param("isi", $punishment->duration, $punishment->description, $punishment->id);
         $result = $stmt->execute();
         $stmt->close();
         return $result;

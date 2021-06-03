@@ -47,8 +47,8 @@ class BanHistorySubForm extends SimpleBaseForm {
             if($i === 6) {
                 if($this->getDataMgr()->punishmentExists($ban->punId)) {
                     $punishment = $this->getDataMgr()->getPunishment($ban->punId);
-                    $params[] = $punishment['description'];
-                    $params[] = Converter::secondsToStr((int) $punishment['duration']);
+                    $params[] = $punishment->description;
+                    $params[] = Converter::secondsToStr($punishment->duration);
                 } else{
                     break;
                 }
