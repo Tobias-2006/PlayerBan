@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace tobias14\playerban\commands;
 
 use pocketmine\command\CommandSender;
+use pocketmine\command\utils\InvalidCommandSyntaxException;
 use pocketmine\plugin\Plugin;
 use pocketmine\utils\TextFormat as C;
 use tobias14\playerban\ban\Ban;
@@ -35,10 +36,8 @@ class BanCommand extends BaseCommand {
             $sender->sendMessage(C::RED . $this->translate("permission.denied"));
             return true;
         }
-        if(!isset($args[0]) or !isset($args[1])) {
-            $sender->sendMessage($this->getUsage());
-            return true;
-        }
+        if(count($args) < 2)
+            throw new InvalidCommandSyntaxException();
         $target = &$args[0];
         $punId = &$args[1];
         if(!PlayerBan::getInstance()->isValidUsername($target) && !PlayerBan::getInstance()->isValidAddress($target)) {

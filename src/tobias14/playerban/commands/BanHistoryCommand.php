@@ -5,6 +5,7 @@ namespace tobias14\playerban\commands;
 
 use pocketmine\command\CommandSender;
 use pocketmine\command\ConsoleCommandSender;
+use pocketmine\command\utils\InvalidCommandSyntaxException;
 use pocketmine\Player;
 use pocketmine\plugin\Plugin;
 use pocketmine\utils\TextFormat as C;
@@ -36,10 +37,8 @@ class BanHistoryCommand extends BaseCommand {
             $sender->sendMessage(C::RED . $this->translate("permission.denied"));
             return true;
         }
-        if(!isset($args[0])) {
-            $sender->sendMessage($this->getUsage());
-            return true;
-        }
+        if(count($args) === 0)
+            throw new InvalidCommandSyntaxException();
         $target = $args[0];
         $bans = $this->getDataMgr()->getBanHistory($target);
         if(is_null($bans)) {
