@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace tobias14\playerban\ban;
 
+use tobias14\playerban\events\PlayerBanTargetBanEvent;
+use tobias14\playerban\events\PlayerBanTargetUnbanEvent;
 use tobias14\playerban\PlayerBan;
 
 class BanManager {
@@ -26,6 +28,11 @@ class BanManager {
      * @return bool
      */
     public function add(Ban $ban) : bool {
+        $event = new PlayerBanTargetBanEvent($ban);
+        $event->call();
+        if($event->isCancelled())
+            return false;
+        $ban = $event->getBan();
         if(!$this->plugin->isValidUserName($ban->target) and !$this->plugin->isValidAddress($ban->target))
             return false;
         if($this->isBanned($ban->target))
@@ -40,6 +47,11 @@ class BanManager {
      * @return bool
      */
     public function remove(string $target) : bool {
+        $event = new PlayerBanTargetUnbanEvent($target);
+        $event->call();
+        if($event->isCancelled())
+            return false;
+        $target = $event->getTarget();
         if(!$this->plugin->isValidUserName($target) and !$this->plugin->isValidAddress($target))
             return false;
         if(!$this->isBanned($target))
