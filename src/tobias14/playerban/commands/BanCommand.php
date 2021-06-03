@@ -63,7 +63,7 @@ class BanCommand extends BaseCommand {
         $expiryTime = time() + (int) $punishment['duration'];
         $ban = new Ban($target, $sender->getName(), $expiryTime, $punId);
 
-        if($ban->save()) {
+        if($this->getDataMgr()->saveBan($ban)) {
             $sender->sendMessage($this->translate("ban.success", [$target]));
             $log = new CreationLog($this->translate("logger.ban.creation"), $sender->getName(), $target);
             $log->save();

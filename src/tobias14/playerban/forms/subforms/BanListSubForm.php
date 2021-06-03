@@ -5,6 +5,7 @@ namespace tobias14\playerban\forms\subforms;
 
 use pocketmine\Player;
 use pocketmine\utils\TextFormat as C;
+use tobias14\playerban\ban\Ban;
 use tobias14\playerban\forms\BanListForm;
 use tobias14\playerban\forms\SimpleBaseForm;
 use tobias14\playerban\utils\Converter;
@@ -14,10 +15,10 @@ class BanListSubForm extends SimpleBaseForm {
     /**
      * BanListSubForm constructor.
      *
-     * @param string[]|int[] $ban
+     * @param Ban $ban
      * @param int $page
      */
-    public function __construct(array $ban, int $page) {
+    public function __construct(Ban $ban, int $page) {
         parent::__construct($this->onCall($ban, $page));
         $this->setTitle($this->translate("banlist.form2.title"));
         $this->setContent($this->getFormContent($ban));
@@ -26,15 +27,15 @@ class BanListSubForm extends SimpleBaseForm {
     }
 
     /**
-     * @param string[]|int[] $ban
+     * @param Ban $ban
      * @param int $page
      * @return callable
      */
-    protected function onCall(array $ban, int $page) : callable {
+    protected function onCall(Ban $ban, int $page) : callable {
         return function (Player $player, $data) use($ban, $page) {
             if(is_null($data)) return;
             if($data === 0) {
-                $player->getServer()->dispatchCommand($player, 'unban "' . $ban["target"] . '"');
+                $player->getServer()->dispatchCommand($player, 'unban "' . $ban->target . '"');
                 return;
             }
             $player->sendForm(new BanListForm($page));
@@ -44,17 +45,17 @@ class BanListSubForm extends SimpleBaseForm {
     /**
      * Returns a string, with the information lines
      *
-     * @param string[]|int[] $ban
+     * @param Ban $ban
      * @return string
      */
-    private function getFormContent(array $ban) : string {
+    private function getFormContent(Ban $ban) : string {
         $data = [];
-        $params = [$ban['id'], $this->formatTime((int) $ban['creation_time']), $ban['target'], $ban['moderator'], $this->formatTime((int) $ban['expiry_time']), $ban['pun_id']];
+        $params = [$ban->id, $this->formatTime($ban->creationTime), $ban->target, $ban->moderator, $this->formatTime($ban->expiryTime), $ban->punId];
         for ($i = 0; $i < 8; $i++) {
             $line = $i + 1;
             if($i === 6) {
-                if($this->getDataMgr()->punishmentExists((int) $ban['pun_id'])) {
-                    $punishment = $this->getDataMgr()->getPunishment((int) $ban['pun_id']);
+                if($this->getDataMgr()->punishmentExists($ban->punId)) {
+                    $punishment = $this->getDataMgr()->getPunishment($ban->punId);
                     $params[] = $punishment['description'];
                     $params[] = Converter::secondsToStr((int) $punishment['duration']);
                 } else{

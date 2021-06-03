@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace tobias14\playerban\database;
 
+use tobias14\playerban\ban\Ban;
 use tobias14\playerban\PlayerBan;
 use mysqli;
 use Exception;
@@ -252,18 +253,15 @@ class MysqlManager extends DataManager {
     }
 
     /**
-     * @param string $target
-     * @param string $moderator
-     * @param int $expiryTime
-     * @param int $punId
-     * @param int $creationTime
+     * @param Ban $ban
      * @return null|bool
      */
-    public function saveBan(string $target, string $moderator, int $expiryTime, int $punId, int $creationTime) : ?bool {
+    public function saveBan(Ban $ban) : ?bool {
         if(!$this->checkConnection()) return null;
         $stmt = $this->db->prepare("INSERT INTO bans(target, moderator, expiry_time, pun_id, creation_time) VALUES(?, ?, ?, ?, ?);");
         if(!$stmt) return false;
-        $stmt->bind_param("ssiii", $target, $moderator, $expiryTime, $punId, $creationTime);
+        $timestamp = time();
+        $stmt->bind_param("ssiii", $ban->target, $ban->moderator, $ban->expiryTime, $ban->punId, $timestamp);
         $result = $stmt->execute();
         $stmt->close();
         return $result;
@@ -286,9 +284,9 @@ class MysqlManager extends DataManager {
 
     /**
      * @param string $target
-     * @return string[]|null
+     * @return Ban|null
      */
-    public function getBanByName(string $target) : ?array {
+    public function getBanByName(string $target) : ?Ban {
         if(!$this->checkConnection()) return null;
         $time = time();
         $stmt = $this->db->prepare("SELECT * FROM bans WHERE target=? AND expiry_time > ?;");
@@ -297,13 +295,15 @@ class MysqlManager extends DataManager {
         $stmt->execute();
         $result = $stmt->get_result();
         if(!$result) return null;
+        $result = $result->fetch_assoc();
+        if(is_null($result)) return null;
         $stmt->close();
-        return $result->fetch_assoc();
+        return new Ban($result['target'], $result['moderator'], (int) $result['expiry_time'], (int) $result['pun_id'], (int) $result['id'], (int) $result['creation_time']);
     }
 
     /**
      * @param string $target
-     * @return array[]|null
+     * @return Ban[]|null
      */
     public function getBanHistory(string $target) : ?array {
         if(!$this->checkConnection()) return null;
@@ -314,7 +314,7 @@ class MysqlManager extends DataManager {
         if(!$result = $stmt->get_result()) return null;
         $data = [];
         while ($row = $result->fetch_assoc()) {
-            $data[] = $row;
+            $data[] = new Ban($row['target'], $row['moderator'], (int) $row['expiry_time'], (int) $row['pun_id'], (int) $row['id'], (int) $row['creation_time']);
         }
         $stmt->close();
         return $data;
@@ -323,7 +323,7 @@ class MysqlManager extends DataManager {
     /**
      * @param int $page
      * @param int $limit
-     * @return array[]|null
+     * @return Ban[]|null
      */
     public function getCurrentBans(int $page = 0, int $limit = 6) : ?array {
         if(!$this->checkConnection()) return null;
@@ -336,7 +336,7 @@ class MysqlManager extends DataManager {
         if(false === $result = $stmt->get_result()) return null;
         $data = [];
         while ($row = $result->fetch_assoc()) {
-            $data[] = $row;
+            $data[] = new Ban($row['target'], $row['moderator'], (int) $row['expiry_time'], (int) $row['pun_id'], (int) $row['id'], (int) $row['creation_time']);
         }
         $stmt->close();
         return $data;

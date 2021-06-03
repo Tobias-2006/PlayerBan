@@ -5,6 +5,7 @@ namespace tobias14\playerban;
 
 use pocketmine\lang\BaseLang;
 use pocketmine\plugin\PluginBase;
+use tobias14\playerban\ban\Ban;
 use tobias14\playerban\commands\BanCommand;
 use tobias14\playerban\commands\BanHistoryCommand;
 use tobias14\playerban\commands\BanListCommand;
@@ -46,12 +47,12 @@ class PlayerBan extends PluginBase {
     /**
      * The message that appears when a banned player wants to enter the server
      *
-     * @param mixed[] $ban
+     * @param Ban $ban
      * @return string
      */
-    public function getKickMessage(array $ban) : string {
-        $expiry = is_numeric($ban['expiry_time']) ? $this->formatTime((int) $ban['expiry_time']) : $ban['expiry_time'];
-        $data = ['{expiry}' => $expiry, '{moderator}' => $ban['moderator'], '{new_line}' => "\n"];
+    public function getKickMessage(Ban $ban) : string {
+        $expiry = $ban->expiryTime !== -1 ? $this->formatTime($ban->expiryTime) : (string) $ban->expiryTime;
+        $data = ['{expiry}' => $expiry, '{moderator}' => $ban->moderator, '{new_line}' => "\n"];
         $message = $this->getConfig()->get('kick-message', '§cYou are banned!{new_line}{new_line}§4Expiry: §f{expiry}');
         foreach ($data as $search => $replace) {
             $message = str_replace($search, $replace, $message);

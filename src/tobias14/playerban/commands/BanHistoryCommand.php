@@ -52,8 +52,8 @@ class BanHistoryCommand extends BaseCommand {
         }
         if($sender instanceof ConsoleCommandSender) {
             foreach ($bans as $ban) {
-                $banCreation = PlayerBan::getInstance()->formatTime($ban['creation_time']);
-                $punishment = $this->getDataMgr()->getPunishment($ban['pun_id']) ?? ['description' => 'undefined'];
+                $banCreation = PlayerBan::getInstance()->formatTime($ban->creationTime);
+                $punishment = $this->getDataMgr()->getPunishment($ban->punId) ?? ['description' => 'undefined'];
                 $sender->sendMessage($this->translate("banhistory.consoleFormat", [$banCreation, $punishment['description']]));
             }
             return true;

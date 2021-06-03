@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace tobias14\playerban\database;
 
+use tobias14\playerban\ban\Ban;
 use tobias14\playerban\PlayerBan;
 
 abstract class DataManager {
@@ -125,14 +126,10 @@ abstract class DataManager {
     /**
      * Saves a ban to the database
      *
-     * @param string $target
-     * @param string $moderator
-     * @param int $expiryTime
-     * @param int $punId
-     * @param int $creationTime
+     * @param Ban $ban
      * @return bool|null
      */
-    abstract public function saveBan(string $target, string $moderator, int $expiryTime, int $punId, int $creationTime) : ?bool;
+    abstract public function saveBan(Ban $ban) : ?bool;
 
     /**
      * Resets the ban duration
@@ -143,18 +140,18 @@ abstract class DataManager {
     abstract public function removeBan(string $target) : ?bool;
 
     /**
-     * Returns a ban as assoc array
+     * Returns a ban instance
      *
      * @param string $target
-     * @return string[]|int[]|null
+     * @return Ban|null
      */
-    abstract public function getBanByName(string $target) : ?array;
+    abstract public function getBanByName(string $target) : ?Ban;
 
     /**
      * Returns a list of all bans of a player or an ip address
      *
      * @param string $target
-     * @return array[]|null
+     * @return Ban[]|null
      */
     abstract public function getBanHistory(string $target) : ?array;
 
@@ -163,7 +160,7 @@ abstract class DataManager {
      *
      * @param int $page
      * @param int $limit
-     * @return array[]|null
+     * @return Ban[]|null
      */
     abstract public function getCurrentBans(int $page = 0, int $limit = 6) : ?array;
 

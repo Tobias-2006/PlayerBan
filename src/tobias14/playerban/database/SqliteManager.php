@@ -5,6 +5,7 @@ namespace tobias14\playerban\database;
 
 use Exception;
 use SQLite3;
+use tobias14\playerban\ban\Ban;
 use tobias14\playerban\PlayerBan;
 
 class SqliteManager extends DataManager {
@@ -219,21 +220,18 @@ class SqliteManager extends DataManager {
     }
 
     /**
-     * @param string $target
-     * @param string $moderator
-     * @param int $expiryTime
-     * @param int $punId
-     * @param int $creationTime
+     * @param Ban $ban
      * @return bool|null
      */
-    public function saveBan(string $target, string $moderator, int $expiryTime, int $punId, int $creationTime) : ?bool {
+    public function saveBan(Ban $ban) : ?bool {
         $stmt = $this->db->prepare("INSERT INTO bans(target, moderator, expiry_time, pun_id, creation_time) VALUES(:target, :mod, :expiry, :pun_id, :creation);");
         if(!$stmt) return false;
-        $stmt->bindParam(":target", $target, SQLITE3_TEXT);
-        $stmt->bindParam(":mod", $moderator, SQLITE3_TEXT);
-        $stmt->bindParam(":expiry", $expiryTime, SQLITE3_INTEGER);
-        $stmt->bindParam(":pun_id", $punId, SQLITE3_INTEGER);
-        $stmt->bindParam(":creation", $creationTime, SQLITE3_INTEGER);
+        $timestamp = time();
+        $stmt->bindParam(":target", $ban->target, SQLITE3_TEXT);
+        $stmt->bindParam(":mod", $ban->moderator, SQLITE3_TEXT);
+        $stmt->bindParam(":expiry", $ban->expiryTime, SQLITE3_INTEGER);
+        $stmt->bindParam(":pun_id", $ban->punId, SQLITE3_INTEGER);
+        $stmt->bindParam(":creation", $timestamp, SQLITE3_INTEGER);
         $result = $stmt->execute() != false;
         $stmt->close();
         return $result;
@@ -256,9 +254,9 @@ class SqliteManager extends DataManager {
 
     /**
      * @param string $target
-     * @return mixed[]|null
+     * @return Ban|null
      */
-    public function getBanByName(string $target) : ?array {
+    public function getBanByName(string $target) : ?Ban {
         $time = time();
         $stmt = $this->db->prepare("SELECT * FROM bans WHERE target=:target AND expiry_time > :time;");
         if(!$stmt) return null;
@@ -267,13 +265,14 @@ class SqliteManager extends DataManager {
         $result = $stmt->execute();
         if(!$result) return null;
         $result = $result->fetchArray(SQLITE3_ASSOC);
+        if(!$result) return null;
         $stmt->close();
-        return !$result ? null : $result;
+        return new Ban($result['target'], $result['moderator'], (int) $result['expiry_time'], (int) $result['pun_id'], (int) $result['id'], (int) $result['creation_time']);
     }
 
     /**
      * @param string $target
-     * @return array[]|null
+     * @return Ban[]|null
      */
     public function getBanHistory(string $target) : ?array {
         $stmt = $this->db->prepare("SELECT * FROM bans WHERE target=:target ORDER BY creation_time DESC;");
@@ -283,7 +282,7 @@ class SqliteManager extends DataManager {
         if(!$result) return null;
         $data = [];
         while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
-            $data[] = $row;
+            $data[] = new Ban($row['target'], $row['moderator'], (int) $row['expiry_time'], (int) $row['pun_id'], (int) $row['id'], (int) $row['creation_time']);
         }
         $stmt->close();
         return $data;
@@ -292,7 +291,7 @@ class SqliteManager extends DataManager {
     /**
      * @param int $page
      * @param int $limit
-     * @return array[]|null
+     * @return Ban[]|null
      */
     public function getCurrentBans(int $page = 0, int $limit = 6) : ?array {
         $time = time();
@@ -306,7 +305,7 @@ class SqliteManager extends DataManager {
         if(false == $result) return null;
         $data = [];
         while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
-            $data[] = $row;
+            $data[] = new Ban($row['target'], $row['moderator'], (int) $row['expiry_time'], (int) $row['pun_id'], (int) $row['id'], (int) $row['creation_time']);
         }
         $stmt->close();
         return $data;

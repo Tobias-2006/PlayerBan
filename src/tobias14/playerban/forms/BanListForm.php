@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace tobias14\playerban\forms;
 
 use pocketmine\Player;
+use tobias14\playerban\ban\Ban;
 use tobias14\playerban\forms\subforms\BanListSubForm;
 
 class BanListForm extends SimpleBaseForm {
@@ -14,17 +15,17 @@ class BanListForm extends SimpleBaseForm {
      * @param int $page form page
      */
     public function __construct(int $page = 0) {
-        $bans = $this->getDataMgr()->getCurrentBans($page);
+        $bans = $this->getDataMgr()->getCurrentBans($page) ?? [];
         parent::__construct($this->onCall($bans, $page));
         $this->setTitle($this->translate("banlist.form.title"));
         foreach ($bans as $ban)
-            $this->addButton($this->translate("banlist.form.button", [$this->formatTime($ban['creation_time']), $ban['target']]));
+            $this->addButton($this->translate("banlist.form.button", [$this->formatTime($ban->creationTime), $ban->target]));
         if($this->getDataMgr()->getMaxBanPage() > ($page + 1))
             $this->addButton($this->translate("button.nextPage"));
     }
 
     /**
-     * @param array[] $bans
+     * @param Ban[] $bans
      * @param int $page
      * @return callable
      */

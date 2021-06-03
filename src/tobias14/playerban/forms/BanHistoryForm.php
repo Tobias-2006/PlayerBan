@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace tobias14\playerban\forms;
 
 use pocketmine\Player;
+use tobias14\playerban\ban\Ban;
 use tobias14\playerban\forms\subforms\BanHistorySubForm;
 
 class BanHistoryForm extends SimpleBaseForm {
@@ -18,14 +19,14 @@ class BanHistoryForm extends SimpleBaseForm {
         parent::__construct($this->onCall($target, $bans));
         $this->setTitle($this->translate("banhistory.form.title", [$target]));
         foreach ($bans as $ban) {
-            $creation = $this->formatTime((int) $ban['creation_time']);
+            $creation = $this->formatTime($ban->creationTime);
             $this->addButton($this->translate("banhistory.form.button", [$creation]));
         }
     }
 
     /**
      * @param string $target
-     * @param array[] $bans
+     * @param Ban[] $bans
      * @return callable
      */
     public function onCall(string $target, array $bans) : callable {
