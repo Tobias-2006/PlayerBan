@@ -27,7 +27,7 @@ class PunishmentListCommand extends BaseCommand {
             return true;
         if(!$this->testPermission($sender))
             return true;
-        $punishments = $this->getDataMgr()->getAllPunishments();
+        $punishments = $this->getPunishmentMgr()->getAll();
         if(is_null($punishments)) {
             $sender->sendMessage(C::RED . $this->translate("error"));
             return true;

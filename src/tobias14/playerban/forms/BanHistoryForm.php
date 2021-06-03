@@ -15,7 +15,7 @@ class BanHistoryForm extends SimpleBaseForm {
      * @param string $target
      */
     public function __construct(string $target) {
-        $bans = $this->getDataMgr()->getBanHistory($target) ?? [];
+        $bans = $this->getBanMgr()->getHistory($target) ?? [];
         parent::__construct($this->onCall($target, $bans));
         $this->setTitle($this->translate("banhistory.form.title", [$target]));
         foreach ($bans as $ban) {

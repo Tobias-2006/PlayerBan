@@ -37,7 +37,7 @@ class PunishmentSubForm2 extends CustomBaseForm {
             $description = &$data["desc"];
             $duration = &$data[2];
             if($data[3]) {
-                if($this->getDataMgr()->deletePunishment($punishment)) {
+                if($this->getPunishmentMgr()->delete($punishment)) {
                     $player->sendMessage(C::RED . $this->translate("error"));
                     return;
                 }
@@ -59,7 +59,7 @@ class PunishmentSubForm2 extends CustomBaseForm {
             }
             $punishment->description = $description;
             $punishment->duration = Converter::strToSeconds($duration);
-            if(!$this->getDataMgr()->updatePunishment($punishment)) {
+            if(!$this->getPunishmentMgr()->update($punishment)) {
                 $player->sendMessage(C::RED . $this->translate("error"));
                 return;
             }

@@ -39,7 +39,7 @@ class BanCommand extends BaseCommand {
             $sender->sendMessage(C::RED . $this->translate("param.incorrect", ["<player|ip>", "max123"]));
             return true;
         }
-        if($this->getDataMgr()->isBanned($target)) {
+        if($this->getBanMgr()->isBanned($target)) {
             $sender->sendMessage(C::RED . $this->translate("target.isBanned"));
             return true;
         }
@@ -48,16 +48,16 @@ class BanCommand extends BaseCommand {
             return true;
         }
         $punId = (int) round((float) $punId);
-        if(!$this->getDataMgr()->punishmentExists($punId)) {
+        if(!$this->getPunishmentMgr()->exists($punId)) {
             $sender->sendMessage(C::RED . $this->translate("punishment.notExist", [$punId]));
             return true;
         }
-        $punishment = $this->getDataMgr()->getPunishment($punId);
+        $punishment = $this->getPunishmentMgr()->get($punId);
 
         $expiryTime = time() + $punishment->duration;
         $ban = new Ban($target, $sender->getName(), $expiryTime, $punId);
 
-        if($this->getDataMgr()->saveBan($ban)) {
+        if($this->getBanMgr()->add($ban)) {
             $sender->sendMessage($this->translate("ban.success", [$target]));
             $log = new CreationLog($this->translate("logger.ban.creation"), $sender->getName(), $target);
             $log->save();

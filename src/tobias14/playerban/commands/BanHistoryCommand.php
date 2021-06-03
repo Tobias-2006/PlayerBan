@@ -36,7 +36,7 @@ class BanHistoryCommand extends BaseCommand {
         if(count($args) === 0)
             throw new InvalidCommandSyntaxException();
         $target = $args[0];
-        $bans = $this->getDataMgr()->getBanHistory($target);
+        $bans = $this->getBanMgr()->getHistory($target);
         if(is_null($bans)) {
             $sender->sendMessage($this->translate(C::RED . "error"));
             return true;
@@ -48,7 +48,7 @@ class BanHistoryCommand extends BaseCommand {
         if($sender instanceof ConsoleCommandSender) {
             foreach ($bans as $ban) {
                 $banCreation = PlayerBan::getInstance()->formatTime($ban->creationTime);
-                $punishment = $this->getDataMgr()->getPunishment($ban->punId) ?? new Punishment(-1, -1, "undefined");
+                $punishment = $this->getPunishmentMgr()->get($ban->punId) ?? new Punishment(-1, -1, "undefined");
                 $sender->sendMessage($this->translate("banhistory.consoleFormat", [$banCreation, $punishment->description]));
             }
             return true;

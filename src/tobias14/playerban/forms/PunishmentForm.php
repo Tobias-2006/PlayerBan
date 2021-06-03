@@ -14,7 +14,7 @@ class PunishmentForm extends SimpleBaseForm {
      * PunishmentForm constructor.
      */
     public function __construct() {
-        $punishments = $this->getDataMgr()->getAllPunishments() ?? [];
+        $punishments = $this->getPunishmentMgr()->getAll() ?? [];
         parent::__construct($this->onCall($punishments));
         $this->setTitle($this->translate("punishments.form.title"));
         foreach ($punishments as $punishment)

@@ -37,12 +37,12 @@ class UnbanCommand extends BaseCommand {
             $sender->sendMessage(C::RED . $this->translate("param.incorrect", ["<player|ip>", "max123"]));
             return true;
         }
-        if(!$this->getDataMgr()->isBanned($target)) {
+        if(!$this->getBanMgr()->isBanned($target)) {
             $sender->sendMessage(C::RED . $this->translate("target.notBanned", [$target]));
             return true;
         }
 
-        if($this->getDataMgr()->removeBan($target)) {
+        if($this->getBanMgr()->remove($target)) {
             $sender->sendMessage($this->translate("unban.success", [$target]));
             $log = new DeletionLog($this->translate("logger.ban.deletion"), $sender->getName(), $target);
             $log->save();

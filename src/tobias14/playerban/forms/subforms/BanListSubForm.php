@@ -54,8 +54,8 @@ class BanListSubForm extends SimpleBaseForm {
         for ($i = 0; $i < 8; $i++) {
             $line = $i + 1;
             if($i === 6) {
-                if($this->getDataMgr()->punishmentExists($ban->punId)) {
-                    $punishment = $this->getDataMgr()->getPunishment($ban->punId);
+                if($this->getPunishmentMgr()->exists($ban->punId)) {
+                    $punishment = $this->getPunishmentMgr()->get($ban->punId);
                     $params[] = $punishment->description;
                     $params[] = Converter::secondsToStr($punishment->duration);
                 } else{

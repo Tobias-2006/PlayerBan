@@ -25,4 +25,13 @@ class Punishment {
         $this->description = $description;
     }
 
+    /**
+     * Check if the id is valid
+     *
+     * @return bool
+     */
+    public function isValidId() : bool {
+        return is_int($this->id) and $this->id >= 0 and $this->id <= 999;
+    }
+
 }

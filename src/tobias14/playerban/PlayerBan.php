@@ -6,6 +6,7 @@ namespace tobias14\playerban;
 use pocketmine\lang\BaseLang;
 use pocketmine\plugin\PluginBase;
 use tobias14\playerban\ban\Ban;
+use tobias14\playerban\ban\BanManager;
 use tobias14\playerban\commands\BanCommand;
 use tobias14\playerban\commands\BanHistoryCommand;
 use tobias14\playerban\commands\BanListCommand;
@@ -16,6 +17,7 @@ use tobias14\playerban\commands\UnbanCommand;
 use tobias14\playerban\database\DataManager;
 use tobias14\playerban\database\MysqlManager;
 use tobias14\playerban\database\SqliteManager;
+use tobias14\playerban\punishment\PunishmentManager;
 
 class PlayerBan extends PluginBase {
 
@@ -25,6 +27,10 @@ class PlayerBan extends PluginBase {
     private $baseLang;
     /** @var DataManager $dataMgr */
     private $dataMgr;
+    /** @var BanManager $banMgr */
+    private $banMgr;
+    /** @var PunishmentManager $punishmentMgr */
+    protected $punishmentMgr;
 
     /**
      * Class instance
@@ -51,6 +57,24 @@ class PlayerBan extends PluginBase {
      */
     public function getDataManager() : DataManager {
         return $this->dataMgr;
+    }
+
+    /**
+     * Ban management
+     *
+     * @return BanManager
+     */
+    public function getBanManager() : BanManager {
+        return $this->banMgr;
+    }
+
+    /**
+     * Punishment management
+     *
+     * @return PunishmentManager
+     */
+    public function getPunishmentManager() : PunishmentManager {
+        return $this->punishmentMgr;
     }
 
     /**
@@ -166,6 +190,8 @@ class PlayerBan extends PluginBase {
 
     public function onEnable() {
         $this->setDataManager();
+        $this->banMgr = new BanManager($this);
+        $this->punishmentMgr = new PunishmentManager($this);
         $commandMap = $this->getServer()->getCommandMap();
         $commands = ["ban", "unban", "pardon", "ban-ip", "unban-ip", "banlist"];
         foreach ($commands as $cmd) {

@@ -7,8 +7,9 @@ use pocketmine\command\CommandSender;
 use pocketmine\command\PluginCommand;
 use pocketmine\plugin\Plugin;
 use pocketmine\utils\TextFormat as C;
-use tobias14\playerban\database\DataManager;
+use tobias14\playerban\ban\BanManager;
 use tobias14\playerban\PlayerBan;
+use tobias14\playerban\punishment\PunishmentManager;
 
 abstract class BaseCommand extends PluginCommand {
 
@@ -39,12 +40,21 @@ abstract class BaseCommand extends PluginCommand {
     }
 
     /**
-     * Database Management
+     * Punishment Management
      *
-     * @return DataManager
+     * @return PunishmentManager
      */
-    public function getDataMgr() : DataManager {
-        return PlayerBan::getInstance()->getDataManager();
+    public function getPunishmentMgr() : PunishmentManager {
+        return PlayerBan::getInstance()->getPunishmentManager();
+    }
+
+    /**
+     * Ban Management
+     *
+     * @return BanManager
+     */
+    public function getBanMgr() : BanManager {
+        return PlayerBan::getInstance()->getBanManager();
     }
 
 }

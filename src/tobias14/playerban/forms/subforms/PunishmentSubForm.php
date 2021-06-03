@@ -31,7 +31,7 @@ class PunishmentSubForm extends CustomBaseForm {
                 return;
             }
             $id = round((float) $id);
-            if($this->getDataMgr()->punishmentExists((int) $id)) {
+            if($this->getPunishmentMgr()->exists((int) $id)) {
                 $player->sendMessage(C::RED . $this->translate("punishment.exist", [$id]));
                 return;
             }
@@ -48,7 +48,7 @@ class PunishmentSubForm extends CustomBaseForm {
                 return;
             }
             $punishment = new Punishment((int) $id, Converter::strToSeconds((string) $duration), $description);
-            if(!$this->getDataMgr()->savePunishment($punishment)) {
+            if(!$this->getPunishmentMgr()->create($punishment)) {
                 $player->sendMessage(C::RED . $this->translate("error"));
                 return;
             }
