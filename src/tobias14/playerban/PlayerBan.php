@@ -148,32 +148,20 @@ class PlayerBan extends PluginBase {
     }
 
     /**
-     * Returns a list of the mysql connection details
-     *
-     * @return string[]
-     */
-    private function getMySQLSettings() : array {
-        return [
-            'Host' => $this->getConfig()->get("host", "127.0.0.1"),
-            'Username' => $this->getConfig()->get("username", "root"),
-            'Password' => $this->getConfig()->get("passwd", "password"),
-            'Database' => $this->getConfig()->get("dbname", "playerban"),
-            'Port' => $this->getConfig()->get("port", 3306)
-        ];
-    }
-
-    /**
      * Sets the chosen DataManager
      *
      * @return void
      */
     private function setDataManager() : void {
-        $datamanager = $this->getConfig()->get("datamanager", "sqlite");
-        switch ($datamanager) {
+        $datamanager = (string) $this->getConfig()->get("datamanager", "sqlite");
+        switch (strtolower($datamanager)) {
             case "mysql":
-            case "MySql":
-            case "MySQL":
-                $this->dataMgr = new MysqlManager($this, $this->getMySQLSettings());
+                try {
+                    $this->dataMgr = new MysqlManager($this, $this->getConfig()->get("mysql-connection"));
+                } catch (\Exception $e) {
+                    $this->getLogger()->critical("MySQL datamanager crashed! Using SQLite instead of MySQL.");
+                    $this->dataMgr = new SqliteManager($this, []);
+                }
                 break;
             case "sqlite":
             case "sqlite3":
@@ -184,7 +172,7 @@ class PlayerBan extends PluginBase {
 
     public function onLoad() {
         self::$instance = $this;
-        $this->saveDefaultConfig();
+        $this->reloadConfig();
         $lang = $this->getConfig()->get("language", BaseLang::FALLBACK_LANGUAGE);
         $this->baseLang = new BaseLang($lang, $this->getFile() . 'resources/');
     }
@@ -215,7 +203,8 @@ class PlayerBan extends PluginBase {
     }
 
     public function onDisable() {
-        $this->dataMgr->close();
+        if(isset($this->dataMgr))
+            $this->dataMgr->close();
     }
 
 }

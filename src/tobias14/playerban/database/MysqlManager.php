@@ -6,13 +6,11 @@ namespace tobias14\playerban\database;
 use tobias14\playerban\ban\Ban;
 use tobias14\playerban\log\Log;
 use tobias14\playerban\PlayerBan;
-use mysqli;
-use Exception;
 use tobias14\playerban\punishment\Punishment;
 
 class MysqlManager extends DataManager {
 
-    /** @var mysqli $db */
+    /** @var \mysqli $db */
     protected $db;
 
     /**
@@ -24,13 +22,9 @@ class MysqlManager extends DataManager {
     public function __construct(PlayerBan $plugin, array $settings) {
         $this->plugin = $plugin;
         $this->settings = $settings;
-        try {
-            $this->db = new mysqli($settings['Host'], $settings['Username'], $settings['Password'], $settings['Database'], (int) $settings['Port']);
-        } catch (Exception $e) {
-            $this->plugin->getLogger()->critical($this->plugin->getLanguage()->translateString("connection.failed"));
-            $this->plugin->getServer()->getPluginManager()->disablePlugin($this->plugin);
-            return;
-        }
+        $this->db = new \mysqli($settings['host'], $settings['username'], $settings['passwd'], $settings['dbname'], (int) $settings['port']);
+        if($this->db->connect_errno)
+            throw new \RuntimeException($this->plugin->getLanguage()->translateString("connection.failed") . " : " . $this->db->connect_error);
         $this->init();
     }
 
@@ -51,8 +45,8 @@ class MysqlManager extends DataManager {
     private function reconnect() {
         try {
             $settings = $this->settings;
-            $this->db = new mysqli($settings['Host'], $settings['Username'], $settings['Password'], $settings['Database'], (int) $settings['Port']);
-        } catch (Exception $e) {
+            $this->db = new \mysqli($settings['host'], $settings['username'], $settings['passwd'], $settings['dbname'], (int) $settings['port']);
+        } catch (\Exception $e) {
             $this->plugin->getLogger()->critical($this->plugin->getLanguage()->translateString("connection.failed"));
             $this->plugin->getServer()->getPluginManager()->disablePlugin($this->plugin);
         }
@@ -64,6 +58,8 @@ class MysqlManager extends DataManager {
      * @return bool
      */
     private function checkConnection() : bool {
+        if($this->plugin->isDisabled())
+            return false;
         if(!$this->db->ping()) {
             $this->reconnect();
             if($this->db->connect_error != '') {
@@ -82,7 +78,7 @@ class MysqlManager extends DataManager {
     public function close() : void {
         try {
             $this->db->close();
-        } catch (Exception $e) {//NOOP
+        } catch (\Exception $e) {//NOOP
         }
     }
 
