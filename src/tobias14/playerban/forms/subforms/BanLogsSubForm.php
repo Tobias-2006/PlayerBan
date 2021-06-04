@@ -8,7 +8,6 @@ use pocketmine\utils\TextFormat as C;
 use tobias14\playerban\forms\BanLogsForm;
 use tobias14\playerban\forms\SimpleBaseForm;
 use tobias14\playerban\log\Log;
-use tobias14\playerban\log\Logger;
 
 class BanLogsSubForm extends SimpleBaseForm {
 
@@ -38,11 +37,7 @@ class BanLogsSubForm extends SimpleBaseForm {
         return function (Player $player, $data) use ($log, $page, $isOp) {
             if(is_null($data)) return;
             if (0 === $data and $isOp) {
-                if(Logger::getLogger()->delete($log)) {
-                    $player->sendMessage($this->translate("banlogs.deleteLog.success"));
-                    return;
-                }
-                $player->sendMessage($this->translate("error"));
+                $player->sendForm(new BanLogsSubForm2($log));
                 return;
             }
             $player->sendForm(new BanLogsForm($page));

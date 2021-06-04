@@ -35,7 +35,7 @@ class BanListSubForm extends SimpleBaseForm {
         return function (Player $player, $data) use($ban, $page) {
             if(is_null($data)) return;
             if($data === 0) {
-                $player->getServer()->dispatchCommand($player, 'unban "' . $ban->target . '"');
+                $player->sendForm(new BanListSubForm2($ban->target));
                 return;
             }
             $player->sendForm(new BanListForm($page));
