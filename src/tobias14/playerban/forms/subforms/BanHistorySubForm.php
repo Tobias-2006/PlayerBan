@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace tobias14\playerban\forms\subforms;
 
 use pocketmine\Player;
+use tobias14\playerban\ban\Ban;
 use tobias14\playerban\forms\BanHistoryForm;
 use tobias14\playerban\forms\SimpleBaseForm;
 use tobias14\playerban\utils\Converter;
@@ -14,9 +15,9 @@ class BanHistorySubForm extends SimpleBaseForm {
      * BanHistorySubForm constructor.
      *
      * @param string $target
-     * @param string[]|int[] $ban
+     * @param Ban $ban
      */
-    public function __construct(string $target, array $ban) {
+    public function __construct(string $target, Ban $ban) {
         parent::__construct($this->onCall($target));
         $this->setTitle($this->translate("banhistory.form2.title"));
         $this->setContent($this->getFormContent($ban));
@@ -35,19 +36,19 @@ class BanHistorySubForm extends SimpleBaseForm {
     }
 
     /**
-     * @param string[]|int[] $ban
+     * @param Ban $ban
      * @return string
      */
-    private function getFormContent(array $ban) : string {
+    private function getFormContent(Ban $ban) : string {
         $data = [];
-        $params = [$ban['id'], $this->formatTime((int) $ban['creation_time']), $ban['target'], $ban['moderator'], $this->formatTime((int) $ban['expiry_time']), $ban['pun_id']];
+        $params = [$ban->id, $this->formatTime($ban->creationTime), $ban->target, $ban->moderator, $this->formatTime($ban->expiryTime), $ban->punId];
         for ($i = 0; $i < 8; $i++) {
             $line = $i + 1;
             if($i === 6) {
-                if($this->getDataMgr()->punishmentExists((int) $ban['pun_id'])) {
-                    $punishment = $this->getDataMgr()->getPunishment((int) $ban['pun_id']);
-                    $params[] = $punishment['description'];
-                    $params[] = Converter::secondsToStr((int) $punishment['duration']);
+                if($this->getPunishmentMgr()->exists($ban->punId)) {
+                    $punishment = $this->getPunishmentMgr()->get($ban->punId);
+                    $params[] = $punishment->description;
+                    $params[] = Converter::secondsToStr($punishment->duration);
                 } else{
                     break;
                 }

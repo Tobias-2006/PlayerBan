@@ -4,45 +4,55 @@ declare(strict_types=1);
 namespace tobias14\playerban\forms\subforms;
 
 use pocketmine\Player;
+use pocketmine\utils\TextFormat as C;
 use tobias14\playerban\forms\BanLogsForm;
 use tobias14\playerban\forms\SimpleBaseForm;
+use tobias14\playerban\log\Log;
 
 class BanLogsSubForm extends SimpleBaseForm {
 
     /**
      * BanLogsSubForm constructor.
      *
-     * @param string[]|int[] $log
+     * @param Log $log
      * @param int $page
+     * @param bool $isOp
      */
-    public function __construct(array $log, int $page) {
-        parent::__construct($this->onCall($page));
+    public function __construct(Log $log, int $page, bool $isOp) {
+        parent::__construct($this->onCall($log, $page, $isOp));
         $this->setTitle($this->translate("banlogs.form2.title"));
         $this->setContent($this->getFormContent($log));
+        if($isOp)
+            $this->addButton(C::RED . $this->translate("button.delete"));
         $this->addButton($this->translate("button.back"));
     }
 
     /**
+     * @param Log $log
      * @param int $page
+     * @param bool $isOp
      * @return callable
      */
-    protected function onCall(int $page) : callable {
-        return function (Player $player, $data) use ($page) {
+    protected function onCall(Log $log, int $page, bool $isOp) : callable {
+        return function (Player $player, $data) use ($log, $page, $isOp) {
             if(is_null($data)) return;
-            if(0 === $data)
-                $player->sendForm(new BanLogsForm($page));
+            if (0 === $data and $isOp) {
+                $player->sendForm(new BanLogsSubForm2($log));
+                return;
+            }
+            $player->sendForm(new BanLogsForm($page));
         };
     }
 
     /**
      * Returns a string, with the information lines
      *
-     * @param string[]|int[] $log
+     * @param Log $log
      * @return string
      */
-    private function getFormContent(array $log) : string {
+    private function getFormContent(Log $log) : string {
         $data = [];
-        $params = [$log['type'], $log['description'], $log['moderator'], $log['target'], $this->formatTime((int) $log['creation_time'])];
+        $params = [$log->type, $log->description, $log->moderator, $log->target, $this->formatTime($log->creationTime)];
         for($i = 0; $i < 5; $i++) {
             $line = $i + 1;
             $data[] = $this->translate("banlogs.form2.line$line", [$params[$i]]);

@@ -19,29 +19,26 @@ class PunishmentListCommand extends BaseCommand {
         parent::__construct($this->translate("punlist.name"), $plugin);
         $this->setPermission($this->translate("punlist.permission"));
         $this->setDescription($this->translate("punlist.description"));
-    }
-
-    public function canUse(CommandSender $sender) : bool {
-        return $sender->hasPermission($this->getPermission());
+        $this->setPermissionMessage(C::RED . $this->translate("permission.denied"));
     }
 
     public function execute(CommandSender $sender, string $commandLabel, array $args) :bool{
         if(!$this->checkPluginState($this->getPlugin(), $sender))
             return true;
-        if(!$this->canUse($sender)) {
-            $sender->sendMessage(C::RED . $this->translate("permission.denied"));
+        if(!$this->testPermission($sender))
             return true;
-        }
-        $data = $this->getDataMgr()->getAllPunishments();
-        if(is_null($data)) {
+        $punishments = $this->getPunishmentMgr()->getAll();
+        if(is_null($punishments)) {
             $sender->sendMessage(C::RED . $this->translate("error"));
             return true;
         }
         $sender->sendMessage($this->translate("punlist.headline"));
-        foreach ($data as $row) {
-            $sender->sendMessage($this->translate(
-                "punlist.format",
-                [$row['id'], $row['description'], Converter::secondsToStr((int) $row['duration'])]
+        foreach ($punishments as $punishment) {
+            $sender->sendMessage($this->translate("punlist.format", [
+                    $punishment->id,
+                    $punishment->description,
+                    Converter::secondsToStr($punishment->duration)
+                ]
             ));
         }
         return true;

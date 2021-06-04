@@ -6,7 +6,8 @@ namespace tobias14\playerban\forms\subforms;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat as C;
 use tobias14\playerban\forms\CustomBaseForm;
-use tobias14\playerban\log\CreationLog;
+use tobias14\playerban\log\Log;
+use tobias14\playerban\log\Logger;
 use tobias14\playerban\punishment\Punishment;
 use tobias14\playerban\utils\Converter;
 
@@ -31,7 +32,7 @@ class PunishmentSubForm extends CustomBaseForm {
                 return;
             }
             $id = round((float) $id);
-            if($this->getDataMgr()->punishmentExists((int) $id)) {
+            if($this->getPunishmentMgr()->exists((int) $id)) {
                 $player->sendMessage(C::RED . $this->translate("punishment.exist", [$id]));
                 return;
             }
@@ -47,16 +48,13 @@ class PunishmentSubForm extends CustomBaseForm {
                 $player->sendMessage(C::RED . $this->translate("param.tooLong", ["description", "3 to 255"]));
                 return;
             }
-            $pun = new Punishment();
-            $pun->id = (int) $id;
-            $pun->description = $description;
-            $pun->duration = Converter::strToSeconds($duration);
-            if(is_null($pun->save())) {
+            $punishment = new Punishment((int) $id, Converter::strToSeconds((string) $duration), $description);
+            if(!$this->getPunishmentMgr()->create($punishment)) {
                 $player->sendMessage(C::RED . $this->translate("error"));
                 return;
             }
-            $log = new CreationLog($this->translate("logger.punishment.creation"), $player->getName(), "PunId[" . $pun->id . "]");
-            if(is_null($log->save())) {
+            $log = new Log(Logger::LOG_TYPE_CREATION, $this->translate("logger.punishment.creation"), $player->getName(), "PunId[" . $punishment->id . "]");
+            if(!Logger::getLogger()->log($log)) {
                 $player->sendMessage(C::RED . $this->translate("error"));
                 return;
             }

@@ -19,11 +19,12 @@ language: eng
 datamanager: sqlite
 
 #MySQL Connection
-host: 127.0.0.1
-username: root
-passwd: password
-dbname: playerban
-port: 3306
+mysql-connection:
+  host: 127.0.0.1
+  username: root
+  passwd: password
+  dbname: playerban
+  port: 3306
 
 #Specify here your date format
 #Available: dd.mm.yyyy, mm.dd.yyyy, yyyy.mm.dd

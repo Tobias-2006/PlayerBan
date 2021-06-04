@@ -3,13 +3,14 @@ declare(strict_types=1);
 
 namespace tobias14\playerban\database;
 
+use tobias14\playerban\ban\Ban;
+use tobias14\playerban\log\Log;
 use tobias14\playerban\PlayerBan;
-use mysqli;
-use Exception;
+use tobias14\playerban\punishment\Punishment;
 
 class MysqlManager extends DataManager {
 
-    /** @var mysqli $db */
+    /** @var \mysqli $db */
     protected $db;
 
     /**
@@ -21,13 +22,9 @@ class MysqlManager extends DataManager {
     public function __construct(PlayerBan $plugin, array $settings) {
         $this->plugin = $plugin;
         $this->settings = $settings;
-        try {
-            $this->db = new mysqli($settings['Host'], $settings['Username'], $settings['Password'], $settings['Database'], (int) $settings['Port']);
-        } catch (Exception $e) {
-            $this->plugin->getLogger()->critical($this->plugin->getLang()->translateString("connection.failed"));
-            $this->plugin->getServer()->getPluginManager()->disablePlugin($this->plugin);
-            return;
-        }
+        $this->db = new \mysqli($settings['host'], $settings['username'], $settings['passwd'], $settings['dbname'], (int) $settings['port']);
+        if($this->db->connect_errno)
+            throw new \RuntimeException($this->plugin->getLanguage()->translateString("connection.failed") . " : " . $this->db->connect_error);
         $this->init();
     }
 
@@ -48,9 +45,9 @@ class MysqlManager extends DataManager {
     private function reconnect() {
         try {
             $settings = $this->settings;
-            $this->db = new mysqli($settings['Host'], $settings['Username'], $settings['Password'], $settings['Database'], (int) $settings['Port']);
-        } catch (Exception $e) {
-            $this->plugin->getLogger()->critical($this->plugin->getLang()->translateString("connection.failed"));
+            $this->db = new \mysqli($settings['host'], $settings['username'], $settings['passwd'], $settings['dbname'], (int) $settings['port']);
+        } catch (\Exception $e) {
+            $this->plugin->getLogger()->critical($this->plugin->getLanguage()->translateString("connection.failed"));
             $this->plugin->getServer()->getPluginManager()->disablePlugin($this->plugin);
         }
     }
@@ -61,6 +58,8 @@ class MysqlManager extends DataManager {
      * @return bool
      */
     private function checkConnection() : bool {
+        if($this->plugin->isDisabled())
+            return false;
         if(!$this->db->ping()) {
             $this->reconnect();
             if($this->db->connect_error != '') {
@@ -79,23 +78,34 @@ class MysqlManager extends DataManager {
     public function close() : void {
         try {
             $this->db->close();
-        } catch (Exception $e) {//NOOP
+        } catch (\Exception $e) {//NOOP
         }
     }
 
     /**
-     * @param int $type
-     * @param string $description
-     * @param string $moderator
-     * @param int $creationTime
-     * @param null|string $target
+     * @param Log $log
      * @return bool|null
      */
-    public function saveLog(int $type, string $description, string $moderator, int $creationTime, string $target = null) : ?bool {
+    public function saveLog(Log $log) : ?bool {
         if(!$this->checkConnection()) return null;
         $stmt = $this->db->prepare("INSERT INTO logs(type, description, moderator, target, creation_time) VALUES(?, ?, ?, ?, ?);");
         if(!$stmt) return false;
-        $stmt->bind_param("isssi", $type, $description, $moderator, $target, $creationTime);
+        $timestamp = time();
+        $stmt->bind_param("isssi", $log->type, $log->description, $log->moderator, $log->target, $timestamp);
+        $result = $stmt->execute();
+        $stmt->close();
+        return $result;
+    }
+
+    /**
+     * @param Log $log
+     * @return bool|null
+     */
+    public function deleteLog(Log $log): ?bool {
+        if(!$this->checkConnection()) return null;
+        $stmt = $this->db->prepare("DELETE FROM logs WHERE moderator=? AND creation_time=?;");
+        if(!$stmt) return false;
+        $stmt->bind_param("si", $log->moderator, $log->creationTime);
         $result = $stmt->execute();
         $stmt->close();
         return $result;
@@ -104,7 +114,7 @@ class MysqlManager extends DataManager {
     /**
      * @param int $page
      * @param int $limit
-     * @return array[]|null
+     * @return Log[]|null
      */
     public function getLogs(int $page = 0, int $limit = 6): ?array {
         if(!$this->checkConnection()) return null;
@@ -116,7 +126,7 @@ class MysqlManager extends DataManager {
         if(false === $result = $stmt->get_result()) return null;
         $data = [];
         while ($row = $result->fetch_assoc()) {
-            $data[] = $row;
+            $data[] = new Log((int) $row['type'], $row['description'], $row['moderator'], $row['target'], (int) $row['creation_time']);
         }
         $stmt->close();
         return $data;
@@ -158,24 +168,26 @@ class MysqlManager extends DataManager {
 
     /**
      * @param int $id
-     * @return string[]|null
+     * @return Punishment|null
      */
-    public function getPunishment(int $id) : ?array {
+    public function getPunishment(int $id) : ?Punishment {
         if(!$this->checkConnection()) return null;
         $stmt = $this->db->prepare("SELECT * FROM punishments WHERE id=?;");
         if(!$stmt) return null;
         $stmt->bind_param("i", $id);
         $stmt->execute();
         $result = $stmt->get_result();
-        $stmt->close();
         if(!$result) return null;
-        return $result->fetch_assoc();
+        $result = $result->fetch_assoc();
+        if(is_null($result)) return null;
+        $stmt->close();
+        return new Punishment((int) $result['id'], (int) $result['duration'], $result['description']);
     }
 
     /**
      * Returns a list of all punishments
      *
-     * @return array[]|null
+     * @return Punishment[]|null
      */
     public function getAllPunishments() : ?array {
         if(!$this->checkConnection()) return null;
@@ -183,52 +195,48 @@ class MysqlManager extends DataManager {
         if(!$result or $result === true) return null;
         $data = [];
         while ($row = $result->fetch_assoc()) {
-            $data[] = $row;
+            $data[] = new Punishment((int) $row['id'], (int) $row['duration'], $row['description']);
         }
         return $data;
     }
 
     /**
-     * @param int $id
-     * @param int $duration
-     * @param string $description
+     * @param Punishment $punishment
      * @return null|bool
      */
-    public function savePunishment(int $id, int $duration, string $description) : ?bool {
+    public function savePunishment(Punishment $punishment) : ?bool {
         if(!$this->checkConnection()) return null;
         $stmt = $this->db->prepare("INSERT INTO punishments(id, duration, description) VALUES(?, ?, ?);");
         if(!$stmt) return false;
-        $stmt->bind_param("iis", $id, $duration, $description);
+        $stmt->bind_param("iis", $punishment->id, $punishment->duration, $punishment->description);
         $result = $stmt->execute();
         $stmt->close();
         return $result;
     }
 
     /**
-     * @param int $id
+     * @param Punishment $punishment
      * @return null|bool
      */
-    public function deletePunishment(int $id) : ?bool {
+    public function deletePunishment(Punishment $punishment) : ?bool {
         if(!$this->checkConnection()) return null;
         $stmt = $this->db->prepare("DELETE FROM punishments WHERE id=?;");
         if(!$stmt) return false;
-        $stmt->bind_param("i", $id);
+        $stmt->bind_param("i", $punishment->id);
         $result = $stmt->execute();
         $stmt->close();
         return $result;
     }
 
     /**
-     * @param int $id
-     * @param int $duration
-     * @param string $description
+     * @param Punishment $punishment
      * @return null|bool
      */
-    public function updatePunishment(int $id, int $duration, string $description) : ?bool {
+    public function updatePunishment(Punishment $punishment) : ?bool {
         if(!$this->checkConnection()) return null;
         $stmt = $this->db->prepare("UPDATE punishments SET duration=?, description=? WHERE id=?;");
         if(!$stmt) return false;
-        $stmt->bind_param("isi", $duration, $description, $id);
+        $stmt->bind_param("isi", $punishment->duration, $punishment->description, $punishment->id);
         $result = $stmt->execute();
         $stmt->close();
         return $result;
@@ -252,18 +260,15 @@ class MysqlManager extends DataManager {
     }
 
     /**
-     * @param string $target
-     * @param string $moderator
-     * @param int $expiryTime
-     * @param int $punId
-     * @param int $creationTime
+     * @param Ban $ban
      * @return null|bool
      */
-    public function saveBan(string $target, string $moderator, int $expiryTime, int $punId, int $creationTime) : ?bool {
+    public function saveBan(Ban $ban) : ?bool {
         if(!$this->checkConnection()) return null;
         $stmt = $this->db->prepare("INSERT INTO bans(target, moderator, expiry_time, pun_id, creation_time) VALUES(?, ?, ?, ?, ?);");
         if(!$stmt) return false;
-        $stmt->bind_param("ssiii", $target, $moderator, $expiryTime, $punId, $creationTime);
+        $timestamp = time();
+        $stmt->bind_param("ssiii", $ban->target, $ban->moderator, $ban->expiryTime, $ban->punId, $timestamp);
         $result = $stmt->execute();
         $stmt->close();
         return $result;
@@ -286,9 +291,9 @@ class MysqlManager extends DataManager {
 
     /**
      * @param string $target
-     * @return string[]|null
+     * @return Ban|null
      */
-    public function getBanByName(string $target) : ?array {
+    public function getBanByName(string $target) : ?Ban {
         if(!$this->checkConnection()) return null;
         $time = time();
         $stmt = $this->db->prepare("SELECT * FROM bans WHERE target=? AND expiry_time > ?;");
@@ -297,13 +302,15 @@ class MysqlManager extends DataManager {
         $stmt->execute();
         $result = $stmt->get_result();
         if(!$result) return null;
+        $result = $result->fetch_assoc();
+        if(is_null($result)) return null;
         $stmt->close();
-        return $result->fetch_assoc();
+        return new Ban($result['target'], $result['moderator'], (int) $result['expiry_time'], (int) $result['pun_id'], (int) $result['id'], (int) $result['creation_time']);
     }
 
     /**
      * @param string $target
-     * @return array[]|null
+     * @return Ban[]|null
      */
     public function getBanHistory(string $target) : ?array {
         if(!$this->checkConnection()) return null;
@@ -314,7 +321,7 @@ class MysqlManager extends DataManager {
         if(!$result = $stmt->get_result()) return null;
         $data = [];
         while ($row = $result->fetch_assoc()) {
-            $data[] = $row;
+            $data[] = new Ban($row['target'], $row['moderator'], (int) $row['expiry_time'], (int) $row['pun_id'], (int) $row['id'], (int) $row['creation_time']);
         }
         $stmt->close();
         return $data;
@@ -323,7 +330,7 @@ class MysqlManager extends DataManager {
     /**
      * @param int $page
      * @param int $limit
-     * @return array[]|null
+     * @return Ban[]|null
      */
     public function getCurrentBans(int $page = 0, int $limit = 6) : ?array {
         if(!$this->checkConnection()) return null;
@@ -336,7 +343,7 @@ class MysqlManager extends DataManager {
         if(false === $result = $stmt->get_result()) return null;
         $data = [];
         while ($row = $result->fetch_assoc()) {
-            $data[] = $row;
+            $data[] = new Ban($row['target'], $row['moderator'], (int) $row['expiry_time'], (int) $row['pun_id'], (int) $row['id'], (int) $row['creation_time']);
         }
         $stmt->close();
         return $data;

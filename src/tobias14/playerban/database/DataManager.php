@@ -3,7 +3,10 @@ declare(strict_types=1);
 
 namespace tobias14\playerban\database;
 
+use tobias14\playerban\ban\Ban;
+use tobias14\playerban\log\Log;
 use tobias14\playerban\PlayerBan;
+use tobias14\playerban\punishment\Punishment;
 
 abstract class DataManager {
 
@@ -37,21 +40,25 @@ abstract class DataManager {
     /**
      * Saves a log into the database
      *
-     * @param int $type
-     * @param string $description
-     * @param string $moderator
-     * @param int $creationTime
-     * @param string|null $target
+     * @param Log $log
      * @return bool|null
      */
-    abstract public function saveLog(int $type, string $description, string $moderator, int $creationTime, string $target = null) : ?bool;
+    abstract public function saveLog(Log $log) : ?bool;
+
+    /**
+     * Deletes a log
+     *
+     * @param Log $log
+     * @return bool|null
+     */
+    abstract public function deleteLog(Log $log) : ?bool;
 
     /**
      * Returns a list of logs for the requested page
      *
      * @param int $page
      * @param int $limit
-     * @return array[]|null
+     * @return Log[]|null
      */
     abstract public function getLogs(int $page = 0, int $limit = 6) : ?array;
 
@@ -72,47 +79,43 @@ abstract class DataManager {
     abstract public function punishmentExists(int $id) : ?bool;
 
     /**
-     * Returns a punishment as assoc array
+     * Returns a punishment or null
      *
      * @param int $id
-     * @return string[]|int[]|null
+     * @return Punishment|null
      */
-    abstract public function getPunishment(int $id) : ?array;
+    abstract public function getPunishment(int $id) : ?Punishment;
 
     /**
-     * Returns a list of all punishments as assoc array
+     * Returns a list of all punishments
      *
-     * @return array[]|null
+     * @return Punishment[]|null
      */
     abstract public function getAllPunishments() : ?array;
 
     /**
      * Saves a punishment to the database
      *
-     * @param int $id
-     * @param int $duration
-     * @param string $description
+     * @param Punishment $punishment
      * @return bool|null
      */
-    abstract public function savePunishment(int $id, int $duration, string $description) : ?bool;
+    abstract public function savePunishment(Punishment $punishment) : ?bool;
 
     /**
      * Deletes a punishment from the database
      *
-     * @param int $id
+     * @param Punishment $punishment
      * @return bool|null
      */
-    abstract public function deletePunishment(int $id) : ?bool;
+    abstract public function deletePunishment(Punishment $punishment) : ?bool;
 
     /**
      * Allows to edit an existing punishment
      *
-     * @param int $id
-     * @param int $duration
-     * @param string $description
+     * @param Punishment $punishment
      * @return bool|null
      */
-    abstract public function updatePunishment(int $id, int $duration, string $description) : ?bool;
+    abstract public function updatePunishment(Punishment $punishment) : ?bool;
 
     /**
      * Checks if a player or an ip address is banned
@@ -125,14 +128,10 @@ abstract class DataManager {
     /**
      * Saves a ban to the database
      *
-     * @param string $target
-     * @param string $moderator
-     * @param int $expiryTime
-     * @param int $punId
-     * @param int $creationTime
+     * @param Ban $ban
      * @return bool|null
      */
-    abstract public function saveBan(string $target, string $moderator, int $expiryTime, int $punId, int $creationTime) : ?bool;
+    abstract public function saveBan(Ban $ban) : ?bool;
 
     /**
      * Resets the ban duration
@@ -143,18 +142,18 @@ abstract class DataManager {
     abstract public function removeBan(string $target) : ?bool;
 
     /**
-     * Returns a ban as assoc array
+     * Returns a ban instance
      *
      * @param string $target
-     * @return string[]|int[]|null
+     * @return Ban|null
      */
-    abstract public function getBanByName(string $target) : ?array;
+    abstract public function getBanByName(string $target) : ?Ban;
 
     /**
      * Returns a list of all bans of a player or an ip address
      *
      * @param string $target
-     * @return array[]|null
+     * @return Ban[]|null
      */
     abstract public function getBanHistory(string $target) : ?array;
 
@@ -163,7 +162,7 @@ abstract class DataManager {
      *
      * @param int $page
      * @param int $limit
-     * @return array[]|null
+     * @return Ban[]|null
      */
     abstract public function getCurrentBans(int $page = 0, int $limit = 6) : ?array;
 

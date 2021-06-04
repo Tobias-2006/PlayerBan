@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace tobias14\playerban\forms;
 
 use jojoe77777\FormAPI\CustomForm;
-use tobias14\playerban\database\DataManager;
 use tobias14\playerban\PlayerBan;
+use tobias14\playerban\punishment\PunishmentManager;
 
 abstract class CustomBaseForm extends CustomForm {
 
@@ -26,16 +26,16 @@ abstract class CustomBaseForm extends CustomForm {
      * @return string
      */
     protected function translate(string $str, array $params = []) : string {
-        return PlayerBan::getInstance()->getLang()->translateString($str, $params);
+        return PlayerBan::getInstance()->getLanguage()->translateString($str, $params);
     }
 
     /**
-     * Database Management
+     * Punishment Management
      *
-     * @return DataManager
+     * @return PunishmentManager
      */
-    protected function getDataMgr() : DataManager {
-        return PlayerBan::getInstance()->getDataManager();
+    protected function getPunishmentMgr() : PunishmentManager {
+        return PlayerBan::getInstance()->getPunishmentManager();
     }
 
     /**

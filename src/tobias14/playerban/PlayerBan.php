@@ -5,6 +5,8 @@ namespace tobias14\playerban;
 
 use pocketmine\lang\BaseLang;
 use pocketmine\plugin\PluginBase;
+use tobias14\playerban\ban\Ban;
+use tobias14\playerban\ban\BanManager;
 use tobias14\playerban\commands\BanCommand;
 use tobias14\playerban\commands\BanHistoryCommand;
 use tobias14\playerban\commands\BanListCommand;
@@ -15,6 +17,8 @@ use tobias14\playerban\commands\UnbanCommand;
 use tobias14\playerban\database\DataManager;
 use tobias14\playerban\database\MysqlManager;
 use tobias14\playerban\database\SqliteManager;
+use tobias14\playerban\log\Logger;
+use tobias14\playerban\punishment\PunishmentManager;
 
 class PlayerBan extends PluginBase {
 
@@ -24,13 +28,26 @@ class PlayerBan extends PluginBase {
     private $baseLang;
     /** @var DataManager $dataMgr */
     private $dataMgr;
+    /** @var BanManager $banMgr */
+    private $banMgr;
+    /** @var PunishmentManager $punishmentMgr */
+    protected $punishmentMgr;
+
+    /**
+     * Class instance
+     *
+     * @return self
+     */
+    public static function getInstance() : self {
+        return self::$instance;
+    }
 
     /**
      * Message management
      *
      * @return BaseLang
      */
-    public function getLang() : BaseLang {
+    public function getLanguage() : BaseLang {
         return $this->baseLang;
     }
 
@@ -44,28 +61,37 @@ class PlayerBan extends PluginBase {
     }
 
     /**
+     * Ban management
+     *
+     * @return BanManager
+     */
+    public function getBanManager() : BanManager {
+        return $this->banMgr;
+    }
+
+    /**
+     * Punishment management
+     *
+     * @return PunishmentManager
+     */
+    public function getPunishmentManager() : PunishmentManager {
+        return $this->punishmentMgr;
+    }
+
+    /**
      * The message that appears when a banned player wants to enter the server
      *
-     * @param mixed[] $ban
+     * @param Ban $ban
      * @return string
      */
-    public function getKickMessage(array $ban) : string {
-        $expiry = is_numeric($ban['expiry_time']) ? $this->formatTime((int) $ban['expiry_time']) : $ban['expiry_time'];
-        $data = ['{expiry}' => $expiry, '{moderator}' => $ban['moderator'], '{new_line}' => "\n"];
+    public function getKickMessage(Ban $ban) : string {
+        $expiry = $ban->expiryTime !== -1 ? $this->formatTime($ban->expiryTime) : (string) $ban->expiryTime;
+        $data = ['{expiry}' => $expiry, '{moderator}' => $ban->moderator, '{new_line}' => "\n"];
         $message = $this->getConfig()->get('kick-message', '§cYou are banned!{new_line}{new_line}§4Expiry: §f{expiry}');
         foreach ($data as $search => $replace) {
             $message = str_replace($search, $replace, $message);
         }
         return $message;
-    }
-
-    /**
-     * Class instance
-     *
-     * @return self
-     */
-    public static function getInstance() : self {
-        return self::$instance;
     }
 
     /**
@@ -122,32 +148,20 @@ class PlayerBan extends PluginBase {
     }
 
     /**
-     * Returns a list of the mysql connection details
-     *
-     * @return string[]
-     */
-    private function getMySQLSettings() : array {
-        return [
-            'Host' => $this->getConfig()->get("host", "127.0.0.1"),
-            'Username' => $this->getConfig()->get("username", "root"),
-            'Password' => $this->getConfig()->get("passwd", "password"),
-            'Database' => $this->getConfig()->get("dbname", "playerban"),
-            'Port' => $this->getConfig()->get("port", 3306)
-        ];
-    }
-
-    /**
      * Sets the chosen DataManager
      *
      * @return void
      */
-    private function setDataMgr() : void {
-        $datamanager = $this->getConfig()->get("datamanager", "sqlite");
-        switch ($datamanager) {
+    private function setDataManager() : void {
+        $datamanager = (string) $this->getConfig()->get("datamanager", "sqlite");
+        switch (strtolower($datamanager)) {
             case "mysql":
-            case "MySql":
-            case "MySQL":
-                $this->dataMgr = new MysqlManager($this, $this->getMySQLSettings());
+                try {
+                    $this->dataMgr = new MysqlManager($this, $this->getConfig()->get("mysql-connection"));
+                } catch (\Exception $e) {
+                    $this->getLogger()->critical("MySQL datamanager crashed! Using SQLite instead of MySQL.");
+                    $this->dataMgr = new SqliteManager($this, []);
+                }
                 break;
             case "sqlite":
             case "sqlite3":
@@ -158,13 +172,17 @@ class PlayerBan extends PluginBase {
 
     public function onLoad() {
         self::$instance = $this;
-        $this->saveDefaultConfig();
+        $this->reloadConfig();
         $lang = $this->getConfig()->get("language", BaseLang::FALLBACK_LANGUAGE);
         $this->baseLang = new BaseLang($lang, $this->getFile() . 'resources/');
     }
 
     public function onEnable() {
-        $this->setDataMgr();
+        $this->setDataManager();
+        $this->banMgr = new BanManager($this);
+        $this->punishmentMgr = new PunishmentManager($this);
+        $logger = new Logger($this->getDataManager());
+        $logger->register();
         $commandMap = $this->getServer()->getCommandMap();
         $commands = ["ban", "unban", "pardon", "ban-ip", "unban-ip", "banlist"];
         foreach ($commands as $cmd) {
@@ -185,7 +203,8 @@ class PlayerBan extends PluginBase {
     }
 
     public function onDisable() {
-        $this->dataMgr->close();
+        if(isset($this->dataMgr))
+            $this->dataMgr->close();
     }
 
 }

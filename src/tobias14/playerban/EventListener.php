@@ -5,6 +5,7 @@ namespace tobias14\playerban;
 
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerPreLoginEvent;
+use tobias14\playerban\ban\Ban;
 
 class EventListener implements Listener {
 
@@ -20,7 +21,7 @@ class EventListener implements Listener {
         if(is_null($target))
             return;
 
-        $ban = PlayerBan::getInstance()->getDataManager()->getBanByName($target) ?? ['expiry_time' => 'undefined', 'moderator' => 'undefined'];
+        $ban = PlayerBan::getInstance()->getBanManager()->get($target) ?? new Ban("undefined", "undefined", -1, -1);
         $event->getPlayer()->kick(PlayerBan::getInstance()->getKickMessage($ban), false);
     }
 
@@ -29,7 +30,7 @@ class EventListener implements Listener {
      * @return bool
      */
     private function isBanned(string $target) : bool {
-        return PlayerBan::getInstance()->getDataManager()->isBanned($target) === true;
+        return PlayerBan::getInstance()->getBanManager()->isBanned($target) === true;
     }
 
 }

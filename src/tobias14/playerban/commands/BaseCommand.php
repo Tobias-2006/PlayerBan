@@ -7,18 +7,11 @@ use pocketmine\command\CommandSender;
 use pocketmine\command\PluginCommand;
 use pocketmine\plugin\Plugin;
 use pocketmine\utils\TextFormat as C;
-use tobias14\playerban\database\DataManager;
+use tobias14\playerban\ban\BanManager;
 use tobias14\playerban\PlayerBan;
+use tobias14\playerban\punishment\PunishmentManager;
 
 abstract class BaseCommand extends PluginCommand {
-
-    /**
-     * Checks if the player has the required permission for the command.
-     *
-     * @param CommandSender $sender
-     * @return bool
-     */
-    abstract function canUse(CommandSender $sender) : bool;
 
     /**
      * Checks if the plugin is enabled/disabled.
@@ -43,16 +36,25 @@ abstract class BaseCommand extends PluginCommand {
      * @return string
      */
     public function translate(string $str, array $params = []) : string {
-        return PlayerBan::getInstance()->getLang()->translateString($str, $params);
+        return PlayerBan::getInstance()->getLanguage()->translateString($str, $params);
     }
 
     /**
-     * Database Management
+     * Punishment Management
      *
-     * @return DataManager
+     * @return PunishmentManager
      */
-    public function getDataMgr() : DataManager {
-        return PlayerBan::getInstance()->getDataManager();
+    public function getPunishmentMgr() : PunishmentManager {
+        return PlayerBan::getInstance()->getPunishmentManager();
+    }
+
+    /**
+     * Ban Management
+     *
+     * @return BanManager
+     */
+    public function getBanMgr() : BanManager {
+        return PlayerBan::getInstance()->getBanManager();
     }
 
 }

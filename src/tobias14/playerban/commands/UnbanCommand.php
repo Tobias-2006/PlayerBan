@@ -4,9 +4,11 @@ declare(strict_types=1);
 namespace tobias14\playerban\commands;
 
 use pocketmine\command\CommandSender;
+use pocketmine\command\utils\InvalidCommandSyntaxException;
 use pocketmine\plugin\Plugin;
 use pocketmine\utils\TextFormat as C;
-use tobias14\playerban\log\DeletionLog;
+use tobias14\playerban\log\Log;
+use tobias14\playerban\log\Logger;
 use tobias14\playerban\PlayerBan;
 
 class UnbanCommand extends BaseCommand {
@@ -21,37 +23,32 @@ class UnbanCommand extends BaseCommand {
         $this->setPermission($this->translate("unban.permission"));
         $this->setDescription($this->translate("unban.description"));
         $this->setUsage($this->translate("unban.usage"));
-    }
-
-    public function canUse(CommandSender $sender) : bool {
-        return $sender->hasPermission($this->getPermission());
+        $this->setPermissionMessage(C::RED . $this->translate("permission.denied"));
     }
 
     public function execute(CommandSender $sender, string $commandLabel, array $args) : bool {
         if(!$this->checkPluginState($this->getPlugin(), $sender))
             return true;
-        if(!$this->canUse($sender)) {
-            $sender->sendMessage(C::RED . $this->translate("permission.denied"));
+        if(!$this->testPermission($sender))
             return true;
-        }
-        if(!isset($args[0])) {
-            $sender->sendMessage($this->getUsage());
-            return true;
-        }
+        if(count($args) === 0)
+            throw new InvalidCommandSyntaxException();
         $target = $args[0];
+        if(($player = $this->getPlugin()->getServer()->getPlayer($target)) !== null)
+            $target = $player->getName();
         if(!PlayerBan::getInstance()->isValidUsername($target) && !PlayerBan::getInstance()->isValidAddress($target)) {
             $sender->sendMessage(C::RED . $this->translate("param.incorrect", ["<player|ip>", "max123"]));
             return true;
         }
-        if(!$this->getDataMgr()->isBanned($target)) {
+        if(!$this->getBanMgr()->isBanned($target)) {
             $sender->sendMessage(C::RED . $this->translate("target.notBanned", [$target]));
             return true;
         }
 
-        if($this->getDataMgr()->removeBan($target)) {
+        if($this->getBanMgr()->remove($target)) {
             $sender->sendMessage($this->translate("unban.success", [$target]));
-            $log = new DeletionLog($this->translate("logger.ban.deletion"), $sender->getName(), $target);
-            $log->save();
+            $log = new Log(Logger::LOG_TYPE_DELETION, $this->translate("logger.ban.deletion"), $sender->getName(), $target);
+            Logger::getLogger()->log($log);
             return true;
         }
 
