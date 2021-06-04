@@ -6,8 +6,8 @@ namespace tobias14\playerban\forms\subforms;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat as C;
 use tobias14\playerban\forms\CustomBaseForm;
-use tobias14\playerban\log\AdaptationLog;
-use tobias14\playerban\log\DeletionLog;
+use tobias14\playerban\log\Log;
+use tobias14\playerban\log\Logger;
 use tobias14\playerban\punishment\Punishment;
 use tobias14\playerban\utils\Converter;
 
@@ -41,8 +41,8 @@ class PunishmentSubForm2 extends CustomBaseForm {
                     $player->sendMessage(C::RED . $this->translate("error"));
                     return;
                 }
-                $log = new DeletionLog($this->translate("logger.punishment.deletion"), $player->getName(), "PunId[" . $punishment->id . "]");
-                if(is_null($log->save())) {
+                $log = new Log(Logger::LOG_TYPE_DELETION, $this->translate("logger.punishment.deletion"), $player->getName(), "PunId[" . $punishment->id . "]");
+                if(!Logger::getLogger()->log($log)) {
                     $player->sendMessage(C::RED . $this->translate("error"));
                     return;
                 }
@@ -63,8 +63,8 @@ class PunishmentSubForm2 extends CustomBaseForm {
                 $player->sendMessage(C::RED . $this->translate("error"));
                 return;
             }
-            $log = new AdaptationLog($this->translate("logger.punishment.adaptation"), $player->getName(), "PunId[" . $punishment->id . "]");
-            if(is_null($log->save())) {
+            $log = new Log(Logger::LOG_TYPE_ADAPTATION, $this->translate("logger.punishment.adaptation"), $player->getName(), "PunId[" . $punishment->id . "]");
+            if(!Logger::getLogger()->log($log)) {
                 $player->sendMessage(C::RED . $this->translate("error"));
                 return;
             }

@@ -6,7 +6,8 @@ namespace tobias14\playerban\forms\subforms;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat as C;
 use tobias14\playerban\forms\CustomBaseForm;
-use tobias14\playerban\log\CreationLog;
+use tobias14\playerban\log\Log;
+use tobias14\playerban\log\Logger;
 use tobias14\playerban\punishment\Punishment;
 use tobias14\playerban\utils\Converter;
 
@@ -52,8 +53,8 @@ class PunishmentSubForm extends CustomBaseForm {
                 $player->sendMessage(C::RED . $this->translate("error"));
                 return;
             }
-            $log = new CreationLog($this->translate("logger.punishment.creation"), $player->getName(), "PunId[" . $punishment->id . "]");
-            if(is_null($log->save())) {
+            $log = new Log(Logger::LOG_TYPE_CREATION, $this->translate("logger.punishment.creation"), $player->getName(), "PunId[" . $punishment->id . "]");
+            if(!Logger::getLogger()->log($log)) {
                 $player->sendMessage(C::RED . $this->translate("error"));
                 return;
             }

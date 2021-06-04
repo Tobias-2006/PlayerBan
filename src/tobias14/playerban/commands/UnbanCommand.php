@@ -7,7 +7,8 @@ use pocketmine\command\CommandSender;
 use pocketmine\command\utils\InvalidCommandSyntaxException;
 use pocketmine\plugin\Plugin;
 use pocketmine\utils\TextFormat as C;
-use tobias14\playerban\log\DeletionLog;
+use tobias14\playerban\log\Log;
+use tobias14\playerban\log\Logger;
 use tobias14\playerban\PlayerBan;
 
 class UnbanCommand extends BaseCommand {
@@ -44,8 +45,8 @@ class UnbanCommand extends BaseCommand {
 
         if($this->getBanMgr()->remove($target)) {
             $sender->sendMessage($this->translate("unban.success", [$target]));
-            $log = new DeletionLog($this->translate("logger.ban.deletion"), $sender->getName(), $target);
-            $log->save();
+            $log = new Log(Logger::LOG_TYPE_DELETION, $this->translate("logger.ban.deletion"), $sender->getName(), $target);
+            Logger::getLogger()->log($log);
             return true;
         }
 

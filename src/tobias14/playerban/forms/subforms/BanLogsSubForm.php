@@ -6,16 +6,17 @@ namespace tobias14\playerban\forms\subforms;
 use pocketmine\Player;
 use tobias14\playerban\forms\BanLogsForm;
 use tobias14\playerban\forms\SimpleBaseForm;
+use tobias14\playerban\log\Log;
 
 class BanLogsSubForm extends SimpleBaseForm {
 
     /**
      * BanLogsSubForm constructor.
      *
-     * @param string[]|int[] $log
+     * @param Log $log
      * @param int $page
      */
-    public function __construct(array $log, int $page) {
+    public function __construct(Log $log, int $page) {
         parent::__construct($this->onCall($page));
         $this->setTitle($this->translate("banlogs.form2.title"));
         $this->setContent($this->getFormContent($log));
@@ -37,12 +38,12 @@ class BanLogsSubForm extends SimpleBaseForm {
     /**
      * Returns a string, with the information lines
      *
-     * @param string[]|int[] $log
+     * @param Log $log
      * @return string
      */
-    private function getFormContent(array $log) : string {
+    private function getFormContent(Log $log) : string {
         $data = [];
-        $params = [$log['type'], $log['description'], $log['moderator'], $log['target'], $this->formatTime((int) $log['creation_time'])];
+        $params = [$log->type, $log->description, $log->moderator, $log->target, $this->formatTime($log->creationTime)];
         for($i = 0; $i < 5; $i++) {
             $line = $i + 1;
             $data[] = $this->translate("banlogs.form2.line$line", [$params[$i]]);

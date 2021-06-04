@@ -6,6 +6,7 @@ namespace tobias14\playerban\database;
 use Exception;
 use SQLite3;
 use tobias14\playerban\ban\Ban;
+use tobias14\playerban\log\Log;
 use tobias14\playerban\PlayerBan;
 use tobias14\playerban\punishment\Punishment;
 
@@ -47,21 +48,18 @@ class SqliteManager extends DataManager {
     }
 
     /**
-     * @param int $type
-     * @param string $description
-     * @param string $moderator
-     * @param int $creationTime
-     * @param string|null $target
+     * @param Log $log
      * @return bool|null
      */
-    public function saveLog(int $type, string $description, string $moderator, int $creationTime, string $target = null) : ?bool {
+    public function saveLog(Log $log) : ?bool {
         $stmt = $this->db->prepare("INSERT INTO logs(type, description, moderator, target, creation_time) VALUES(:type, :desc, :mod, :target, :creation);");
         if(!$stmt) return false;
-        $stmt->bindParam(":type", $type, SQLITE3_INTEGER);
-        $stmt->bindParam(":desc", $description, SQLITE3_TEXT);
-        $stmt->bindParam(":mod", $moderator, SQLITE3_TEXT);
-        $stmt->bindParam(":target", $target, SQLITE3_TEXT);
-        $stmt->bindParam(":creation", $creationTime, SQLITE3_INTEGER);
+        $timestamp = time();
+        $stmt->bindParam(":type", $log->type, SQLITE3_INTEGER);
+        $stmt->bindParam(":desc", $log->description, SQLITE3_TEXT);
+        $stmt->bindParam(":mod", $log->moderator, SQLITE3_TEXT);
+        $stmt->bindParam(":target", $log->target, SQLITE3_TEXT);
+        $stmt->bindParam(":creation", $timestamp, SQLITE3_INTEGER);
         $result = $stmt->execute() != false;
         $stmt->close();
         return $result;
@@ -70,7 +68,7 @@ class SqliteManager extends DataManager {
     /**
      * @param int $page
      * @param int $limit
-     * @return array[]|null
+     * @return Log[]|null
      */
     public function getLogs(int $page = 0, int $limit = 6) : ?array {
         $page *= $limit;
@@ -82,7 +80,7 @@ class SqliteManager extends DataManager {
         if(false == $result) return null;
         $data = [];
         while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
-            $data[] = $row;
+            $data[] = new Log($row['type'], $row['description'], $row['moderator'], $row['target'], $row['creation_time']);
         }
         $stmt->close();
         return $data;

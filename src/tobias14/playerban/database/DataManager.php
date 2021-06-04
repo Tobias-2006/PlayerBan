@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace tobias14\playerban\database;
 
 use tobias14\playerban\ban\Ban;
+use tobias14\playerban\log\Log;
 use tobias14\playerban\PlayerBan;
 use tobias14\playerban\punishment\Punishment;
 
@@ -39,21 +40,17 @@ abstract class DataManager {
     /**
      * Saves a log into the database
      *
-     * @param int $type
-     * @param string $description
-     * @param string $moderator
-     * @param int $creationTime
-     * @param string|null $target
+     * @param Log $log
      * @return bool|null
      */
-    abstract public function saveLog(int $type, string $description, string $moderator, int $creationTime, string $target = null) : ?bool;
+    abstract public function saveLog(Log $log) : ?bool;
 
     /**
      * Returns a list of logs for the requested page
      *
      * @param int $page
      * @param int $limit
-     * @return array[]|null
+     * @return Log[]|null
      */
     abstract public function getLogs(int $page = 0, int $limit = 6) : ?array;
 

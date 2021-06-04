@@ -3,78 +3,50 @@ declare(strict_types=1);
 
 namespace tobias14\playerban\log;
 
-abstract class Log {
+class Log {
 
     /** @var int $type */
-    protected $type;
+    public $type;
     /** @var string $description */
-    protected $description;
+    public $description;
     /** @var string $moderator */
-    protected $moderator;
+    public $moderator;
     /** @var string $target */
-    protected $target;
-    /** @var int $creationTime */
-    protected $creationTime;
+    public $target;
+    /** @var int|null $creationTime */
+    public $creationTime;
 
     /**
      * Log constructor.
      *
+     * @param int $type
      * @param string $description
      * @param string $moderator
      * @param string $target
+     * @param int|null $creationTime
      */
-    public function __construct(string $description, string $moderator, string $target) {
+    public function __construct(int $type, string $description, string $moderator, string $target, ?int $creationTime = null) {
+        $this->type = $type;
         $this->description = $description;
         $this->moderator = $moderator;
         $this->target = $target;
+        $this->creationTime = $creationTime;
     }
 
     /**
-     * Types: LOG_TYPE_CREATION, LOG_TYPE_DELETION, LOG_TYPE_ADAPTATION | (Logger.php)
+     * Check if the type is valid
      *
-     * @return int
+     * @return bool
      */
-    public function getType() : int {
-        return $this->type;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDescription() : string {
-        return $this->description;
-    }
-
-    /**
-     * @return string
-     */
-    public function getModerator() : string {
-        return $this->moderator;
-    }
-
-    /**
-     * @return string
-     */
-    public function getTarget() : string {
-        return $this->target;
-    }
-
-    /**
-     * Current Unix-Timestamp
-     *
-     * @return int
-     */
-    public function getCreationTime() : int {
-        return $this->creationTime;
-    }
-
-    /**
-     * Saves the log to the database
-     *
-     * @return null|bool
-     */
-    public function save() : ?bool {
-        return Logger::log($this);
+    public function hasValidType() : bool {
+        switch ($this->type) {
+            case Logger::LOG_TYPE_CREATION:
+            case Logger::LOG_TYPE_DELETION:
+            case Logger::LOG_TYPE_ADAPTATION:
+                return true;
+            default:
+                return false;
+        }
     }
 
 }

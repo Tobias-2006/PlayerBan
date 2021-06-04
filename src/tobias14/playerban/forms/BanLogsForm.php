@@ -5,6 +5,7 @@ namespace tobias14\playerban\forms;
 
 use pocketmine\Player;
 use tobias14\playerban\forms\subforms\BanLogsSubForm;
+use tobias14\playerban\log\Log;
 
 class BanLogsForm extends SimpleBaseForm {
 
@@ -18,13 +19,13 @@ class BanLogsForm extends SimpleBaseForm {
         parent::__construct($this->onCall($logs, $page));
         $this->setTitle($this->translate("banlogs.form.title"));
         foreach ($logs as $log)
-            $this->addButton($this->translate("banlogs.form.button", [$this->formatTime($log['creation_time']), $log['moderator']]));
+            $this->addButton($this->translate("banlogs.form.button", [$this->formatTime($log->creationTime), $log->moderator]));
         if($this->getDataMgr()->getMaxLogPage() > ($page + 1))
             $this->addButton($this->translate("button.nextPage"));
     }
 
     /**
-     * @param mixed[] $logs
+     * @param Log[] $logs
      * @param int $page
      * @return callable
      */

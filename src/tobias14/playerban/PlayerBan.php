@@ -17,6 +17,7 @@ use tobias14\playerban\commands\UnbanCommand;
 use tobias14\playerban\database\DataManager;
 use tobias14\playerban\database\MysqlManager;
 use tobias14\playerban\database\SqliteManager;
+use tobias14\playerban\log\Logger;
 use tobias14\playerban\punishment\PunishmentManager;
 
 class PlayerBan extends PluginBase {
@@ -192,6 +193,8 @@ class PlayerBan extends PluginBase {
         $this->setDataManager();
         $this->banMgr = new BanManager($this);
         $this->punishmentMgr = new PunishmentManager($this);
+        $logger = new Logger($this->getDataManager());
+        $logger->register();
         $commandMap = $this->getServer()->getCommandMap();
         $commands = ["ban", "unban", "pardon", "ban-ip", "unban-ip", "banlist"];
         foreach ($commands as $cmd) {

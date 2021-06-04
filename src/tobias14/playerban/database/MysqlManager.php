@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace tobias14\playerban\database;
 
 use tobias14\playerban\ban\Ban;
+use tobias14\playerban\log\Log;
 use tobias14\playerban\PlayerBan;
 use mysqli;
 use Exception;
@@ -86,18 +87,15 @@ class MysqlManager extends DataManager {
     }
 
     /**
-     * @param int $type
-     * @param string $description
-     * @param string $moderator
-     * @param int $creationTime
-     * @param null|string $target
+     * @param Log $log
      * @return bool|null
      */
-    public function saveLog(int $type, string $description, string $moderator, int $creationTime, string $target = null) : ?bool {
+    public function saveLog(Log $log) : ?bool {
         if(!$this->checkConnection()) return null;
         $stmt = $this->db->prepare("INSERT INTO logs(type, description, moderator, target, creation_time) VALUES(?, ?, ?, ?, ?);");
         if(!$stmt) return false;
-        $stmt->bind_param("isssi", $type, $description, $moderator, $target, $creationTime);
+        $timestamp = time();
+        $stmt->bind_param("isssi", $log->type, $log->description, $log->moderator, $log->target, $timestamp);
         $result = $stmt->execute();
         $stmt->close();
         return $result;
@@ -106,7 +104,7 @@ class MysqlManager extends DataManager {
     /**
      * @param int $page
      * @param int $limit
-     * @return array[]|null
+     * @return Log[]|null
      */
     public function getLogs(int $page = 0, int $limit = 6): ?array {
         if(!$this->checkConnection()) return null;
@@ -118,7 +116,7 @@ class MysqlManager extends DataManager {
         if(false === $result = $stmt->get_result()) return null;
         $data = [];
         while ($row = $result->fetch_assoc()) {
-            $data[] = $row;
+            $data[] = new Log($row['type'], $row['description'], $row['moderator'], $row['target'], $row['creation_time']);
         }
         $stmt->close();
         return $data;

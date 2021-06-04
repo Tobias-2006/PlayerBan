@@ -8,7 +8,8 @@ use pocketmine\command\utils\InvalidCommandSyntaxException;
 use pocketmine\plugin\Plugin;
 use pocketmine\utils\TextFormat as C;
 use tobias14\playerban\ban\Ban;
-use tobias14\playerban\log\CreationLog;
+use tobias14\playerban\log\Log;
+use tobias14\playerban\log\Logger;
 use tobias14\playerban\PlayerBan;
 
 class BanCommand extends BaseCommand {
@@ -59,8 +60,8 @@ class BanCommand extends BaseCommand {
 
         if($this->getBanMgr()->add($ban)) {
             $sender->sendMessage($this->translate("ban.success", [$target]));
-            $log = new CreationLog($this->translate("logger.ban.creation"), $sender->getName(), $target);
-            $log->save();
+            $log = new Log(Logger::LOG_TYPE_CREATION, $this->translate("logger.ban.creation"), $sender->getName(), $target);
+            Logger::getLogger()->log($log);
             $this->kickTarget($target);
             return true;
         }
