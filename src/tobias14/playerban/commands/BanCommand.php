@@ -5,9 +5,11 @@ namespace tobias14\playerban\commands;
 
 use pocketmine\command\CommandSender;
 use pocketmine\command\utils\InvalidCommandSyntaxException;
+use pocketmine\Player;
 use pocketmine\plugin\Plugin;
 use pocketmine\utils\TextFormat as C;
 use tobias14\playerban\ban\Ban;
+use tobias14\playerban\forms\BanForm;
 use tobias14\playerban\log\Log;
 use tobias14\playerban\log\Logger;
 use tobias14\playerban\PlayerBan;
@@ -32,6 +34,10 @@ class BanCommand extends BaseCommand {
             return true;
         if(!$this->testPermission($sender))
             return true;
+        if(count($args) === 0 and $sender instanceof Player) {
+            $sender->sendForm(new BanForm());
+            return true;
+        }
         if(count($args) < 2)
             throw new InvalidCommandSyntaxException();
         $target = &$args[0];
