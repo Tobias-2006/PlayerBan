@@ -38,7 +38,7 @@ class BanHistoryCommand extends BaseCommand {
         $target = $args[0];
         $bans = $this->getBanMgr()->getHistory($target);
         if(is_null($bans)) {
-            $sender->sendMessage($this->translate(C::RED . "error"));
+            $sender->sendMessage(C::RED . $this->translate("error"));
             return true;
         }
         if(count($bans) === 0) {
