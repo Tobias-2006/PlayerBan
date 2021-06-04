@@ -6,7 +6,7 @@ namespace tobias14\playerban\forms;
 use jojoe77777\FormAPI\ModalForm;
 use tobias14\playerban\PlayerBan;
 
-class ModalBaseForm extends ModalForm {
+abstract class ModalBaseForm extends ModalForm {
 
     /**
      * ModalBaseForm constructor.
