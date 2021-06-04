@@ -102,6 +102,20 @@ class MysqlManager extends DataManager {
     }
 
     /**
+     * @param Log $log
+     * @return bool|null
+     */
+    public function deleteLog(Log $log): ?bool {
+        if(!$this->checkConnection()) return null;
+        $stmt = $this->db->prepare("DELETE FROM logs WHERE moderator=? AND creation_time=?;");
+        if(!$stmt) return false;
+        $stmt->bind_param("si", $log->moderator, $log->creationTime);
+        $result = $stmt->execute();
+        $stmt->close();
+        return $result;
+    }
+
+    /**
      * @param int $page
      * @param int $limit
      * @return Log[]|null
@@ -116,7 +130,7 @@ class MysqlManager extends DataManager {
         if(false === $result = $stmt->get_result()) return null;
         $data = [];
         while ($row = $result->fetch_assoc()) {
-            $data[] = new Log($row['type'], $row['description'], $row['moderator'], $row['target'], $row['creation_time']);
+            $data[] = new Log((int) $row['type'], $row['description'], $row['moderator'], $row['target'], (int) $row['creation_time']);
         }
         $stmt->close();
         return $data;

@@ -51,4 +51,14 @@ class Logger {
         return $this->dataMgr->saveLog($log) ?? false;
     }
 
+    /**
+     * Delete a log
+     *
+     * @param Log $log
+     * @return bool
+     */
+    public function delete(Log $log) : bool {
+        return $this->dataMgr->deleteLog($log) ?? false;
+    }
+
 }

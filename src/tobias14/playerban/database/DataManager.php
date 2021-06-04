@@ -46,6 +46,14 @@ abstract class DataManager {
     abstract public function saveLog(Log $log) : ?bool;
 
     /**
+     * Deletes a log
+     *
+     * @param Log $log
+     * @return bool|null
+     */
+    abstract public function deleteLog(Log $log) : ?bool;
+
+    /**
      * Returns a list of logs for the requested page
      *
      * @param int $page

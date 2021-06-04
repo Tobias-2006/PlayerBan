@@ -66,6 +66,20 @@ class SqliteManager extends DataManager {
     }
 
     /**
+     * @param Log $log
+     * @return bool|null
+     */
+    public function deleteLog(Log $log): ?bool {
+        $stmt = $this->db->prepare("DELETE FROM logs WHERE moderator=:mod AND creation_time=:creation;");
+        if(!$stmt) return false;
+        $stmt->bindParam(":mod", $log->moderator, SQLITE3_TEXT);
+        $stmt->bindParam(":creation", $log->creationTime, SQLITE3_INTEGER);
+        $result = $stmt->execute();
+        $stmt->close();
+        return $result != false;
+    }
+
+    /**
      * @param int $page
      * @param int $limit
      * @return Log[]|null

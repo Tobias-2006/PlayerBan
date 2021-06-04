@@ -36,7 +36,7 @@ class BanLogsForm extends SimpleBaseForm {
                 $player->sendForm(new BanLogsForm($page + 1));
                 return;
             }
-            $player->sendForm(new BanLogsSubForm($logs[$data], $page));
+            $player->sendForm(new BanLogsSubForm($logs[$data], $page, $player->isOp()));
         };
     }
 
