@@ -34,6 +34,8 @@ class UnbanCommand extends BaseCommand {
         if(count($args) === 0)
             throw new InvalidCommandSyntaxException();
         $target = $args[0];
+        if(($player = $this->getPlugin()->getServer()->getPlayer($target)) !== null)
+            $target = $player->getName();
         if(!PlayerBan::getInstance()->isValidUsername($target) && !PlayerBan::getInstance()->isValidAddress($target)) {
             $sender->sendMessage(C::RED . $this->translate("param.incorrect", ["<player|ip>", "max123"]));
             return true;

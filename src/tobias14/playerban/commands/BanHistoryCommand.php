@@ -36,6 +36,8 @@ class BanHistoryCommand extends BaseCommand {
         if(count($args) === 0)
             throw new InvalidCommandSyntaxException();
         $target = $args[0];
+        if(($player = $this->getPlugin()->getServer()->getPlayer($target)) !== null)
+            $target = $player->getName();
         $bans = $this->getBanMgr()->getHistory($target);
         if(is_null($bans)) {
             $sender->sendMessage(C::RED . $this->translate("error"));

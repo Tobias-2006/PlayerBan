@@ -40,6 +40,8 @@ class BanCommand extends BaseCommand {
             $sender->sendMessage(C::RED . $this->translate("param.incorrect", ["<player|ip>", "max123"]));
             return true;
         }
+        if(($player = $this->getPlugin()->getServer()->getPlayer($target)) !== null)
+            $target = $player->getName();
         if($this->getBanMgr()->isBanned($target)) {
             $sender->sendMessage(C::RED . $this->translate("target.isBanned"));
             return true;
