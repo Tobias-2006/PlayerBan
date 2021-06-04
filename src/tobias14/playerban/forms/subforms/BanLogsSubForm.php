@@ -39,7 +39,7 @@ class BanLogsSubForm extends SimpleBaseForm {
             if(is_null($data)) return;
             if (0 === $data and $isOp) {
                 if(Logger::getLogger()->delete($log)) {
-                    $player->sendMessage("success...");
+                    $player->sendMessage($this->translate("banlogs.deleteLog.success"));
                     return;
                 }
                 $player->sendMessage($this->translate("error"));
