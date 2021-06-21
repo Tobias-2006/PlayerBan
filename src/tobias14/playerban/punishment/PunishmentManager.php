@@ -28,7 +28,7 @@ class PunishmentManager {
     public function create(Punishment $punishment) : bool {
         if($this->exists($punishment->id))
             return false;
-        if(!$punishment->isValidId())
+        if(!$punishment->hasValidId())
             return false;
         return $this->plugin->getDataManager()->savePunishment($punishment) ?? false;
     }
