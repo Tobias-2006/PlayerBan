@@ -5,33 +5,34 @@ namespace tobias14\playerban\events;
 
 use pocketmine\event\Cancellable;
 use pocketmine\event\Event;
+use tobias14\playerban\ban\Ban;
 
 class PlayerBanTargetUnbanEvent extends Event implements Cancellable {
 
-    /** @var string $target */
-    protected $target;
+    /** @var Ban $ban */
+    private $ban;
 
     /**
      * PlayerBanTargetUnbanEvent constructor.
      *
-     * @param string $target
+     * @param Ban $ban
      */
-    public function __construct(string $target) {
-        $this->target = $target;
+    public function __construct(Ban $ban) {
+        $this->ban = $ban;
     }
 
     /**
-     * @return string
+     * @return Ban
      */
-    public function getTarget() : string {
-        return $this->target;
+    public function getBan() : Ban {
+        return $this->ban;
     }
 
     /**
-     * @param string $target
+     * @param Ban $ban
      */
-    public function setTarget(string $target) : void {
-        $this->target = $target;
+    public function setBan(Ban $ban) : void {
+        $this->ban = $ban;
     }
 
 }
