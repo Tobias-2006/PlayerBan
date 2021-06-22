@@ -10,7 +10,7 @@ use tobias14\playerban\ban\Ban;
 class PlayerBanTargetBanEvent extends Event implements Cancellable {
 
     /** @var Ban $ban */
-    protected $ban;
+    private $ban;
 
     /**
      * PlayerBanTargetBanEvent constructor.
