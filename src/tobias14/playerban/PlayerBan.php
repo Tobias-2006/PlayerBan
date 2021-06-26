@@ -5,7 +5,7 @@ namespace tobias14\playerban;
 
 use pocketmine\lang\BaseLang;
 use pocketmine\plugin\PluginBase;
-use tobias14\playerban\ban\Ban;
+use pocketmine\utils\TextFormat;
 use tobias14\playerban\ban\BanManager;
 use tobias14\playerban\commands\BanCommand;
 use tobias14\playerban\commands\BanHistoryCommand;
@@ -79,19 +79,18 @@ class PlayerBan extends PluginBase {
     }
 
     /**
-     * The message that appears when a banned player wants to enter the server
+     * For messages of the configuration file
      *
-     * @param Ban $ban
+     * @param string $string
+     * @param string[] $params
      * @return string
      */
-    public function getKickMessage(Ban $ban) : string {
-        $expiry = $ban->expiryTime !== -1 ? $this->formatTime($ban->expiryTime) : (string) $ban->expiryTime;
-        $data = ['{expiry}' => $expiry, '{moderator}' => $ban->moderator, '{new_line}' => "\n"];
-        $message = $this->getConfig()->get('kick-message', '§cYou are banned!{new_line}{new_line}§4Expiry: §f{expiry}');
-        foreach ($data as $search => $replace) {
-            $message = str_replace($search, $replace, $message);
+    public function customTranslation(string $string, array $params) : string {
+        $text = TextFormat::colorize($string);
+        foreach ($params as $key => $val) {
+            $text = str_replace($key, $val, $text);
         }
-        return $message;
+        return $text;
     }
 
     /**
@@ -199,7 +198,7 @@ class PlayerBan extends PluginBase {
             new BanListCommand($this),
             new BanHistoryCommand($this)
         ]);
-        $this->getServer()->getPluginManager()->registerEvents(new EventListener(), $this);
+        $this->getServer()->getPluginManager()->registerEvents(new EventListener($this), $this);
     }
 
     public function onDisable() {
