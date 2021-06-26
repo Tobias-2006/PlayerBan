@@ -24,9 +24,9 @@ class PunishmentSubForm extends CustomBaseForm {
     protected function onCall() : callable {
         return function (Player $player, $data) {
             if(is_null($data)) return;
-            $id = &$data[0];
-            $description = &$data[1];
-            $duration = &$data[2];
+            $id = $data[0];
+            $description = $data[1];
+            $duration = $data[2];
             if(!is_numeric($id)) {
                 $player->sendMessage(C::RED . $this->translate("param.incorrect", ["id", "3 (0 to 999)"]));
                 return;
@@ -48,7 +48,7 @@ class PunishmentSubForm extends CustomBaseForm {
                 $player->sendMessage(C::RED . $this->translate("param.tooLong", ["description", "3 to 255"]));
                 return;
             }
-            $punishment = new Punishment((int) $id, Converter::strToSeconds((string) $duration), $description);
+            $punishment = new Punishment((int) $id, Converter::strToSeconds((string) $duration) ?? 0, $description);
             if(!$this->getPunishmentMgr()->create($punishment)) {
                 $player->sendMessage(C::RED . $this->translate("error"));
                 return;

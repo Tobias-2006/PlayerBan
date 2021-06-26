@@ -58,7 +58,7 @@ class PunishmentSubForm2 extends CustomBaseForm {
                 return;
             }
             $punishment->description = $description;
-            $punishment->duration = Converter::strToSeconds($duration);
+            $punishment->duration = Converter::strToSeconds($duration) ?? 0;
             if(!$this->getPunishmentMgr()->update($punishment)) {
                 $player->sendMessage(C::RED . $this->translate("error"));
                 return;
