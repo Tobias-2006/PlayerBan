@@ -39,7 +39,8 @@ class EventListener implements Listener {
 
         $ban = $banManager->get($target) ?? new Ban('undefined', 'undefined', -1, -1);
         $expiry = $ban->expiryTime !== -1 ? $this->plugin->formatTime($ban->expiryTime) : 'undefined';
-        $event->getPlayer()->kick($this->plugin->customTranslation($this->kickMessage, ['{expiry}' => $expiry, '{moderator}' => $ban->moderator, '{new_line}' => "\n"]), false);
+        $event->setKickMessage($this->plugin->customTranslation($this->kickMessage, ['{expiry}' => $expiry, '{moderator}' => $ban->moderator, '{new_line}' => "\n"]));
+        $event->setCancelled();
     }
 
 }
