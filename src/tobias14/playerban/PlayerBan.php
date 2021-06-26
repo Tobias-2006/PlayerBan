@@ -7,16 +7,16 @@ use pocketmine\lang\BaseLang;
 use pocketmine\plugin\PluginBase;
 use pocketmine\utils\TextFormat;
 use tobias14\playerban\ban\BanManager;
-use tobias14\playerban\commands\BanCommand;
-use tobias14\playerban\commands\BanHistoryCommand;
-use tobias14\playerban\commands\BanListCommand;
-use tobias14\playerban\commands\BanLogsCommand;
-use tobias14\playerban\commands\PunishmentListCommand;
-use tobias14\playerban\commands\PunishmentsCommand;
-use tobias14\playerban\commands\UnbanCommand;
-use tobias14\playerban\database\DataManager;
-use tobias14\playerban\database\MysqlManager;
-use tobias14\playerban\database\SqliteManager;
+use tobias14\playerban\commands\{
+    BanCommand,
+    BanHistoryCommand,
+    BanListCommand,
+    BanLogsCommand,
+    PunishmentListCommand,
+    PunishmentsCommand,
+    UnbanCommand
+};
+use tobias14\playerban\database\{DataManager, MysqlManager, SqliteManager};
 use tobias14\playerban\log\Logger;
 use tobias14\playerban\punishment\PunishmentManager;
 

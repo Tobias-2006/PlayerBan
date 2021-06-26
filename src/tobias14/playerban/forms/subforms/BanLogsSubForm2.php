@@ -5,8 +5,7 @@ namespace tobias14\playerban\forms\subforms;
 
 use pocketmine\Player;
 use tobias14\playerban\forms\ModalBaseForm;
-use tobias14\playerban\log\Log;
-use tobias14\playerban\log\Logger;
+use tobias14\playerban\log\{Log, Logger};
 
 class BanLogsSubForm2 extends ModalBaseForm {
 

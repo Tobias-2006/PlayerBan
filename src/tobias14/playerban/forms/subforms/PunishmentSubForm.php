@@ -6,8 +6,7 @@ namespace tobias14\playerban\forms\subforms;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat as C;
 use tobias14\playerban\forms\CustomBaseForm;
-use tobias14\playerban\log\Log;
-use tobias14\playerban\log\Logger;
+use tobias14\playerban\log\{Log, Logger};
 use tobias14\playerban\punishment\Punishment;
 use tobias14\playerban\utils\Converter;
 

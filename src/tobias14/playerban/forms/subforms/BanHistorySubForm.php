@@ -5,8 +5,7 @@ namespace tobias14\playerban\forms\subforms;
 
 use pocketmine\Player;
 use tobias14\playerban\ban\Ban;
-use tobias14\playerban\forms\BanHistoryForm;
-use tobias14\playerban\forms\SimpleBaseForm;
+use tobias14\playerban\forms\{BanHistoryForm, SimpleBaseForm};
 use tobias14\playerban\utils\Converter;
 
 class BanHistorySubForm extends SimpleBaseForm {

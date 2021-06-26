@@ -3,8 +3,7 @@ declare(strict_types=1);
 
 namespace tobias14\playerban\ban;
 
-use tobias14\playerban\events\PlayerBanTargetBanEvent;
-use tobias14\playerban\events\PlayerBanTargetUnbanEvent;
+use tobias14\playerban\events\{PlayerBanTargetBanEvent, PlayerBanTargetUnbanEvent};
 use tobias14\playerban\PlayerBan;
 
 class BanManager {

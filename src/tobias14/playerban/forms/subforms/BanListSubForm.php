@@ -6,8 +6,7 @@ namespace tobias14\playerban\forms\subforms;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat as C;
 use tobias14\playerban\ban\Ban;
-use tobias14\playerban\forms\BanListForm;
-use tobias14\playerban\forms\SimpleBaseForm;
+use tobias14\playerban\forms\{BanListForm, SimpleBaseForm};
 use tobias14\playerban\utils\Converter;
 
 class BanListSubForm extends SimpleBaseForm {

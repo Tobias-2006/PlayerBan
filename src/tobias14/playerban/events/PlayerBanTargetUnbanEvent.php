@@ -3,8 +3,7 @@ declare(strict_types=1);
 
 namespace tobias14\playerban\events;
 
-use pocketmine\event\Cancellable;
-use pocketmine\event\Event;
+use pocketmine\event\{Cancellable, Event};
 use tobias14\playerban\ban\Ban;
 
 class PlayerBanTargetUnbanEvent extends Event implements Cancellable {

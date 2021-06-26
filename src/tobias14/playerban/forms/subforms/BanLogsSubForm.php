@@ -5,8 +5,7 @@ namespace tobias14\playerban\forms\subforms;
 
 use pocketmine\Player;
 use pocketmine\utils\TextFormat as C;
-use tobias14\playerban\forms\BanLogsForm;
-use tobias14\playerban\forms\SimpleBaseForm;
+use tobias14\playerban\forms\{BanLogsForm, SimpleBaseForm};
 use tobias14\playerban\log\Log;
 
 class BanLogsSubForm extends SimpleBaseForm {
