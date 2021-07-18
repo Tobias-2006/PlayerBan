@@ -30,7 +30,7 @@ class Punishment {
      *
      * @return bool
      */
-    public function isValidId() : bool {
+    public function hasValidId() : bool {
         return is_int($this->id) and $this->id >= 0 and $this->id <= 999;
     }
 

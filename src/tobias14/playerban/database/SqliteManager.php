@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace tobias14\playerban\database;
 
-use Exception;
-use SQLite3;
 use tobias14\playerban\ban\Ban;
 use tobias14\playerban\log\Log;
 use tobias14\playerban\PlayerBan;
@@ -12,7 +10,7 @@ use tobias14\playerban\punishment\Punishment;
 
 class SqliteManager extends DataManager {
 
-    /** @var SQLite3 $db */
+    /** @var \SQLite3 $db */
     protected $db;
 
     /**
@@ -24,7 +22,7 @@ class SqliteManager extends DataManager {
     public function __construct(PlayerBan $plugin, array $settings) {
         $this->plugin = $plugin;
         $this->settings = $settings;
-        $this->db = new SQLite3($this->plugin->getDataFolder() . 'playerban.db');
+        $this->db = new \SQLite3($this->plugin->getDataFolder() . 'playerban.db');
         $this->init();
     }
 
@@ -43,7 +41,7 @@ class SqliteManager extends DataManager {
     public function close() : void {
         try {
             $this->db->close();
-        } catch (Exception $e) {//NOOP
+        } catch (\Exception $e) {//NOOP
         }
     }
 

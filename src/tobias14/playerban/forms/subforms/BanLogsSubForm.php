@@ -5,8 +5,7 @@ namespace tobias14\playerban\forms\subforms;
 
 use pocketmine\Player;
 use pocketmine\utils\TextFormat as C;
-use tobias14\playerban\forms\BanLogsForm;
-use tobias14\playerban\forms\SimpleBaseForm;
+use tobias14\playerban\forms\{BanLogsForm, SimpleBaseForm};
 use tobias14\playerban\log\Log;
 
 class BanLogsSubForm extends SimpleBaseForm {
@@ -52,7 +51,7 @@ class BanLogsSubForm extends SimpleBaseForm {
      */
     private function getFormContent(Log $log) : string {
         $data = [];
-        $params = [$log->type, $log->description, $log->moderator, $log->target, $this->formatTime($log->creationTime)];
+        $params = [$log->type, $log->description, $log->moderator, $log->target, $this->formatTime($log->creationTime ?? 0)];
         for($i = 0; $i < 5; $i++) {
             $line = $i + 1;
             $data[] = $this->translate("banlogs.form2.line$line", [$params[$i]]);

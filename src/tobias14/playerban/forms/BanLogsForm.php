@@ -19,7 +19,7 @@ class BanLogsForm extends SimpleBaseForm {
         parent::__construct($this->onCall($logs, $page));
         $this->setTitle($this->translate("banlogs.form.title"));
         foreach ($logs as $log)
-            $this->addButton($this->translate("banlogs.form.button", [$this->formatTime($log->creationTime), $log->moderator]));
+            $this->addButton($this->translate("banlogs.form.button", [$this->formatTime($log->creationTime ?? 0), $log->moderator]));
         if($this->getDataMgr()->getMaxLogPage() > ($page + 1))
             $this->addButton($this->translate("button.nextPage"));
     }

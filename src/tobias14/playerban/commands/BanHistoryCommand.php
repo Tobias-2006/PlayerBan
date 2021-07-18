@@ -3,8 +3,7 @@ declare(strict_types=1);
 
 namespace tobias14\playerban\commands;
 
-use pocketmine\command\CommandSender;
-use pocketmine\command\ConsoleCommandSender;
+use pocketmine\command\{CommandSender, ConsoleCommandSender};
 use pocketmine\command\utils\InvalidCommandSyntaxException;
 use pocketmine\Player;
 use pocketmine\plugin\Plugin;

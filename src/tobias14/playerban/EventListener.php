@@ -9,28 +9,38 @@ use tobias14\playerban\ban\Ban;
 
 class EventListener implements Listener {
 
+    /** @var PlayerBan $plugin */
+    protected $plugin;
+    /** @var string $kickMessage */
+    protected $kickMessage;
+
+    /**
+     * EventListener constructor.
+     *
+     * @param PlayerBan $plugin
+     */
+    public function __construct(PlayerBan $plugin) {
+       $this->plugin = $plugin;
+       $this->kickMessage = $this->plugin->getConfig()->get('kick-message', 'You are banned!');
+    }
+
     public function onPreLogin(PlayerPreLoginEvent $event) : void {
         $name = $event->getPlayer()->getName();
         $address = $event->getPlayer()->getAddress();
+        $banManager = $this->plugin->getBanManager();
         $target = null;
 
-        if($this->isBanned($name))
+        if($banManager->isBanned($name))
             $target = $name;
-        elseif($this->isBanned($address))
+        elseif($banManager->isBanned($address))
             $target = $address;
         if(is_null($target))
             return;
 
-        $ban = PlayerBan::getInstance()->getBanManager()->get($target) ?? new Ban("undefined", "undefined", -1, -1);
-        $event->getPlayer()->kick(PlayerBan::getInstance()->getKickMessage($ban), false);
-    }
-
-    /**
-     * @param string $target
-     * @return bool
-     */
-    private function isBanned(string $target) : bool {
-        return PlayerBan::getInstance()->getBanManager()->isBanned($target) === true;
+        $ban = $banManager->get($target) ?? new Ban('undefined', 'undefined', -1, -1);
+        $expiry = $ban->expiryTime !== -1 ? $this->plugin->formatTime($ban->expiryTime) : 'undefined';
+        $event->setKickMessage($this->plugin->customTranslation($this->kickMessage, ['{expiry}' => $expiry, '{moderator}' => $ban->moderator, '{new_line}' => "\n"]));
+        $event->setCancelled();
     }
 
 }

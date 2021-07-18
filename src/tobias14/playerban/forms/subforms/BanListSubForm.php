@@ -6,8 +6,7 @@ namespace tobias14\playerban\forms\subforms;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat as C;
 use tobias14\playerban\ban\Ban;
-use tobias14\playerban\forms\BanListForm;
-use tobias14\playerban\forms\SimpleBaseForm;
+use tobias14\playerban\forms\{BanListForm, SimpleBaseForm};
 use tobias14\playerban\utils\Converter;
 
 class BanListSubForm extends SimpleBaseForm {
@@ -54,8 +53,8 @@ class BanListSubForm extends SimpleBaseForm {
         for ($i = 0; $i < 8; $i++) {
             $line = $i + 1;
             if($i === 6) {
-                if($this->getPunishmentMgr()->exists($ban->punId)) {
-                    $punishment = $this->getPunishmentMgr()->get($ban->punId);
+                $punishment = $this->getPunishmentMgr()->get($ban->punId);
+                if(!is_null($punishment)) {
                     $params[] = $punishment->description;
                     $params[] = Converter::secondsToStr($punishment->duration);
                 } else{

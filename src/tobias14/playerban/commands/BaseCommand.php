@@ -3,8 +3,7 @@ declare(strict_types=1);
 
 namespace tobias14\playerban\commands;
 
-use pocketmine\command\CommandSender;
-use pocketmine\command\PluginCommand;
+use pocketmine\command\{CommandSender, PluginCommand};
 use pocketmine\plugin\Plugin;
 use pocketmine\utils\TextFormat as C;
 use tobias14\playerban\ban\BanManager;

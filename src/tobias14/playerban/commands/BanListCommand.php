@@ -29,7 +29,7 @@ class BanListCommand extends BaseCommand {
         if(!$this->testPermission($sender))
             return true;
         if(!$sender instanceof Player) {
-            $sender->sendMessage($this->getPermissionMessage());
+            $sender->sendMessage(C::RED . $this->translate("ingame.usage"));
             return true;
         }
         /** @var Player $player */

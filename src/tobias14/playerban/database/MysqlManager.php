@@ -142,7 +142,9 @@ class MysqlManager extends DataManager {
         if(!$stmt) return null;
         $stmt->execute();
         if(false === $result = $stmt->get_result()) return null;
-        $rowCount = $result->fetch_row()[0];
+        $result = $result->fetch_row();
+        if(null === $result) return null;
+        $rowCount = $result[0];
         $sites = $rowCount / $limit;
         if(($rowCount % $limit) != 0)
             $sites += 1;
@@ -362,7 +364,9 @@ class MysqlManager extends DataManager {
         $stmt->execute();
         $result = $stmt->get_result();
         if(!$result) return null;
-        $rowCount = $result->fetch_row()[0];
+        $result = $result->fetch_row();
+        if(null === $result) return null;
+        $rowCount = $result[0];
         $sites = $rowCount / $limit;
         if(($rowCount % $limit) != 0)
             $sites += 1;

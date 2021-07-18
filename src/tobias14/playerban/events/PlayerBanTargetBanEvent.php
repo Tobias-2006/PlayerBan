@@ -3,14 +3,13 @@ declare(strict_types=1);
 
 namespace tobias14\playerban\events;
 
-use pocketmine\event\Cancellable;
-use pocketmine\event\Event;
+use pocketmine\event\{Cancellable, Event};
 use tobias14\playerban\ban\Ban;
 
 class PlayerBanTargetBanEvent extends Event implements Cancellable {
 
     /** @var Ban $ban */
-    protected $ban;
+    private $ban;
 
     /**
      * PlayerBanTargetBanEvent constructor.

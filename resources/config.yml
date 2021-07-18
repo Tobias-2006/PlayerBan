@@ -7,7 +7,7 @@
 #                 __/ |
 #                |___/
 # Config File
-# Version: 1.2.0
+# Version: 1.2.1
 
 #Set your language here
 #English (eng),
@@ -34,4 +34,4 @@ date-format: 'dd.mm.yyyy'
 #Moderator: {moderator}
 #Expiration date: {expiry}
 #New line: {new_line}
-kick-message: '§cYou are banned!{new_line}{new_line}§4Expiry: §f{expiry}'
+kick-message: '&cYou are banned!{new_line}{new_line}&4Expiry: &f{expiry}'

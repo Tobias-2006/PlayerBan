@@ -4,8 +4,7 @@ declare(strict_types=1);
 namespace tobias14\playerban\forms;
 
 use pocketmine\Player;
-use tobias14\playerban\forms\subforms\PunishmentSubForm;
-use tobias14\playerban\forms\subforms\PunishmentSubForm2;
+use tobias14\playerban\forms\subforms\{PunishmentSubForm, PunishmentSubForm2};
 use tobias14\playerban\punishment\Punishment;
 
 class PunishmentForm extends SimpleBaseForm {

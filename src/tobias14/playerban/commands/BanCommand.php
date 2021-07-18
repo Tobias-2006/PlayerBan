@@ -10,8 +10,7 @@ use pocketmine\plugin\Plugin;
 use pocketmine\utils\TextFormat as C;
 use tobias14\playerban\ban\Ban;
 use tobias14\playerban\forms\BanForm;
-use tobias14\playerban\log\Log;
-use tobias14\playerban\log\Logger;
+use tobias14\playerban\log\{Log, Logger};
 use tobias14\playerban\PlayerBan;
 
 class BanCommand extends BaseCommand {
@@ -62,6 +61,10 @@ class BanCommand extends BaseCommand {
             return true;
         }
         $punishment = $this->getPunishmentMgr()->get($punId);
+        if(is_null($punishment)) {
+            $sender->sendMessage(C::RED . $this->translate("error"));
+            return true;
+        }
 
         $expiryTime = time() + $punishment->duration;
         $ban = new Ban($target, $sender->getName(), $expiryTime, $punId);

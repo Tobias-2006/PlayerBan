@@ -7,8 +7,7 @@ use pocketmine\command\CommandSender;
 use pocketmine\command\utils\InvalidCommandSyntaxException;
 use pocketmine\plugin\Plugin;
 use pocketmine\utils\TextFormat as C;
-use tobias14\playerban\log\Log;
-use tobias14\playerban\log\Logger;
+use tobias14\playerban\log\{Log, Logger};
 use tobias14\playerban\PlayerBan;
 
 class UnbanCommand extends BaseCommand {
