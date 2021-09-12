@@ -23,67 +23,115 @@ class PunishmentManager {
      * Create a new punishment
      *
      * @param Punishment $punishment
-     * @return bool
+     * @param callable|null $onSuccess
+     * @param callable|null $onFailure
+     * @return void
      */
-    public function create(Punishment $punishment) : bool {
-        if($this->exists($punishment->id))
-            return false;
-        if(!$punishment->hasValidId())
-            return false;
-        return $this->plugin->getDataManager()->savePunishment($punishment) ?? false;
+    public function create(Punishment $punishment, callable $onSuccess = null, callable $onFailure = null) : void {
+        $this->exists($punishment->id, function (bool $punExists) use ($punishment, $onSuccess, $onFailure) {
+            if($punExists)
+                return;
+            if(!$punishment->hasValidId())
+                throw new InvalidPunishmentIdException('Tried to save a punishment with an invalid id!');
+            $this->plugin->getDataManager()->savePunishment(
+                $punishment,
+                $onSuccess,
+                $onFailure
+            );
+        });
     }
 
     /**
      * Delete a new punishment
      *
      * @param Punishment $punishment
-     * @return bool
+     * @param callable|null $onSuccess
+     * @param callable|null $onFailure
+     * @return void
      */
-    public function delete(Punishment $punishment) : bool {
-        if(!$this->exists($punishment->id))
-            return false;
-        return $this->plugin->getDataManager()->deletePunishment($punishment) ?? false;
+    public function delete(Punishment $punishment, callable $onSuccess = null, callable $onFailure = null) : void {
+        $this->exists($punishment->id, function (bool $punExists) use ($punishment, $onSuccess, $onFailure) {
+            if(!$punExists)
+                return;
+            $this->plugin->getDataManager()->deletePunishment(
+                $punishment,
+                $onSuccess,
+                $onFailure
+            );
+        });
     }
 
     /**
      * Update a punishment
      *
      * @param Punishment $punishment
-     * @return bool
+     * @param callable|null $onSuccess
+     * @param callable|null $onFailure
+     * @return void
      */
-    public function update(Punishment $punishment) : bool {
-        if(!$this->exists($punishment->id))
-            return false;
-        return $this->plugin->getDataManager()->updatePunishment($punishment) ?? false;
+    public function update(Punishment $punishment, callable $onSuccess = null, callable $onFailure = null) : void {
+        $this->exists($punishment->id, function (bool $punExists) use ($punishment, $onSuccess, $onFailure) {
+            if(!$punExists)
+                return;
+            $this->plugin->getDataManager()->updatePunishment(
+                $punishment,
+                $onSuccess,
+                $onFailure
+            );
+        });
     }
 
     /**
      * Check if a punishment exists
      *
      * @param int $id
-     * @return bool|null
+     * @param callable $onSuccess
+     * @param callable|null $onFailure
+     * @return void
      */
-    public function exists(int $id) : ?bool {
-        return $this->plugin->getDataManager()->punishmentExists($id);
+    public function exists(int $id, callable $onSuccess, callable $onFailure = null) : void {
+        $this->plugin->getDataManager()->getPunishment($id, function(array $rows) use ($onSuccess) {
+            $onSuccess(count($rows) > 0);
+        }, $onFailure);
     }
 
     /**
-     * Returns a punishment instance if the punishment exists
+     * Gets a punishment instance (if the punishment exists)
      *
      * @param int $id
-     * @return Punishment|null
+     * @param callable $onSuccess
+     * @param callable|null $onFailure
+     * @return void
      */
-    public function get(int $id) : ?Punishment {
-        return $this->plugin->getDataManager()->getPunishment($id);
+    public function get(int $id, callable $onSuccess, callable $onFailure = null) : void {
+        $this->plugin->getDataManager()->getPunishment($id, function(array $rows) use ($onSuccess, $onFailure) {
+            $row = $rows[0] ?? null;
+            if(is_null($row)) {
+                if(!is_null($onFailure)) {
+                    $onFailure();
+                }
+                return;
+            }
+            $p = new Punishment((int) $row['id'], (int) $row['duration'], $row['description']);;
+            $onSuccess($p);
+        }, $onFailure);
     }
 
     /**
-     * Returns a list of all punishments
+     * Gets a list of all punishments
      *
-     * @return Punishment[]|null
+     * @param callable $onSuccess
+     * @param callable|null $onFailure
+     * @return void
      */
-    public function getAll() : ?array {
-        return $this->plugin->getDataManager()->getAllPunishments();
+    public function getAll(callable $onSuccess, callable $onFailure = null) : void {
+        $this->plugin->getDataManager()->getAllPunishments(function (array $rows) use ($onSuccess) {
+            $data = [];
+            foreach ($rows as $row) {
+                $data[] = new Punishment((int) $row['id'], (int) $row['duration'], $row['description']);
+            }
+            $onSuccess($data);
+        }, $onFailure);
     }
 
 }

@@ -34,7 +34,15 @@ class BanListCommand extends BaseCommand {
         }
         /** @var Player $player */
         $player = &$sender;
-        $player->sendForm(new BanListForm());
+        BanListForm::getCurrentBansForPage(function (array $bans) use ($player) {
+            BanListForm::getMaxCurrentBansPage(function (int $pages) use ($player, $bans) {
+                $player->sendForm(new BanListForm($bans, $pages));
+            }, function() use ($player) {
+                $player->sendMessage(C::RED . $this->translate('error'));
+            });
+        }, function() use ($player) {
+            $player->sendMessage(C::RED . $this->translate('error'));
+        });
         return true;
     }
 

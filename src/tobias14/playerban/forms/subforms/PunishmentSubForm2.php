@@ -36,16 +36,13 @@ class PunishmentSubForm2 extends CustomBaseForm {
             $description = &$data["desc"];
             $duration = &$data[2];
             if($data[3]) {
-                if(!$this->getPunishmentMgr()->delete($punishment)) {
+                $this->getPunishmentMgr()->delete($punishment, function() use ($player, $punishment) {
+                    $log = new Log(Logger::LOG_TYPE_DELETION, $this->translate("logger.punishment.deletion"), $player->getName(), "PunId[" . $punishment->id . "]");
+                    Logger::getLogger()->log($log);
+                    $player->sendMessage($this->translate("punishments.delete.success", [$punishment->id]));
+                }, function() use ($player) {
                     $player->sendMessage(C::RED . $this->translate("error"));
-                    return;
-                }
-                $log = new Log(Logger::LOG_TYPE_DELETION, $this->translate("logger.punishment.deletion"), $player->getName(), "PunId[" . $punishment->id . "]");
-                if(!Logger::getLogger()->log($log)) {
-                    $player->sendMessage(C::RED . $this->translate("error"));
-                    return;
-                }
-                $player->sendMessage($this->translate("punishments.delete.success", [$punishment->id]));
+                });
                 return;
             }
             if(!preg_match("/(^[1-9][0-9]{0,2}[mhd])(,[1-9][0-9]{0,2}[mhd]){0,2}$/", $duration)) {
@@ -58,16 +55,13 @@ class PunishmentSubForm2 extends CustomBaseForm {
             }
             $punishment->description = $description;
             $punishment->duration = Converter::strToSeconds($duration) ?? 0;
-            if(!$this->getPunishmentMgr()->update($punishment)) {
+            $this->getPunishmentMgr()->update($punishment, function() use ($player, $punishment) {
+                $log = new Log(Logger::LOG_TYPE_ADAPTATION, $this->translate("logger.punishment.adaptation"), $player->getName(), "PunId[" . $punishment->id . "]");
+                Logger::getLogger()->log($log);
+                $player->sendMessage($this->translate("punishments.edit.success", [$punishment->id]));
+            }, function () use ($player) {
                 $player->sendMessage(C::RED . $this->translate("error"));
-                return;
-            }
-            $log = new Log(Logger::LOG_TYPE_ADAPTATION, $this->translate("logger.punishment.adaptation"), $player->getName(), "PunId[" . $punishment->id . "]");
-            if(!Logger::getLogger()->log($log)) {
-                $player->sendMessage(C::RED . $this->translate("error"));
-                return;
-            }
-            $player->sendMessage($this->translate("punishments.edit.success", [$punishment->id]));
+            });
         };
     }
 

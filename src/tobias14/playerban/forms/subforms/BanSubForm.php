@@ -9,8 +9,13 @@ use tobias14\playerban\punishment\Punishment;
 
 class BanSubForm extends SimpleBaseForm {
 
-    public function __construct(Player $player) {
-        $punishments = $this->getPunishmentMgr()->getAll() ?? [];
+    /**
+     * BanSubForm constructor.
+     *
+     * @param Player $player
+     * @param Punishment[] $punishments
+     */
+    public function __construct(Player $player, array $punishments) {
         parent::__construct($this->onCall($player, $punishments));
         $this->setTitle($this->translate("ban.form2.title"));
         foreach ($punishments as $punishment)

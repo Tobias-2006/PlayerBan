@@ -31,33 +31,33 @@ class PunishmentSubForm extends CustomBaseForm {
                 return;
             }
             $id = round((float) $id);
-            if($this->getPunishmentMgr()->exists((int) $id)) {
-                $player->sendMessage(C::RED . $this->translate("punishment.exist", [$id]));
-                return;
-            }
             if((int) $id > 999) {
                 $player->sendMessage(C::RED . $this->translate("param.tooLong", ["id", "3"]));
                 return;
             }
             if(!preg_match("/(^[1-9][0-9]{0,2}[mhd])(,[1-9][0-9]{0,2}[mhd]){0,2}$/", $duration)) {
-                $player->sendMessage(C::RED . $this->translate("param.incorrect", ["duration", "1d,12h Example2: 2d,5h,30m Example3: 30m"]));
+                $player->sendMessage(C::RED . $this->translate("param.incorrect", ["duration", "1d,12h"]));
                 return;
             }
             if(strlen($description) > 255 or strlen($description) < 3) {
                 $player->sendMessage(C::RED . $this->translate("param.tooLong", ["description", "3 to 255"]));
                 return;
             }
-            $punishment = new Punishment((int) $id, Converter::strToSeconds((string) $duration) ?? 0, $description);
-            if(!$this->getPunishmentMgr()->create($punishment)) {
-                $player->sendMessage(C::RED . $this->translate("error"));
-                return;
-            }
-            $log = new Log(Logger::LOG_TYPE_CREATION, $this->translate("logger.punishment.creation"), $player->getName(), "PunId[" . $punishment->id . "]");
-            if(!Logger::getLogger()->log($log)) {
-                $player->sendMessage(C::RED . $this->translate("error"));
-                return;
-            }
-            $player->sendMessage($this->translate("punishments.new.success", [$id]));
+
+            $this->getPunishmentMgr()->exists((int) $id, function(bool $exists) use ($player, $id, $duration, $description) {
+                if($exists) {
+                    $player->sendMessage(C::RED . $this->translate("punishment.exist", [$id]));
+                    return;
+                }
+                $punishment = new Punishment((int) $id, Converter::strToSeconds((string) $duration) ?? 0, $description);
+                $this->getPunishmentMgr()->create($punishment, function() use ($player, $punishment, $id) {
+                    $log = new Log(Logger::LOG_TYPE_CREATION, $this->translate("logger.punishment.creation"), $player->getName(), "PunId[" . $punishment->id . "]");
+                    Logger::getLogger()->log($log);
+                    $player->sendMessage($this->translate("punishments.new.success", [$id]));
+                }, function() use ($player) {
+                    $player->sendMessage(C::RED . $this->translate("error"));
+                });
+            });
         };
     }
 

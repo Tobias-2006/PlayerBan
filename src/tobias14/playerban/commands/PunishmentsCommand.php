@@ -34,7 +34,11 @@ class PunishmentsCommand extends BaseCommand {
         }
         /** @var Player $player */
         $player = &$sender;
-        $player->sendForm(new PunishmentForm());
+        $this->getPunishmentMgr()->getAll(function(array $punishments) use ($player) {
+            $player->sendForm(new PunishmentForm($punishments));
+        }, function() use ($player) {
+            $player->sendMessage(C::RED . $this->translate('error'));
+        });
         return true;
     }
 

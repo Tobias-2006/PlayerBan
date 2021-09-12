@@ -27,20 +27,19 @@ class PunishmentListCommand extends BaseCommand {
             return true;
         if(!$this->testPermission($sender))
             return true;
-        $punishments = $this->getPunishmentMgr()->getAll();
-        if(is_null($punishments)) {
+        $this->getPunishmentMgr()->getAll(function(array $punishments) use ($sender) {
+            $sender->sendMessage($this->translate("punlist.headline"));
+            foreach ($punishments as $punishment) {
+                $sender->sendMessage($this->translate("punlist.format", [
+                        $punishment->id,
+                        $punishment->description,
+                        Converter::secondsToStr($punishment->duration)
+                    ]
+                ));
+            }
+        }, function() use ($sender) {
             $sender->sendMessage(C::RED . $this->translate("error"));
-            return true;
-        }
-        $sender->sendMessage($this->translate("punlist.headline"));
-        foreach ($punishments as $punishment) {
-            $sender->sendMessage($this->translate("punlist.format", [
-                    $punishment->id,
-                    $punishment->description,
-                    Converter::secondsToStr($punishment->duration)
-                ]
-            ));
-        }
+        });
         return true;
     }
 

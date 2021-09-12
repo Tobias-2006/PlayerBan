@@ -9,4 +9,6 @@ projects:
     libs:
     - src: jojoe77777/FormAPI/libFormAPI
       version: ^1.3
+    - src: poggit\libasynql
+      version: ^3.3.0
 ...

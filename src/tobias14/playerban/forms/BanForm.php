@@ -27,7 +27,11 @@ class BanForm extends SimpleBaseForm {
     public function onCall(array $players) : callable {
         return function (Player $player, $data) use ($players) {
             if(is_null($data)) return;
-            $player->sendForm(new BanSubForm($players[array_keys($players)[$data]]));
+            $this->getPunishmentMgr()->getAll(function(array $punishments) use ($data, $player, $players) {
+                $player->sendForm(new BanSubForm($players[array_keys($players)[$data]], $punishments));
+            }, function() use ($player) {
+                $player->sendMessage($this->translate('error'));
+            });
         };
     }
 

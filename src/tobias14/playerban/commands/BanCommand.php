@@ -12,6 +12,7 @@ use tobias14\playerban\ban\Ban;
 use tobias14\playerban\forms\BanForm;
 use tobias14\playerban\log\{Log, Logger};
 use tobias14\playerban\PlayerBan;
+use tobias14\playerban\punishment\Punishment;
 
 class BanCommand extends BaseCommand {
 
@@ -45,39 +46,34 @@ class BanCommand extends BaseCommand {
             $sender->sendMessage(C::RED . $this->translate("param.incorrect", ["<player|ip>", "max123"]));
             return true;
         }
-        if(($player = $this->getPlugin()->getServer()->getPlayer($target)) !== null)
-            $target = $player->getName();
-        if($this->getBanMgr()->isBanned($target)) {
-            $sender->sendMessage(C::RED . $this->translate("target.isBanned"));
-            return true;
-        }
         if(!is_numeric($punId)) {
             $sender->sendMessage(C::RED . $this->translate("param.incorrect", ["<punId>", "3"]));
             return true;
         }
+        if(($player = $this->getPlugin()->getServer()->getPlayer($target)) !== null)
+            $target = $player->getName();
         $punId = (int) round((float) $punId);
-        if(!$this->getPunishmentMgr()->exists($punId)) {
-            $sender->sendMessage(C::RED . $this->translate("punishment.notExist", [$punId]));
-            return true;
-        }
-        $punishment = $this->getPunishmentMgr()->get($punId);
-        if(is_null($punishment)) {
-            $sender->sendMessage(C::RED . $this->translate("error"));
-            return true;
-        }
 
-        $expiryTime = time() + $punishment->duration;
-        $ban = new Ban($target, $sender->getName(), $expiryTime, $punId);
-
-        if($this->getBanMgr()->add($ban)) {
-            $sender->sendMessage($this->translate("ban.success", [$target]));
-            $log = new Log(Logger::LOG_TYPE_CREATION, $this->translate("logger.ban.creation"), $sender->getName(), $target);
-            Logger::getLogger()->log($log);
-            $this->kickTarget($target);
-            return true;
-        }
-
-        $sender->sendMessage(C::RED . $this->translate("error"));
+        $this->getBanMgr()->isBanned($target, function (bool $banned) use ($sender, $target, $punId) {
+            if($banned) {
+                $sender->sendMessage(C::RED . $this->translate("target.isBanned"));
+                return;
+            }
+            $this->getPunishmentMgr()->get($punId, function(Punishment $punishment) use ($sender, $target, $punId) {
+                $expiryTime = time() + $punishment->duration;
+                $ban = new Ban($target, $sender->getName(), $expiryTime, $punId);
+                $this->getBanMgr()->add($ban, function() use ($sender, $target) {
+                    $sender->sendMessage($this->translate("ban.success", [$target]));
+                    $log = new Log(Logger::LOG_TYPE_CREATION, $this->translate("logger.ban.creation"), $sender->getName(), $target);
+                    Logger::getLogger()->log($log);
+                    $this->kickTarget($target);
+                }, function() use ($sender) {
+                    $sender->sendMessage(C::RED . $this->translate('error'));
+                });
+            }, function() use ($sender) {
+                $sender->sendMessage(C::RED . $this->translate('error'));
+            });
+        });
         return true;
     }
 

@@ -37,26 +37,27 @@ class BanHistoryCommand extends BaseCommand {
         $target = $args[0];
         if(($player = $this->getPlugin()->getServer()->getPlayer($target)) !== null)
             $target = $player->getName();
-        $bans = $this->getBanMgr()->getHistory($target);
-        if(is_null($bans)) {
-            $sender->sendMessage(C::RED . $this->translate("error"));
-            return true;
-        }
-        if(count($bans) === 0) {
-            $sender->sendMessage(C::RED . $this->translate("target.neverBanned", [$target]));
-            return true;
-        }
-        if($sender instanceof ConsoleCommandSender) {
-            foreach ($bans as $ban) {
-                $banCreation = PlayerBan::getInstance()->formatTime($ban->creationTime);
-                $punishment = $this->getPunishmentMgr()->get($ban->punId) ?? new Punishment(-1, -1, "undefined");
-                $sender->sendMessage($this->translate("banhistory.consoleFormat", [$banCreation, $punishment->description]));
+
+        $this->getBanMgr()->getHistory($target, function(array $bans) use ($sender, $target) {
+            if(count($bans) === 0) {
+                $sender->sendMessage(C::RED . $this->translate("target.neverBanned", [$target]));
+                return;
             }
-            return true;
-        }
-        if(!$sender instanceof Player)
-            return true;
-        $sender->sendForm(new BanHistoryForm($target));
+            if($sender instanceof ConsoleCommandSender) {
+                foreach ($bans as $ban) {
+                    $this->getPunishmentMgr()->get($ban->punId, function(Punishment $punishment) use ($sender, $ban) {
+                        $banCreation = PlayerBan::getInstance()->formatTime($ban->creationTime);
+                        $sender->sendMessage($this->translate("banhistory.consoleFormat", [$banCreation, $punishment->description]));
+                    });
+                }
+                return;
+            }
+            if(!$sender instanceof Player)
+                return;
+            $sender->sendForm(new BanHistoryForm($target, $bans));
+        }, function() use ($sender) {
+            $sender->sendMessage(C::RED . $this->translate("error"));
+        });
         return true;
     }
 

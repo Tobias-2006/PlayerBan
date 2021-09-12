@@ -12,8 +12,6 @@ abstract class DataManager {
 
     /** @var PlayerBan $plugin */
     protected $plugin;
-    /** @var string[] $settings */
-    protected $settings;
 
     /**
      * DataManager constructor.
@@ -31,147 +29,168 @@ abstract class DataManager {
     abstract protected function init() : void;
 
     /**
-     * Closes the connection to the database
+     * Closes the DataConnector
      *
      * @return void
      */
     abstract public function close() : void;
 
     /**
+     * Disables async mode for existing queries
+     *
+     * @return void
+     */
+    abstract public function block() : void;
+
+    /**
      * Saves a log into the database
      *
      * @param Log $log
-     * @return bool|null
+     * @param callable|null $onSuccess
+     * @param callable|null $onFailure
+     * @return void
      */
-    abstract public function saveLog(Log $log) : ?bool;
+    abstract public function saveLog(Log $log, callable $onSuccess = null, callable $onFailure = null) : void;
 
     /**
      * Deletes a log
      *
      * @param Log $log
-     * @return bool|null
+     * @param callable|null $onSuccess
+     * @param callable|null $onFailure
+     * @return void
      */
-    abstract public function deleteLog(Log $log) : ?bool;
+    abstract public function deleteLog(Log $log, callable $onSuccess = null, callable $onFailure = null) : void;
 
     /**
-     * Returns a list of logs for the requested page
+     * Gets a list of logs for the requested page
      *
+     * @param callable $onSuccess
+     * @param callable|null $onFailure
      * @param int $page
      * @param int $limit
-     * @return Log[]|null
+     * @return void
      */
-    abstract public function getLogs(int $page = 0, int $limit = 6) : ?array;
+    abstract public function getLogsForPage(callable $onSuccess, callable $onFailure = null, int $page = 0, int $limit = 6) : void;
 
     /**
-     * Returns the number of log pages
+     * Gets the number of log pages
      *
+     * @param callable $onSuccess
+     * @param callable|null $onFailure
      * @param int $limit Maximum number of logs per page
-     * @return int|null
+     * @return void
      */
-    abstract public function getMaxLogPage(int $limit = 6) : ?int;
+    abstract public function getLogCount(callable $onSuccess, callable $onFailure = null, int $limit = 6) : void;
 
     /**
-     * Checks if a punishment exists
+     * Gets a punishment by id
      *
      * @param int $id
-     * @return bool|null
+     * @param callable $onSuccess
+     * @param callable|null $onFailure
+     * @return void
      */
-    abstract public function punishmentExists(int $id) : ?bool;
+    abstract public function getPunishment(int $id, callable $onSuccess, callable $onFailure = null) : void;
 
     /**
-     * Returns a punishment or null
+     * Gets a list of all punishments
      *
-     * @param int $id
-     * @return Punishment|null
+     * @param callable $onSuccess
+     * @param callable|null $onFailure
+     * @return void
      */
-    abstract public function getPunishment(int $id) : ?Punishment;
-
-    /**
-     * Returns a list of all punishments
-     *
-     * @return Punishment[]|null
-     */
-    abstract public function getAllPunishments() : ?array;
+    abstract public function getAllPunishments(callable $onSuccess, callable $onFailure = null) : void;
 
     /**
      * Saves a punishment to the database
      *
      * @param Punishment $punishment
-     * @return bool|null
+     * @param callable|null $onSuccess
+     * @param callable|null $onFailure
+     * @return void
      */
-    abstract public function savePunishment(Punishment $punishment) : ?bool;
+    abstract public function savePunishment(Punishment $punishment, callable $onSuccess = null, callable $onFailure = null) : void;
 
     /**
      * Deletes a punishment from the database
      *
      * @param Punishment $punishment
-     * @return bool|null
+     * @param callable|null $onSuccess
+     * @param callable|null $onFailure
+     * @return void
      */
-    abstract public function deletePunishment(Punishment $punishment) : ?bool;
+    abstract public function deletePunishment(Punishment $punishment, callable $onSuccess = null, callable $onFailure = null) : void;
 
     /**
-     * Allows to edit an existing punishment
+     * Allows to overwrite an existing punishment
      *
      * @param Punishment $punishment
-     * @return bool|null
+     * @param callable|null $onSuccess
+     * @param callable|null $onFailure
+     * @return void
      */
-    abstract public function updatePunishment(Punishment $punishment) : ?bool;
-
-    /**
-     * Checks if a player or an ip address is banned
-     *
-     * @param string $target
-     * @return bool|null
-     */
-    abstract public function isBanned(string $target) : ?bool;
+    abstract public function updatePunishment(Punishment $punishment, callable $onSuccess = null, callable $onFailure = null) : void;
 
     /**
      * Saves a ban to the database
      *
      * @param Ban $ban
-     * @return bool|null
+     * @param callable|null $onSuccess
+     * @param callable|null $onFailure
+     * @return void
      */
-    abstract public function saveBan(Ban $ban) : ?bool;
+    abstract public function saveBan(Ban $ban, callable $onSuccess = null, callable $onFailure = null) : void;
 
     /**
-     * Resets the ban duration
+     * Resets the ban expiration
      *
      * @param string $target
-     * @return bool|null
+     * @param callable|null $onSuccess
+     * @param callable|null $onFailure
+     * @return void
      */
-    abstract public function removeBan(string $target) : ?bool;
+    abstract public function removeBan(string $target, callable $onSuccess = null, callable $onFailure = null) : void;
 
     /**
-     * Returns a ban instance
+     * Gets a ban by name/ip
      *
      * @param string $target
-     * @return Ban|null
+     * @param callable $onSuccess
+     * @param callable|null $onFailure
+     * @return void
      */
-    abstract public function getBanByName(string $target) : ?Ban;
+    abstract public function getBanByName(string $target, callable $onSuccess, callable $onFailure = null) : void;
 
     /**
-     * Returns a list of all bans of a player or an ip address
+     * Gets a list of all bans of a player or an ip address
      *
      * @param string $target
-     * @return Ban[]|null
+     * @param callable $onSuccess
+     * @param callable|null $onFailure
+     * @return void
      */
-    abstract public function getBanHistory(string $target) : ?array;
+    abstract public function getBanHistory(string $target, callable $onSuccess, callable $onFailure = null) : void;
 
     /**
-     * Returns a list of all active bans for the requested page
+     * Gets a list of all active bans for the requested page
      *
+     * @param callable $onSuccess
+     * @param callable|null $onFailure
      * @param int $page
      * @param int $limit
-     * @return Ban[]|null
+     * @return void
      */
-    abstract public function getCurrentBans(int $page = 0, int $limit = 6) : ?array;
+    abstract public function getCurrentBansForPage(callable $onSuccess, callable $onFailure = null, int $page = 0, int $limit = 6) : void;
 
     /**
-     * Returns the number of banlist pages
+     * Gets the number of banlist pages
      *
+     * @param callable $onSuccess
+     * @param callable|null $onFailure
      * @param int $limit Maximum number of bans per page
-     * @return int|null
+     * @return void
      */
-    abstract public function getMaxBanPage(int $limit = 6) : ?int;
+    abstract public function getCurrentBansCount(callable $onSuccess, callable $onFailure = null, int $limit = 6) : void;
 
 }

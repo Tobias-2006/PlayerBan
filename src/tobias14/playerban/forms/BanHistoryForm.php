@@ -6,6 +6,7 @@ namespace tobias14\playerban\forms;
 use pocketmine\Player;
 use tobias14\playerban\ban\Ban;
 use tobias14\playerban\forms\subforms\BanHistorySubForm;
+use tobias14\playerban\punishment\Punishment;
 
 class BanHistoryForm extends SimpleBaseForm {
 
@@ -13,9 +14,9 @@ class BanHistoryForm extends SimpleBaseForm {
      * BanHistoryForm constructor.
      *
      * @param string $target
+     * @param Ban[] $bans
      */
-    public function __construct(string $target) {
-        $bans = $this->getBanMgr()->getHistory($target) ?? [];
+    public function __construct(string $target, array $bans) {
         parent::__construct($this->onCall($target, $bans));
         $this->setTitle($this->translate("banhistory.form.title", [$target]));
         foreach ($bans as $ban) {
@@ -32,7 +33,12 @@ class BanHistoryForm extends SimpleBaseForm {
     public function onCall(string $target, array $bans) : callable {
         return function (Player $player, $data) use ($target, $bans) {
             if(is_null($data)) return;
-            $player->sendForm(new BanHistorySubForm($target, $bans[$data]));
+            $ban = $bans[$data];
+            $this->getPunishmentMgr()->get($ban->punId, function(Punishment $punishment) use($player, $target, $ban, $bans) {
+                $player->sendForm(new BanHistorySubForm($target, $ban, $bans, $punishment));
+            }, function() use($player, $target, $ban, $bans) {
+                $player->sendForm(new BanHistorySubForm($target, $ban, $bans));
+            });
         };
     }
 

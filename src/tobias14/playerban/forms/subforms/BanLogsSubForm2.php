@@ -4,8 +4,10 @@ declare(strict_types=1);
 namespace tobias14\playerban\forms\subforms;
 
 use pocketmine\Player;
+use poggit\libasynql\SqlError;
 use tobias14\playerban\forms\ModalBaseForm;
 use tobias14\playerban\log\{Log, Logger};
+use tobias14\playerban\PlayerBan;
 
 class BanLogsSubForm2 extends ModalBaseForm {
 
@@ -30,11 +32,12 @@ class BanLogsSubForm2 extends ModalBaseForm {
         return function(Player $player, $data) use ($log) {
             if(!$data)
                 return;
-            if(Logger::getLogger()->delete($log)) {
+            Logger::getLogger()->delete($log, function () use ($player) {
                 $player->sendMessage($this->translate("banlogs.deleteLog.success"));
-                return;
-            }
-            $player->sendMessage($this->translate("error"));
+            }, function (SqlError $error) use ($player) {
+                $player->sendMessage($this->translate("error"));
+                PlayerBan::getInstance()->getLogger()->error($error->getMessage());
+            });
         };
     }
 

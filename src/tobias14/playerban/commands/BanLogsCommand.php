@@ -34,7 +34,11 @@ class BanLogsCommand extends BaseCommand {
         }
         /** @var Player $player */
         $player = &$sender;
-        $player->sendForm(new BanLogsForm());
+        BanLogsForm::getLogsForPage(function($logs) use ($player) {
+            BanLogsForm::getMaxLogPage(function($maxLogPage) use ($player, $logs) {
+                $player->sendForm(new BanLogsForm($logs, $maxLogPage));
+            });
+        });
         return true;
     }
 

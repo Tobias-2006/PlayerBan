@@ -43,22 +43,27 @@ class Logger {
      * Creates a new log and saves it into the database
      *
      * @param Log $log
-     * @return bool
+     * @param callable|null $onSuccess
+     * @param callable|null $onFailure
+     * @return void
+     * @throws InvalidLogTypeException
      */
-    public function log(Log $log) : bool {
+    public function log(Log $log, callable $onSuccess = null, callable $onFailure = null) : void {
         if(!$log->hasValidType())
-            return false;
-        return $this->dataMgr->saveLog($log) ?? false;
+            throw new InvalidLogTypeException('Tried to save a log with an invalid type!');
+        $this->dataMgr->saveLog($log, $onSuccess, $onFailure);
     }
 
     /**
      * Delete a log
      *
      * @param Log $log
-     * @return bool
+     * @param callable|null $onSuccess
+     * @param callable|null $onFailure
+     * @return void
      */
-    public function delete(Log $log) : bool {
-        return $this->dataMgr->deleteLog($log) ?? false;
+    public function delete(Log $log, callable $onSuccess = null, callable $onFailure = null) : void {
+        $this->dataMgr->deleteLog($log, $onSuccess, $onFailure);
     }
 
 }

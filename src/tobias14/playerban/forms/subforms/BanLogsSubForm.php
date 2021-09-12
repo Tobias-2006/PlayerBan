@@ -39,7 +39,15 @@ class BanLogsSubForm extends SimpleBaseForm {
                 $player->sendForm(new BanLogsSubForm2($log));
                 return;
             }
-            $player->sendForm(new BanLogsForm($page));
+            BanLogsForm::getLogsForPage(function(array $logs) use ($player, $page) {
+                BanLogsForm::getMaxLogPage(function(int $maxPage) use ($player, $logs, $page) {
+                    $player->sendForm(new BanLogsForm($logs, $maxPage, $page));
+                }, function() use ($player) {
+                    $player->sendMessage(C::RED . $this->translate('error'));
+                });
+            }, function() use ($player) {
+                $player->sendMessage(C::RED . $this->translate('error'));
+            }, $page);
         };
     }
 

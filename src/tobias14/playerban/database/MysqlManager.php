@@ -3,15 +3,18 @@ declare(strict_types=1);
 
 namespace tobias14\playerban\database;
 
+use poggit\libasynql\DataConnector;
+use poggit\libasynql\libasynql;
 use tobias14\playerban\ban\Ban;
 use tobias14\playerban\log\Log;
 use tobias14\playerban\PlayerBan;
 use tobias14\playerban\punishment\Punishment;
+use tobias14\playerban\utils\Queries;
 
-class MysqlManager extends DataManager {
+class MysqlManager extends DataManager implements Queries {
 
-    /** @var \mysqli $db */
-    protected $db;
+    /** @var DataConnector $conn */
+    protected $conn;
 
     /**
      * DataManager constructor.
@@ -21,10 +24,18 @@ class MysqlManager extends DataManager {
      */
     public function __construct(PlayerBan $plugin, array $settings) {
         $this->plugin = $plugin;
-        $this->settings = $settings;
-        $this->db = new \mysqli($settings['host'], $settings['username'], $settings['passwd'], $settings['dbname'], (int) $settings['port']);
-        if($this->db->connect_errno)
-            throw new \RuntimeException($this->plugin->getLanguage()->translateString("connection.failed") . " : " . $this->db->connect_error);
+        $this->conn = libasynql::create($plugin, [
+            'type' => 'mysql',
+            'mysql' => [
+                'host' => $settings['host'],
+                'username' => $settings['username'],
+                'password' => $settings['passwd'],
+                'schema' => $settings['dbname']
+            ],
+            'worker-limit' => 2
+        ], [
+            'mysql' => ['mysql.sql']
+        ]);
         $this->init();
     }
 
@@ -32,346 +43,239 @@ class MysqlManager extends DataManager {
      * @return void
      */
     protected function init() : void {
-        $this->db->query("CREATE TABLE IF NOT EXISTS bans(id INT AUTO_INCREMENT, target VARCHAR(255) NOT NULL, moderator VARCHAR(255) NOT NULL, expiry_time INT NOT NULL, pun_id INT NOT NULL, creation_time INT NOT NULL, PRIMARY KEY(id));");
-        $this->db->query("CREATE TABLE IF NOT EXISTS punishments(id INT NOT NULL, duration INT NOT NULL, description VARCHAR(255) NOT NULL, PRIMARY KEY(id));");
-        $this->db->query("CREATE TABLE IF NOT EXISTS logs(type INT NOT NULL, description TEXT NOT NULL, moderator VARCHAR(255) NOT NULL, target VARCHAR(255), creation_time INT NOT NULL);");
-    }
-
-    /**
-     * Reconnects to the database
-     *
-     * @return void
-     */
-    private function reconnect() {
-        try {
-            $settings = $this->settings;
-            $this->db = new \mysqli($settings['host'], $settings['username'], $settings['passwd'], $settings['dbname'], (int) $settings['port']);
-        } catch (\Exception $e) {
-            $this->plugin->getLogger()->critical($this->plugin->getLanguage()->translateString("connection.failed"));
-            $this->plugin->getServer()->getPluginManager()->disablePlugin($this->plugin);
-        }
-    }
-
-    /**
-     * Checks the database connection and restores it in case of errors
-     *
-     * @return bool
-     */
-    private function checkConnection() : bool {
-        if($this->plugin->isDisabled())
-            return false;
-        if(!$this->db->ping()) {
-            $this->reconnect();
-            if($this->db->connect_error != '') {
-                $this->plugin->getLogger()->critical($this->db->connect_error);
-                if($this->plugin->isEnabled())
-                    $this->plugin->getServer()->getPluginManager()->disablePlugin($this->plugin);
-                return false;
-            }
-        }
-        return true;
+        $this->conn->executeGeneric(self::PLAYERBAN_INIT_BANS);
+        $this->conn->executeGeneric(self::PLAYERBAN_INIT_PUNISHMENTS);
+        $this->conn->executeGeneric(self::PLAYERBAN_INIT_LOGS);
     }
 
     /**
      * @return void
      */
     public function close() : void {
-        try {
-            $this->db->close();
-        } catch (\Exception $e) {//NOOP
-        }
+        if(isset($this->conn))
+            $this->conn->close();
+    }
+
+    /**
+     * @return void
+     */
+    public function block() : void {
+        $this->conn->waitAll();
     }
 
     /**
      * @param Log $log
-     * @return bool|null
+     * @param callable|null $onSuccess
+     * @param callable|null $onFailure
+     * @return void
      */
-    public function saveLog(Log $log) : ?bool {
-        if(!$this->checkConnection()) return null;
-        $stmt = $this->db->prepare("INSERT INTO logs(type, description, moderator, target, creation_time) VALUES(?, ?, ?, ?, ?);");
-        if(!$stmt) return false;
-        $timestamp = time();
-        $stmt->bind_param("isssi", $log->type, $log->description, $log->moderator, $log->target, $timestamp);
-        $result = $stmt->execute();
-        $stmt->close();
-        return $result;
+    public function saveLog(Log $log, callable $onSuccess = null, callable $onFailure = null) : void {
+        $this->conn->executeInsert(self::PLAYERBAN_LOG_SAVE, [
+            'type' => $log->type,
+            'description' => $log->description,
+            'moderator' => $log->moderator,
+            'target' => $log->target,
+            'creation' => time()
+        ], $onSuccess, $onFailure);
     }
 
     /**
      * @param Log $log
-     * @return bool|null
+     * @param callable|null $onSuccess
+     * @param callable|null $onFailure
+     * @return void
      */
-    public function deleteLog(Log $log): ?bool {
-        if(!$this->checkConnection()) return null;
-        $stmt = $this->db->prepare("DELETE FROM logs WHERE moderator=? AND creation_time=?;");
-        if(!$stmt) return false;
-        $stmt->bind_param("si", $log->moderator, $log->creationTime);
-        $result = $stmt->execute();
-        $stmt->close();
-        return $result;
+    public function deleteLog(Log $log, callable $onSuccess = null, callable $onFailure = null) : void {
+        $this->conn->executeChange(self::PLAYERBAN_LOG_DELETE, [
+            'moderator' => $log->moderator,
+            'creation' => $log->creationTime
+        ], $onSuccess, $onFailure);
     }
 
     /**
+     * The following method should be used instead
+     * @link \tobias14\playerban\forms\BanLogsForm::getLogsForPage()
+     *
+     * @param callable $onSuccess
+     * @param callable|null $onFailure
      * @param int $page
      * @param int $limit
-     * @return Log[]|null
+     * @return void
      */
-    public function getLogs(int $page = 0, int $limit = 6): ?array {
-        if(!$this->checkConnection()) return null;
+    public function getLogsForPage(callable $onSuccess, callable $onFailure = null, int $page = 0, int $limit = 6) : void {
         $page *= $limit;
-        $stmt = $this->db->prepare("SELECT * FROM logs ORDER BY creation_time DESC LIMIT ?, ?;");
-        if(!$stmt) return null;
-        $stmt->bind_param("ii", $page, $limit);
-        $stmt->execute();
-        if(false === $result = $stmt->get_result()) return null;
-        $data = [];
-        while ($row = $result->fetch_assoc()) {
-            $data[] = new Log((int) $row['type'], $row['description'], $row['moderator'], $row['target'], (int) $row['creation_time']);
-        }
-        $stmt->close();
-        return $data;
+        $this->conn->executeSelect(self::PLAYERBAN_LOG_GET_PAGE, [
+            'page' => $page,
+            'limit' => $limit
+        ], $onSuccess, $onFailure);
     }
 
     /**
+     * @param callable $onSuccess
+     * @param callable|null $onFailure
      * @param int $limit
-     * @return int|null
+     * @return void
      */
-    public function getMaxLogPage(int $limit = 6) : ?int {
-        if(!$this->checkConnection()) return null;
-        $stmt = $this->db->prepare("SELECT COUNT(*) FROM logs;");
-        if(!$stmt) return null;
-        $stmt->execute();
-        if(false === $result = $stmt->get_result()) return null;
-        $result = $result->fetch_row();
-        if(null === $result) return null;
-        $rowCount = $result[0];
-        $sites = $rowCount / $limit;
-        if(($rowCount % $limit) != 0)
-            $sites += 1;
-        $stmt->close();
-        return (int) floor($sites);
+    public function getLogCount(callable $onSuccess, callable $onFailure = null, int $limit = 6) : void {
+        $this->conn->executeSelect(
+            self::PLAYERBAN_LOG_GET_LOGCOUNT,
+            [],
+            $onSuccess,
+            $onFailure
+        );
     }
 
     /**
      * @param int $id
-     * @return null|bool
+     * @param callable $onSuccess
+     * @param callable|null $onFailure
+     * @return void
      */
-    public function punishmentExists(int $id) : ?bool {
-        if(!$this->checkConnection()) return null;
-        $stmt = $this->db->prepare("SELECT * FROM punishments WHERE id=?;");
-        if(!$stmt) return null;
-        $stmt->bind_param("i", $id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $stmt->close();
-        if(!$result) return null;
-        return $result->num_rows === 1;
-    }
-
-    /**
-     * @param int $id
-     * @return Punishment|null
-     */
-    public function getPunishment(int $id) : ?Punishment {
-        if(!$this->checkConnection()) return null;
-        $stmt = $this->db->prepare("SELECT * FROM punishments WHERE id=?;");
-        if(!$stmt) return null;
-        $stmt->bind_param("i", $id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        if(!$result) return null;
-        $result = $result->fetch_assoc();
-        if(is_null($result)) return null;
-        $stmt->close();
-        return new Punishment((int) $result['id'], (int) $result['duration'], $result['description']);
+    public function getPunishment(int $id, callable $onSuccess, callable $onFailure = null) : void {
+        $this->conn->executeSelect(self::PLAYERBAN_PUNISHMENT_GET, [
+            'id' => $id
+        ], $onSuccess, $onFailure);
     }
 
     /**
      * Returns a list of all punishments
      *
-     * @return Punishment[]|null
+     * @param callable $onSuccess
+     * @param callable|null $onFailure
+     * @return void
      */
-    public function getAllPunishments() : ?array {
-        if(!$this->checkConnection()) return null;
-        $result = $this->db->query("SELECT * FROM punishments;");
-        if(!$result or $result === true) return null;
-        $data = [];
-        while ($row = $result->fetch_assoc()) {
-            $data[] = new Punishment((int) $row['id'], (int) $row['duration'], $row['description']);
-        }
-        return $data;
+    public function getAllPunishments(callable $onSuccess, callable $onFailure = null) : void {
+        $this->conn->executeSelect(
+            self::PLAYERBAN_PUNISHMENT_GET_ALL,
+            [],
+            $onSuccess,
+            $onFailure
+        );
     }
 
     /**
      * @param Punishment $punishment
-     * @return null|bool
+     * @param callable|null $onSuccess
+     * @param callable|null $onFailure
+     * @return void
      */
-    public function savePunishment(Punishment $punishment) : ?bool {
-        if(!$this->checkConnection()) return null;
-        $stmt = $this->db->prepare("INSERT INTO punishments(id, duration, description) VALUES(?, ?, ?);");
-        if(!$stmt) return false;
-        $stmt->bind_param("iis", $punishment->id, $punishment->duration, $punishment->description);
-        $result = $stmt->execute();
-        $stmt->close();
-        return $result;
+    public function savePunishment(Punishment $punishment, callable $onSuccess = null, callable $onFailure = null) : void {
+        $this->conn->executeChange(self::PLAYERBAN_PUNISHMENT_SAVE, [
+            'id' => $punishment->id,
+            'duration' => $punishment->duration,
+            'description' => $punishment->description
+        ], $onSuccess, $onFailure);
     }
 
     /**
      * @param Punishment $punishment
-     * @return null|bool
+     * @param callable|null $onSuccess
+     * @param callable|null $onFailure
+     * @return void
      */
-    public function deletePunishment(Punishment $punishment) : ?bool {
-        if(!$this->checkConnection()) return null;
-        $stmt = $this->db->prepare("DELETE FROM punishments WHERE id=?;");
-        if(!$stmt) return false;
-        $stmt->bind_param("i", $punishment->id);
-        $result = $stmt->execute();
-        $stmt->close();
-        return $result;
+    public function deletePunishment(Punishment $punishment, callable $onSuccess = null, callable $onFailure = null) : void {
+        $this->conn->executeChange(self::PLAYERBAN_PUNISHMENT_DELETE, [
+            'id' => $punishment->id
+        ], $onSuccess, $onFailure);
     }
 
     /**
      * @param Punishment $punishment
-     * @return null|bool
+     * @param callable|null $onSuccess
+     * @param callable|null $onFailure
+     * @return void
      */
-    public function updatePunishment(Punishment $punishment) : ?bool {
-        if(!$this->checkConnection()) return null;
-        $stmt = $this->db->prepare("UPDATE punishments SET duration=?, description=? WHERE id=?;");
-        if(!$stmt) return false;
-        $stmt->bind_param("isi", $punishment->duration, $punishment->description, $punishment->id);
-        $result = $stmt->execute();
-        $stmt->close();
-        return $result;
-    }
-
-    /**
-     * @param string $target
-     * @return bool|null
-     */
-    public function isBanned(string $target) : ?bool {
-        if(!$this->checkConnection()) return null;
-        $time = time();
-        $stmt = $this->db->prepare("SELECT * FROM bans WHERE target=? AND expiry_time > ?;");
-        if(!$stmt) return null;
-        $stmt->bind_param("si", $target, $time);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        if(!$result) return null;
-        $stmt->close();
-        return $result->num_rows === 1;
+    public function updatePunishment(Punishment $punishment, callable $onSuccess = null, callable $onFailure = null) : void {
+        $this->conn->executeChange(self::PLAYERBAN_PUNISHMENT_UPDATE, [
+            'duration' => $punishment->duration,
+            'description' => $punishment->description,
+            'id' => $punishment->id
+        ], $onSuccess, $onFailure);
     }
 
     /**
      * @param Ban $ban
-     * @return null|bool
+     * @param callable|null $onSuccess
+     * @param callable|null $onFailure
+     * @return void
      */
-    public function saveBan(Ban $ban) : ?bool {
-        if(!$this->checkConnection()) return null;
-        $stmt = $this->db->prepare("INSERT INTO bans(target, moderator, expiry_time, pun_id, creation_time) VALUES(?, ?, ?, ?, ?);");
-        if(!$stmt) return false;
-        $timestamp = time();
-        $stmt->bind_param("ssiii", $ban->target, $ban->moderator, $ban->expiryTime, $ban->punId, $timestamp);
-        $result = $stmt->execute();
-        $stmt->close();
-        return $result;
+    public function saveBan(Ban $ban, callable $onSuccess = null, callable $onFailure = null) : void {
+        $this->conn->executeInsert(self::PLAYERBAN_BAN_SAVE, [
+            'target' => $ban->target,
+            'moderator' => $ban->moderator,
+            'expiry' => $ban->expiryTime,
+            'punId' => $ban->punId,
+            'creation' => time()
+        ], $onSuccess, $onFailure);
     }
 
     /**
      * @param string $target
-     * @return bool|null
+     * @param callable|null $onSuccess
+     * @param callable|null $onFailure
+     * @return void
      */
-    public function removeBan(string $target) : ?bool {
-        if(!$this->checkConnection()) return null;
-        $time = time();
-        $stmt = $this->db->prepare("UPDATE bans SET expiry_time=? WHERE target=? AND expiry_time > ?;");
-        if(!$stmt) return false;
-        $stmt->bind_param("isi", $time, $target, $time);
-        $result = $stmt->execute();
-        $stmt->close();
-        return $result;
+    public function removeBan(string $target, callable $onSuccess = null, callable $onFailure = null) : void {
+        $this->conn->executeChange(self::PLAYERBAN_BAN_REMOVE, [
+            'timestamp' => time(),
+            'target' => $target
+        ], $onSuccess, $onFailure);
     }
 
     /**
      * @param string $target
-     * @return Ban|null
+     * @param callable $onSuccess
+     * @param callable|null $onFailure
+     * @return void
      */
-    public function getBanByName(string $target) : ?Ban {
-        if(!$this->checkConnection()) return null;
-        $time = time();
-        $stmt = $this->db->prepare("SELECT * FROM bans WHERE target=? AND expiry_time > ?;");
-        if(!$stmt) return null;
-        $stmt->bind_param("si", $target, $time);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        if(!$result) return null;
-        $result = $result->fetch_assoc();
-        if(is_null($result)) return null;
-        $stmt->close();
-        return new Ban($result['target'], $result['moderator'], (int) $result['expiry_time'], (int) $result['pun_id'], (int) $result['id'], (int) $result['creation_time']);
+    public function getBanByName(string $target, callable $onSuccess, callable $onFailure = null) : void {
+        $this->conn->executeSelect(self::PLAYERBAN_BAN_GET, [
+            'target' => $target,
+            'timestamp' => time()
+        ], $onSuccess, $onFailure);
     }
 
     /**
      * @param string $target
-     * @return Ban[]|null
+     * @param callable $onSuccess
+     * @param callable|null $onFailure
+     * @return void
      */
-    public function getBanHistory(string $target) : ?array {
-        if(!$this->checkConnection()) return null;
-        $stmt = $this->db->prepare("SELECT * FROM bans WHERE target=? ORDER BY creation_time DESC;");
-        if(!$stmt) return null;
-        $stmt->bind_param("s", $target);
-        $stmt->execute();
-        if(!$result = $stmt->get_result()) return null;
-        $data = [];
-        while ($row = $result->fetch_assoc()) {
-            $data[] = new Ban($row['target'], $row['moderator'], (int) $row['expiry_time'], (int) $row['pun_id'], (int) $row['id'], (int) $row['creation_time']);
-        }
-        $stmt->close();
-        return $data;
+    public function getBanHistory(string $target, callable $onSuccess, callable $onFailure = null) : void {
+        $this->conn->executeSelect(self::PLAYERBAN_BAN_GET_BANHISTORY, [
+            'target' => $target
+        ], $onSuccess, $onFailure);
     }
 
     /**
+     * The following method should be used instead
+     * @link \tobias14\playerban\forms\BanListForm::getCurrentBansForPage()
+     *
+     * @param callable $onSuccess
+     * @param callable|null $onFailure
      * @param int $page
      * @param int $limit
-     * @return Ban[]|null
+     * @return void
      */
-    public function getCurrentBans(int $page = 0, int $limit = 6) : ?array {
-        if(!$this->checkConnection()) return null;
-        $time = time();
+    public function getCurrentBansForPage(callable $onSuccess, callable $onFailure = null, int $page = 0, int $limit = 6) : void {
         $page *= $limit;
-        $stmt = $this->db->prepare("SELECT * FROM bans WHERE expiry_time > ? ORDER BY creation_time DESC LIMIT ?, ?;");
-        if(!$stmt) return null;
-        $stmt->bind_param("iii", $time, $page, $limit);
-        $stmt->execute();
-        if(false === $result = $stmt->get_result()) return null;
-        $data = [];
-        while ($row = $result->fetch_assoc()) {
-            $data[] = new Ban($row['target'], $row['moderator'], (int) $row['expiry_time'], (int) $row['pun_id'], (int) $row['id'], (int) $row['creation_time']);
-        }
-        $stmt->close();
-        return $data;
+        $this->conn->executeSelect(Queries::PLAYERBAN_BAN_GET_CURRENTBANS, [
+            'timestamp' => time(),
+            'page' => $page,
+            'limit' => $limit
+        ], $onSuccess, $onFailure);
     }
 
     /**
+     * @param callable $onSuccess
+     * @param callable|null $onFailure
      * @param int $limit
-     * @return int|null
+     * @return void
      */
-    public function getMaxBanPage(int $limit = 6) : ?int {
-        if(!$this->checkConnection()) return null;
-        $time = time();
-        $stmt = $this->db->prepare("SELECT COUNT(*) FROM bans WHERE expiry_time > ?;");
-        if(!$stmt) return null;
-        $stmt->bind_param("i", $time);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        if(!$result) return null;
-        $result = $result->fetch_row();
-        if(null === $result) return null;
-        $rowCount = $result[0];
-        $sites = $rowCount / $limit;
-        if(($rowCount % $limit) != 0)
-            $sites += 1;
-        $stmt->close();
-        return (int) floor($sites);
+    public function getCurrentBansCount(callable $onSuccess, callable $onFailure = null, int $limit = 6) : void {
+        $this->conn->executeSelect(Queries::PLAYERBAN_BAN_GET_CURRENTBANS_COUNT, [
+            'timestamp' => time()
+        ], $onSuccess, $onFailure);
     }
 
 }

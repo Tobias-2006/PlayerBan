@@ -39,19 +39,22 @@ class UnbanCommand extends BaseCommand {
             $sender->sendMessage(C::RED . $this->translate("param.incorrect", ["<player|ip>", "max123"]));
             return true;
         }
-        if(!$this->getBanMgr()->isBanned($target)) {
-            $sender->sendMessage(C::RED . $this->translate("target.notBanned", [$target]));
-            return true;
-        }
 
-        if($this->getBanMgr()->remove($target)) {
-            $sender->sendMessage($this->translate("unban.success", [$target]));
-            $log = new Log(Logger::LOG_TYPE_DELETION, $this->translate("logger.ban.deletion"), $sender->getName(), $target);
-            Logger::getLogger()->log($log);
-            return true;
-        }
-
-        $sender->sendMessage(C::RED . $this->translate("error"));
+        $this->getBanMgr()->isBanned($target, function (bool $banned) use ($sender, $target) {
+            if(!$banned) {
+                $sender->sendMessage(C::RED . $this->translate("target.notBanned", [$target]));
+                return;
+            }
+            $this->getBanMgr()->remove($target, function() use ($sender, $target) {
+                $sender->sendMessage($this->translate("unban.success", [$target]));
+                $log = new Log(Logger::LOG_TYPE_DELETION, $this->translate("logger.ban.deletion"), $sender->getName(), $target);
+                Logger::getLogger()->log($log);
+            }, function() use ($sender) {
+                $sender->sendMessage(C::RED . $this->translate('error'));
+            });
+        }, function() use ($sender) {
+            $sender->sendMessage(C::RED . $this->translate('error'));
+        });
         return true;
     }
 

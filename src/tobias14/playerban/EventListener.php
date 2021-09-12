@@ -28,19 +28,31 @@ class EventListener implements Listener {
         $name = $event->getPlayer()->getName();
         $address = $event->getPlayer()->getAddress();
         $banManager = $this->plugin->getBanManager();
-        $target = null;
 
-        if($banManager->isBanned($name))
-            $target = $name;
-        elseif($banManager->isBanned($address))
-            $target = $address;
-        if(is_null($target))
-            return;
-
-        $ban = $banManager->get($target) ?? new Ban('undefined', 'undefined', -1, -1);
-        $expiry = $ban->expiryTime !== -1 ? $this->plugin->formatTime($ban->expiryTime) : 'undefined';
-        $event->setKickMessage($this->plugin->customTranslation($this->kickMessage, ['{expiry}' => $expiry, '{moderator}' => $ban->moderator, '{new_line}' => "\n"]));
-        $event->setCancelled();
+        $banManager->isBanned($name, function(bool $banned) use ($banManager, $name, $address, $event) {
+            $target = null;
+            if($banned) {
+               $target = $name;
+            }
+            $banManager->isBanned($address, function(bool $banned) use ($banManager, $target, $address, $event) {
+               if($banned) {
+                   $target = $address;
+               }
+               if(is_null($target)) {
+                   return;
+               }
+               $banManager->get($target, function(Ban $ban) use ($event) {
+                   $expiry = $this->plugin->formatTime($ban->expiryTime);
+                   $event->setKickMessage($this->plugin->customTranslation($this->kickMessage, ['{expiry}' => $expiry, '{moderator}' => $ban->moderator, '{new_line}' => "\n"]));
+                   $event->setCancelled();
+               }, function () use ($event) {
+                   $ban = new Ban('undefined', 'undefined', -1, -1);
+                   $event->setKickMessage($this->plugin->customTranslation($this->kickMessage, ['{expiry}' => 'undefined', '{moderator}' => $ban->moderator, '{new_line}' => "\n"]));
+                   $event->setCancelled();
+               });
+            });
+        });
+        $this->plugin->getDataManager()->block();
     }
 
 }
